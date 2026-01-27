@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Labeling Stored Documents - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Status Cards */
+        .status-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .status-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .status-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .status-card-header h4 { font-size: 1.05rem; }
+        .status-card-body { padding: 22px; }
+        .status-card ul { list-style: none; padding: 0; }
+        .status-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .status-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Labeling Stored Documents</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Labeling Documents</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Adding Documents</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Labeling Fields</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Document Status</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Modifying Documents</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Expiration Dates</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Byte Labeling Stored Documents</h1>
+                <p class="subtitle">Tips for Storing and Labeling Documents in Byte</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: All Users</span>
+                    <span class="meta-item">Document: RET256/122420</span>
+                    <span class="meta-item">Duration: 2-5 min per document</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Adding a New Document -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Adding a New Document</h2><span>Drag, drop, or print documents to Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Drag & Drop or Print to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Import & Edit Documents Window Opens</div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Pro Tip: Multiple Documents</h4>
+                        <p>When dragging multiple documents, drag into the <strong>Overview Pane</strong> to automatically split documents into separate entries.</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>Purpose of Document Labeling</h4>
+                        <p>Stored Documents is used by various departments during the loan process. Proper labeling ensures efficient file movement, review, and investor package assembly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Labeling Fields -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Labeling Fields</h2><span>Configure Type, Category, and Description</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="summary-grid">
+                        <div class="summary-card"><h4>Document Type</h4><div class="value">Select</div><div class="label">Auto-updates Description</div></div>
+                        <div class="summary-card"><h4>Category</h4><div class="value">INC/ASSET</div><div class="label">Income, Asset, etc.</div></div>
+                        <div class="summary-card"><h4>Description</h4><div class="value">Custom</div><div class="label">Add specific details</div></div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Document Type</th><th>Description Format</th><th>Example</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">W2</strong></td><td>Borrower + Year</td><td>B1 2019 or Francesca 2019</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Paystub</strong></td><td>Borrower + Date</td><td>B1 Paystub 9.18 or Francesca Paystub 9.18</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Bank Statement</strong></td><td>Bank + Acct# + Period</td><td>TD Bank #5541 August or TD Bank 2256 8.1-8.31</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">EMD</strong></td><td>Earnest Money Deposit</td><td>EMD 7/14/20</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">VOE</strong></td><td>Verification + Reference</td><td>Credit Plus VOE Work Number</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Document Labeling Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node input">Select Document Type</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Type Auto-Fills Description</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Update Description with Details</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Document Status -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Document Status</h2><span>Reviewed, Approved, or Inactive</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="status-comparison">
+                        <div class="status-card">
+                            <div class="status-card-header"><h4>Reviewed</h4></div>
+                            <div class="status-card-body">
+                                <ul>
+                                    <li><span class="check-icon">OK</span> Items for Underwriter review</li>
+                                    <li><span class="check-icon">OK</span> Acceptable to remain in file</li>
+                                    <li><span class="check-icon">OK</span> Qualifying documents pending UW approval</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-header" style="background: linear-gradient(135deg, var(--accent-green), #16a34a);"><h4>Approved</h4></div>
+                            <div class="status-card-body">
+                                <ul>
+                                    <li><span class="check-icon">OK</span> Final documents</li>
+                                    <li><span class="check-icon">OK</span> Part of investor package</li>
+                                    <li><span class="check-icon">OK</span> UW has reviewed and accepted</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-header" style="background: linear-gradient(135deg, var(--accent-rose), #dc2626);"><h4>Inactive</h4></div>
+                            <div class="status-card-body">
+                                <ul>
+                                    <li><span class="x-icon">X</span> Expired documents</li>
+                                    <li><span class="x-icon">X</span> Invalid documents</li>
+                                    <li><span class="x-icon">X</span> Incomplete documents</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Important: Approved Status</h4>
+                        <p>Qualifying documents for underwriting review should <strong>NOT</strong> be marked Approved until the Underwriter reviews and accepts them. Marking documents Inactive eliminates them from the investor package.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Status Selection Logic</h3>
+                        <div class="tree-node level-1"><span class="tree-label">Is document final?</span></div>
+                        <div class="tree-node"><span class="tree-label" style="background: var(--accent-green); color: white;">YES</span> -> Mark as <strong style="color: var(--text-primary);">Approved</strong> (investor package)</div>
+                        <div class="tree-node"><span class="tree-label" style="background: var(--accent-amber); color: var(--bg-primary);">NO - Pending UW</span> -> Mark as <strong style="color: var(--text-primary);">Reviewed</strong></div>
+                        <div class="tree-node"><span class="tree-label" style="background: var(--accent-rose); color: white;">NO - Expired/Invalid</span> -> Mark as <strong style="color: var(--text-primary);">Inactive</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Modifying an Existing Document -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Modifying an Existing Document</h2><span>Edit description and properties after initial storage</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Double-Click Document in Stored Documents</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Document Properties Dialog Opens</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow" style="transform: rotate(90deg);">-></span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Edit Description Field</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Update Status if Needed</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Save Changes</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Editable</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">Status</strong></td><td><span class="badge optional-badge">Yes</span></td><td>Change between Reviewed/Approved/Inactive</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Outdated</strong></td><td><span class="badge optional-badge">Yes</span></td><td>Checkbox to flag outdated documents</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Type</strong></td><td><span class="badge optional-badge">Yes</span></td><td>Document type from dropdown</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Category</strong></td><td><span class="badge optional-badge">Yes</span></td><td>INC, ASSET, etc.</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Description</strong></td><td><span class="badge optional-badge">Yes</span></td><td>Custom text field</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Expires</strong></td><td><span class="badge optional-badge">Yes</span></td><td>Set expiration date for tracking</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Format</strong></td><td><span class="badge calculated-badge">Read Only</span></td><td>PDF, etc. (auto-detected)</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Created</strong></td><td><span class="badge calculated-badge">Read Only</span></td><td>Timestamp of initial storage</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: Expiration Dates -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Expiration Dates</h2><span>Track document validity with expiration alerts</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Expiration Date Feature</h4>
+                        <p>Expiration dates can be used for credit or verification items for quick reference. When expiration dates are added to documents, the date shows in Stored Documents and is <strong>highlighted when the date is reached</strong>.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Expiration Tracking Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Document Properties</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Enter Expiration Date</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Date Displays in Stored Docs List</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow" style="transform: rotate(90deg);">-></span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node decision">Date Reached?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow" style="transform: rotate(90deg);">-></span>
+                                <div class="flow-node exception">Document Highlighted</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow" style="transform: rotate(90deg);">-></span>
+                                <div class="flow-node output">Date Displays Normally</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Best Practice: Use Expiration Dates For</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Credit reports (typically 120 days)</li>
+                            <li>Verification of Employment (VOE)</li>
+                            <li>Bank statements (aging requirements)</li>
+                            <li>Appraisals (typically 120-180 days)</li>
+                            <li>Rate locks and commitments</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+ADD DOCUMENT: Drag & Drop or Print to Byte -> Overview Pane (splits multiple docs)
+
+LABELING FORMAT:
+  W2           -> B1 2019 or [Name] 2019
+  Paystub      -> B1 Paystub 9.18 or [Name] Paystub [Date]
+  Bank Stmt    -> [Bank] #[Acct] [Period] (e.g., TD Bank #5541 August)
+  VOE          -> Credit Plus VOE Work Number
+
+STATUS MEANINGS:
+  REVIEWED  -> Pending UW review, acceptable in file
+  APPROVED  -> Final, part of investor package (UW accepted)
+  INACTIVE  -> Expired, invalid, or incomplete (excluded from package)
+
+MODIFY DOCUMENT: Double-click in Stored Documents -> Edit fields -> Save
+
+EXPIRATION DATES:
+  - Use for credit, VOE, time-sensitive items
+  - Highlighted in list view when date is reached
+  - Quick reference for document validity
+
+CATEGORIES: INC (Income), ASSET, and others per document type
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Document Labeling Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">5 Process Steps Analyzed</span>
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 60% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">60%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">90%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-autolabel')" title="Click to view agent details">
+                        <div class="heat-score">95</div>
+                        <div class="heat-name">Auto-Label Agent</div>
+                        <div class="heat-desc">AI document classification and labeling</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>2</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-expiration')" title="Click to view agent details">
+                        <div class="heat-score">82</div>
+                        <div class="heat-name">Expiration Monitor</div>
+                        <div class="heat-desc">Auto-detect and set expiration dates</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>5</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-status')" title="Click to view agent details">
+                        <div class="heat-score">75</div>
+                        <div class="heat-name">Status Recommender</div>
+                        <div class="heat-desc">Suggest appropriate document status</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>3</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-quality')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Quality Checker</div>
+                        <div class="heat-desc">Validate document completeness</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>1</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Auto-Label Agent -->
+                <div class="agent-card" id="agent-autolabel">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">AI</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Auto-Label Agent</div>
+                            <div class="agent-type">Document Classification Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Uses AI/ML to automatically classify incoming documents, extract key information, and populate Type, Category, and Description fields following naming conventions (B1 2019, TD Bank #5541 August, etc.).</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Document Upload</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">OCR Extract</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Classify Type</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Auto-Label</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('autolabel')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Expiration Monitor -->
+                <div class="agent-card" id="agent-expiration">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">EX</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Expiration Monitor Agent</div>
+                            <div class="agent-type">Compliance Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically detects document types requiring expiration tracking (credit reports, VOEs, appraisals), calculates expiration dates based on business rules, and alerts users before documents expire.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Detect Doc Type</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Apply Rules</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Set Expiration</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Monitor & Alert</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-90%</div><div class="agent-stat-label">Expired Docs</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('expiration')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Status Recommender -->
+                <div class="agent-card" id="agent-status">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">ST</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Status Recommender Agent</div>
+                            <div class="agent-type">Decision Support Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Analyzes document context, loan stage, and underwriting status to recommend appropriate document status (Reviewed/Approved/Inactive). Prevents premature Approved status on qualifying documents.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Analyze Context</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check UW Status</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Apply Rules</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Recommend Status</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">30sec</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-95%</div><div class="agent-stat-label">Status Errors</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('status')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Quality Checker -->
+                <div class="agent-card" id="agent-quality">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">QC</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Quality Checker Agent</div>
+                            <div class="agent-type">Validation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Validates uploaded documents for completeness, readability, and investor requirements. Flags illegible scans, missing pages, or documents that don't meet quality standards before they enter the workflow.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Upload</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Quality Analysis</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Completeness Check</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Pass/Flag</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">1min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-80%</div><div class="agent-stat-label">Rework</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('quality')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Labeling Stored Documents - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">X Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Byte Labeling Stored Documents Workflow
+
+## Overview
+Stored Documents is used by various departments during the loan process. For efficiency of file movement and review, documents can easily be labeled when storing and reviewing.
+
+## 1. Adding a New Document
+1. Drag and Drop or print the documents to Byte
+2. Note: When dragging multiple documents, drag into the overview pane to split documents
+3. The Import and Edit Documents window opens
+
+## 2. Labeling Fields
+
+### Document Type
+Select from dropdown - auto-updates Description field
+
+### Description Examples
+| Type | Format | Example |
+|------|--------|---------|
+| W2 | Borrower + Year | B1 2019 or Francesca 2019 |
+| Paystub | Borrower + Date | B1 Paystub 9.18 |
+| Bank Statement | Bank + Acct + Period | TD Bank #5541 August |
+
+## 3. Document Status
+
+### Reviewed
+- Items for Underwriter review
+- Acceptable to remain in file
+- Qualifying documents pending UW approval
+
+### Approved
+- Final documents
+- Part of investor package
+- UW has reviewed and accepted
+
+### Inactive
+- Expired documents
+- Invalid documents
+- Incomplete documents
+
+**Note:** Qualifying documents should NOT be marked Approved until Underwriter reviews and accepts them.
+
+## 4. Modifying Existing Documents
+1. Double-click document in Stored Documents
+2. Edit the Description and other fields
+3. Save changes
+
+## 5. Expiration Dates
+- Use for credit or verification items
+- Date shows in Stored Documents list
+- Highlighted when expiration date is reached
+
+Document: RET256/122420
+See your manager for additional assistance.</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">X Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll spy variables
+        let isScrolling = false;
+        let scrollTimeout = null;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+        // Handle nav item clicks
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                isScrolling = true;
+
+                // Clear any existing timeout
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // Get target section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+
+                if (targetSection) {
+                    // Update active state immediately
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Scroll to section
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+
+                    // Reset isScrolling after 1000ms
+                    scrollTimeout = setTimeout(() => {
+                        isScrolling = false;
+                    }, 1000);
+                }
+            });
+        });
+
+        function updateActiveNav() {
+            // Don't update during programmatic scrolling
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // ====== AGENT PROMPT SYSTEM ======
+        const agentPrompts = {
+            autolabel: {
+                name: 'Auto-Label Agent',
+                tags: ['Document Classification', 'OCR', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically classifies incoming documents using AI/OCR, extracts key information (borrower names, dates, account numbers), and populates the Type, Category, and Description fields following CMG naming conventions.`,
+                prompt: `You are building a Document Classification Agent for CMG Financial's Byte LOS Stored Documents system.
+
+AGENT NAME: Auto-Label Agent
+TYPE: Document Classification / OCR Processing
+
+OBJECTIVE:
+Create an agent that automatically classifies and labels incoming documents when they are uploaded to Byte, reducing manual data entry and ensuring consistent naming conventions.
+
+INPUT DATA:
+1. Document file (PDF, image)
+2. Loan context (borrower names, loan number)
+
+CLASSIFICATION RULES:
+Document Type Detection:
+- W2 Forms: Look for "Wage and Tax Statement", Box numbers
+- Paystubs: Look for "Pay Period", "Gross Pay", "Net Pay"
+- Bank Statements: Look for bank logos, "Account Summary", "Statement Period"
+- Credit Reports: Look for "Credit Score", bureau names
+- VOE: Look for "Verification of Employment"
+- EMD: Look for "Earnest Money", deposit receipt patterns
+
+DESCRIPTION FORMAT BY TYPE:
+Type        | Format                  | Example
+------------|-------------------------|-------------------------
+W2          | [Borrower] [Year]       | B1 2019, Francesca 2019
+Paystub     | [Borrower] Paystub [Date] | B1 Paystub 9.18
+Bank Stmt   | [Bank] #[Acct] [Period] | TD Bank #5541 August
+VOE         | [Provider] VOE [Ref]    | Credit Plus VOE Work Number
+EMD         | EMD [Date]              | EMD 7/14/20
+
+CATEGORY MAPPING:
+- Income docs (W2, Paystub, VOE) -> INC
+- Asset docs (Bank Statements) -> ASSET
+- Title docs -> TITLE
+- Credit docs -> CREDIT
+
+OUTPUT FORMAT:
+{
+  "documentType": "Pay Stub",
+  "category": "INC",
+  "description": "B1 Paystub 9.18",
+  "confidence": 0.95,
+  "extractedData": {
+    "borrowerName": "Francesca",
+    "date": "2020-09-18",
+    "employer": "ABC Company"
+  }
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Document Upload Hook
+   - Trigger on file upload to Stored Documents
+   - Process before Import dialog displays
+   - Pre-fill fields with recommendations
+
+2. OCR Service
+   - AWS Textract, Google Vision, or Azure Form Recognizer
+   - Extract text and structured data
+   - Handle multi-page documents
+
+3. Machine Learning Model
+   - Train on historical labeled documents
+   - Continuous learning from corrections
+   - Confidence threshold for manual review
+
+4. User Interface
+   - Show confidence score
+   - Allow one-click accept or manual override
+   - Learn from user corrections`
+            },
+            expiration: {
+                name: 'Expiration Monitor Agent',
+                tags: ['Compliance', 'Monitoring', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically detects document types that require expiration tracking, calculates appropriate expiration dates based on business rules, sets them in Byte, and sends proactive alerts before documents expire.`,
+                prompt: `You are building a Compliance Monitoring Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Expiration Monitor Agent
+TYPE: Compliance Monitoring / Alert System
+
+OBJECTIVE:
+Automatically track document expiration dates and alert users before time-sensitive documents become invalid, ensuring loan files maintain compliance throughout the process.
+
+EXPIRATION RULES BY DOCUMENT TYPE:
+Document Type     | Expiration Period | Calculation Base
+------------------|-------------------|------------------
+Credit Report     | 120 days          | From pull date
+VOE               | 90 days           | From verification date
+Bank Statement    | 90 days           | From statement end date
+Appraisal         | 120-180 days      | From appraisal date
+Pay Stubs         | 60 days           | From pay period end
+Tax Returns       | Calendar year     | April 15 of following year
+Rate Lock         | Per lock period   | From lock date
+
+DETECTION LOGIC:
+1. On document classification (from Auto-Label Agent)
+2. Extract relevant dates from document
+3. Apply expiration rule
+4. Set Expires field in Byte
+5. Create monitoring entry
+
+ALERT SCHEDULE:
+Days Before Expiration | Alert Type
+-----------------------|------------
+30 days                | Email notification
+14 days                | Dashboard warning
+7 days                 | Urgent alert + email
+0 days                 | Document flagged EXPIRED
+
+ALERT MESSAGE FORMAT:
+"EXPIRATION ALERT: [Document Type] for [Borrower] expires in [X] days.
+Loan: [Loan Number]
+Document: [Description]
+Expires: [Date]
+Action Required: [Recommendation]"
+
+OUTPUT FORMAT:
+{
+  "documentId": "DOC-12345",
+  "expirationDate": "2026-05-15",
+  "daysRemaining": 30,
+  "alertLevel": "warning",
+  "recommendedAction": "Order updated credit report"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Stored Documents Integration
+   - Set Expires field automatically
+   - Monitor existing documents
+   - Highlight expired docs in list view
+
+2. Notification System
+   - Email via SendGrid/internal mail
+   - Dashboard notifications
+   - Optional SMS for critical alerts
+
+3. Scheduler Service
+   - Daily scan of all active loans
+   - Calculate days to expiration
+   - Trigger appropriate alerts
+
+4. Reporting
+   - Expiration report by processor
+   - Compliance dashboard
+   - Audit trail of alerts sent`
+            },
+            status: {
+                name: 'Status Recommender Agent',
+                tags: ['Decision Support', 'Workflow', 'Low Complexity', 'High Priority'],
+                purpose: `This agent analyzes document context, loan stage, and underwriting decisions to recommend the appropriate document status (Reviewed/Approved/Inactive), preventing premature Approved status on qualifying documents.`,
+                prompt: `You are building a Decision Support Agent for CMG Financial's Byte LOS document status management.
+
+AGENT NAME: Status Recommender Agent
+TYPE: Decision Support / Workflow Automation
+
+OBJECTIVE:
+Recommend the appropriate document status based on document type, loan stage, and underwriting review status, ensuring documents are not prematurely marked Approved.
+
+STATUS DEFINITIONS:
+REVIEWED:
+- Documents pending Underwriter review
+- Acceptable to remain in file
+- Default for qualifying documents
+
+APPROVED:
+- Final documents accepted by UW
+- Part of investor package
+- Only after explicit UW sign-off
+
+INACTIVE:
+- Expired documents
+- Superseded versions
+- Invalid/incomplete documents
+
+DECISION LOGIC:
+
+IF document is qualifying (income, asset, credit):
+  IF UW has signed off on this specific document:
+    RECOMMEND: Approved
+  ELSE:
+    RECOMMEND: Reviewed
+    WARNING: "Qualifying documents should not be Approved until UW reviews"
+
+IF document is administrative (disclosures, checklists):
+  IF properly executed:
+    RECOMMEND: Approved
+  ELSE:
+    RECOMMEND: Reviewed
+
+IF document has been superseded by newer version:
+  RECOMMEND: Inactive
+  NOTE: "Newer version [X] exists in file"
+
+IF document is expired:
+  RECOMMEND: Inactive
+  NOTE: "Document expired on [date]"
+
+QUALIFYING DOCUMENT TYPES:
+- W2, Paystubs, Tax Returns (Income)
+- Bank Statements, Asset Statements
+- Credit Reports
+- VOE, VOD
+- Appraisal
+
+CONTEXT SIGNALS:
+- Loan status (Processing, Submitted, Approved, etc.)
+- UW condition sign-off dates
+- Document age and expiration
+- Presence of superseding documents
+
+OUTPUT:
+{
+  "recommendedStatus": "Reviewed",
+  "confidence": 0.92,
+  "reasoning": "Qualifying income document pending UW review",
+  "warnings": ["Do not mark Approved until UW accepts"],
+  "alternativeStatuses": [
+    {"status": "Approved", "condition": "After UW sign-off"},
+    {"status": "Inactive", "condition": "If superseded"}
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Document Import
+   - Pre-fill Status based on recommendation
+   - Show warning if Approved selected prematurely
+
+2. Loan Status Monitoring
+   - Track UW decisions and sign-offs
+   - Update recommendations as loan progresses
+
+3. Bulk Status Update
+   - When UW clears conditions, suggest bulk Approved
+   - Identify documents ready for status change
+
+4. Audit & Compliance
+   - Log all status recommendations
+   - Track overrides for QC review`
+            },
+            quality: {
+                name: 'Quality Checker Agent',
+                tags: ['Validation', 'Image Processing', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent validates uploaded documents for quality, completeness, and investor requirements. It flags illegible scans, missing pages, or documents that don't meet standards before they enter the workflow.`,
+                prompt: `You are building a Validation Agent for CMG Financial's Byte LOS document quality assurance.
+
+AGENT NAME: Quality Checker Agent
+TYPE: Document Validation / Image Processing
+
+OBJECTIVE:
+Validate incoming documents for quality and completeness before they are stored, reducing rework and investor stipulations due to poor document quality.
+
+QUALITY CHECKS:
+
+1. IMAGE QUALITY
+   - Resolution: Minimum 200 DPI
+   - Readability: OCR confidence > 85%
+   - Orientation: Auto-detect and flag rotation issues
+   - Contrast: Sufficient for all text visible
+
+2. COMPLETENESS CHECKS BY TYPE
+   Document Type    | Required Elements
+   -----------------|-------------------
+   W2               | All boxes visible, both copies if applicable
+   Bank Statement   | All pages present, account number visible
+   Paystub          | YTD visible, pay period dates clear
+   Credit Report    | All 3 bureaus, complete tradelines
+   Appraisal        | All addenda present, photos included
+
+3. COMPLIANCE CHECKS
+   - PII properly handled (no over-redaction)
+   - Signatures present where required
+   - Dates legible and consistent
+
+4. INVESTOR REQUIREMENTS
+   - Check specific investor stacking order
+   - Verify required stamps/certifications
+   - Confirm acceptable formats
+
+QUALITY SCORES:
+Score | Rating    | Action
+------|-----------|--------
+90-100| Excellent | Auto-accept
+75-89 | Good      | Accept with note
+50-74 | Fair      | Warning, may need rescan
+0-49  | Poor      | Reject, request new document
+
+OUTPUT FORMAT:
+{
+  "qualityScore": 85,
+  "rating": "Good",
+  "action": "Accept",
+  "issues": [
+    {
+      "type": "warning",
+      "description": "Page 2 slightly skewed",
+      "severity": "minor"
+    }
+  ],
+  "completenessCheck": {
+    "passed": true,
+    "missingElements": []
+  },
+  "recommendations": ["Consider rescanning page 2 for optimal quality"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Upload Processing
+   - Intercept before storage
+   - Display quality report
+   - Allow proceed or request rescan
+
+2. Image Processing Service
+   - OpenCV for image analysis
+   - Tesseract/Cloud OCR for text extraction
+   - Resolution and contrast detection
+
+3. Completeness Database
+   - Document templates by type
+   - Investor-specific requirements
+   - Learning from QC feedback
+
+4. User Feedback Loop
+   - Track which documents get rejected at QC
+   - Improve detection based on patterns
+   - Report common quality issues to source`
+            }
+        };
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = `${agent.name} - Build Prompt`;
+
+            const tagsHtml = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = `# ${agent.name}\n\n## Purpose\n${agent.purpose}\n\n## Build Prompt\n${agent.prompt}\n\n## Integration Points\n${agent.integration}`;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
