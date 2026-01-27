@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Loans - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-card: #1a2234; --accent-blue: #3b82f6; --accent-teal: #14b8a6; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-green: #22c55e; --accent-purple: #8b5cf6; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b; --border-subtle: rgba(255,255,255,0.08); --sidebar-width: 280px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; } html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; border: 1px solid var(--border-subtle); }
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+        .sidebar { position: fixed; top: 54px; left: 0; width: var(--sidebar-width); height: calc(100vh - 54px); background: var(--bg-secondary); overflow-y: auto; z-index: 1000; border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-tab { flex: 1; padding: 14px 10px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; background: none; border-left: none; border-right: none; border-top: none; }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--text-secondary); text-decoration: none; border-left: 3px solid transparent; transition: all 0.2s ease; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+        .nav-number { background: rgba(255,255,255,0.1); color: var(--text-secondary); width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2); }
+        .doc-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.95rem; }
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+        .tab-panel { display: none; } .tab-panel.active { display: block; }
+        .header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%); pointer-events: none; }
+        .header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+        .header .meta-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .legend { display: flex; flex-wrap: wrap; gap: 15px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 25px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+        .section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin-bottom: 25px; overflow: hidden; scroll-margin-top: 75px; }
+        .section-header { background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%); border-bottom: 1px solid var(--border-subtle); padding: 22px 25px; display: flex; align-items: center; gap: 18px; }
+        .section-number { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; }
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+        .workflow-diagram { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; margin-bottom: 22px; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+        .flow-node { padding: 14px 22px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 600; min-width: 150px; }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; }
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .field-table th { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 14px 18px; text-align: left; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); }
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+        .tip-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; }
+        .tip-box p { color: var(--text-secondary); }
+        .info-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; }
+        .info-box p { color: var(--text-secondary); }
+        .quick-ref { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%); border: 1px solid var(--border-subtle); padding: 28px; border-radius: 16px; margin-top: 30px; }
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); overflow-x: auto; }
+        .agent-header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .agent-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .agent-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .agent-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .agent-summary-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 25px; text-align: center; }
+        .agent-summary-value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+        .heat-legend { display: flex; gap: 25px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .heat-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: transform 0.2s; cursor: pointer; }
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-score { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; font-weight: 800; }
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); }
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; transition: transform 0.2s; scroll-margin-top: 75px; }
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        .agent-card.highlight { animation: highlightPulse 2s ease; }
+        @keyframes highlightPulse { 0% { box-shadow: 0 0 0 3px var(--accent-purple); } 50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5); } 100% { box-shadow: none; } }
+        .agent-card-header { padding: 22px; display: flex; align-items: flex-start; gap: 18px; border-bottom: 1px solid var(--border-subtle); }
+        .agent-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; }
+        .agent-priority { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-flow { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; }
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .agent-step { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .agent-stat { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; text-align: center; }
+        .agent-stat-value { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+        .agent-prompt-btn { width: 100%; margin-top: 18px; padding: 14px 20px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 10px; color: var(--accent-purple); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; }
+        .modal-btn.copy { background: white; color: var(--accent-purple); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; }
+        .prompt-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .copy-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+        @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 75px 20px 30px 20px; } .agent-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏦 CLEAR 2.0</a>
+        <span class="separator">›</span>
+        <span class="current">💼 Opportunity Loans</span>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>💼 Opportunity Loans</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active"><span class="nav-number">1</span><span class="nav-label">Overview</span></a>
+            <a href="#section-2" class="nav-item"><span class="nav-number">2</span><span class="nav-label">Create Opportunity</span></a>
+            <a href="#section-3" class="nav-item"><span class="nav-number">3</span><span class="nav-label">Manage Pipeline</span></a>
+            <a href="#section-4" class="nav-item"><span class="nav-number">4</span><span class="nav-label">Convert to Loan</span></a>
+        </nav>
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active"><span class="nav-number">📊</span><span class="nav-label">Summary</span></a>
+            <a href="#agent-heatmap" class="nav-item"><span class="nav-number">🔥</span><span class="nav-label">Heat Map</span></a>
+            <a href="#agent-details" class="nav-item"><span class="nav-number">🤖</span><span class="nav-label">Agent Details</span></a>
+        </nav>
+        <div class="sidebar-footer"><a href="./index.html" class="doc-btn">← Back to CLEAR Index</a></div>
+    </aside>
+
+    <main class="main-content">
+        <div id="workflow-panel" class="tab-panel active">
+            <div class="header">
+                <h1>💼 Opportunity Loans in CLEAR 2.0</h1>
+                <p class="subtitle">Complete workflow for pre-application opportunity tracking and conversion</p>
+                <div class="meta">
+                    <span class="meta-item">🏢 System: CLEAR 2.0</span>
+                    <span class="meta-item">👤 Role: Loan Officer</span>
+                    <span class="meta-item">📅 Updated: Jan 2026</span>
+                    <span class="meta-item">⏱️ Duration: 2-5 min</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Opportunity Loans Overview</h2>
+                        <span>Pre-application lead tracking in CLEAR</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">New Lead</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Create Opportunity</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Nurture Lead</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Convert to Loan</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>💼 What is an Opportunity Loan?</h4>
+                        <p>Opportunity loans are pre-application records used to track potential borrowers before they formally apply. This allows LOs to manage their pipeline, track communications, and convert leads to applications when ready.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Feature</th><th>Opportunity</th><th>Full Application</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Credit Pull</strong></td><td>Optional/Soft pull</td><td>Hard pull required</td></tr>
+                            <tr><td><strong>Disclosures</strong></td><td>Not required</td><td>TRID required</td></tr>
+                            <tr><td><strong>Pipeline View</strong></td><td>Separate opportunity view</td><td>Main pipeline</td></tr>
+                            <tr><td><strong>Data Required</strong></td><td>Minimal (name, contact)</td><td>Full 1003</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Create New Opportunity</h2>
+                        <span>Adding leads to your opportunity pipeline</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">New Loan Menu</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Select Opportunity</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Enter Basic Info</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Save</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Field</th><th>Required</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>First Name</strong></td><td>Yes</td><td>Borrower first name</td></tr>
+                            <tr><td><strong>Last Name</strong></td><td>Yes</td><td>Borrower last name</td></tr>
+                            <tr><td><strong>Email</strong></td><td>Yes</td><td>Primary contact email</td></tr>
+                            <tr><td><strong>Phone</strong></td><td>Recommended</td><td>Best contact number</td></tr>
+                            <tr><td><strong>Loan Purpose</strong></td><td>Recommended</td><td>Purchase, Refi, etc.</td></tr>
+                            <tr><td><strong>Est. Loan Amount</strong></td><td>Optional</td><td>Helps with pipeline planning</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>💡 Pro Tip: Add Notes Early</h4>
+                        <p>Document how the lead came in (referral source, website, etc.) and any initial conversation details. This helps when you follow up later.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Manage Opportunity Pipeline</h2>
+                        <span>Track and nurture your leads</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Meaning</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--accent-blue);">New</strong></td><td>Just entered, not contacted</td><td>Initial outreach</td></tr>
+                            <tr><td><strong style="color: var(--accent-amber);">Working</strong></td><td>In active communication</td><td>Continue nurturing</td></tr>
+                            <tr><td><strong style="color: var(--accent-green);">Ready</strong></td><td>Ready to apply</td><td>Convert to loan</td></tr>
+                            <tr><td><strong style="color: var(--accent-rose);">Lost</strong></td><td>Went elsewhere/not interested</td><td>Mark closed</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>📊 Pipeline Best Practices</h4>
+                        <p>Review your opportunity pipeline weekly. Set follow-up tasks for each active opportunity and update statuses promptly to maintain accurate pipeline reporting.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title">
+                        <h2>Convert to Full Application</h2>
+                        <span>Moving from opportunity to active loan</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Borrower Ready</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Open Opportunity</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Click Convert</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Full Loan Created</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>🔄 What Happens on Conversion</h4>
+                        <p>When you convert an opportunity:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-secondary);">
+                            <li>All existing data transfers to the new loan</li>
+                            <li>A new loan number is assigned</li>
+                            <li>The opportunity record is linked to the loan</li>
+                            <li>TRID timelines begin (if application is complete)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="quick-ref" class="quick-ref">
+                <h3>⚡ Quick Reference Card</h3>
+                <pre>
+╔══════════════════════════════════════════════════════════════════╗
+║               OPPORTUNITY LOANS QUICK GUIDE                      ║
+╠══════════════════════════════════════════════════════════════════╣
+║  CREATE: New Loan → Opportunity Type                             ║
+║                                                                  ║
+║  MINIMUM REQUIRED:                                               ║
+║  • First Name                                                    ║
+║  • Last Name                                                     ║
+║  • Email Address                                                 ║
+║                                                                  ║
+║  STATUS FLOW:                                                    ║
+║  New → Working → Ready → Convert to Loan                         ║
+║       ↓                                                          ║
+║      Lost (if not converting)                                    ║
+║                                                                  ║
+║  CONVERSION:                                                     ║
+║  Open Opportunity → Actions → Convert to Loan                    ║
+║  All data transfers to new loan file                             ║
+║                                                                  ║
+║  PRO TIP: Review pipeline weekly, update statuses regularly      ║
+╚══════════════════════════════════════════════════════════════════╝
+                </pre>
+            </section>
+        </div>
+
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Opportunity Loans Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">🤖 2 Agent Candidates Identified</span>
+                    <span class="meta-item">⏱️ Est. 50% Time Savings</span>
+                </div>
+            </div>
+
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card"><div class="agent-summary-value">2</div><div class="agent-summary-label">Agent Candidates</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">1</div><div class="agent-summary-label">Critical Priority</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">50%</div><div class="agent-summary-label">Time Savings</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">75%</div><div class="agent-summary-label">Automation Potential</div></div>
+            </div>
+
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong></span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong></span></div>
+            </div>
+
+            <div class="heat-map-container">
+                <div class="heat-map-title">🔥 Automation Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-lead-nurture')">
+                        <div class="heat-score">94</div>
+                        <div class="heat-name">Lead Nurture Agent</div>
+                        <div class="heat-desc">Auto-follow up with leads</div>
+                        <div class="heat-metrics"><div class="heat-metric">Volume: <span>High</span></div><div class="heat-metric">Impact: <span>Conversion</span></div></div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-conversion-predictor')">
+                        <div class="heat-score">81</div>
+                        <div class="heat-name">Conversion Predictor</div>
+                        <div class="heat-desc">Score lead readiness</div>
+                        <div class="heat-metrics"><div class="heat-metric">Volume: <span>High</span></div><div class="heat-metric">Impact: <span>Efficiency</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 25px; color: var(--text-primary);" id="agent-details">🤖 Agent Details</h2>
+            <div class="agent-grid">
+                <div class="agent-card" id="agent-lead-nurture">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📧</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Lead Nurture Agent</div>
+                            <div class="agent-type">Communication Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically sends personalized follow-up communications to opportunity leads based on their status, engagement, and time since last contact.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Workflow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Monitor Status</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Check Timeline</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Draft Message</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Send/Queue</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">94</div><div class="agent-stat-label">Priority</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">55%</div><div class="agent-stat-label">Time Save</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">High</div><div class="agent-stat-label">ROI</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('lead-nurture')">✨ View AI Build Prompt</button>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-conversion-predictor">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📊</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Conversion Predictor</div>
+                            <div class="agent-type">Analysis Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Scores opportunity leads based on engagement patterns, data completeness, and historical conversion factors to help LOs prioritize their pipeline.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Workflow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Analyze Lead</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Score Factors</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Predict Timing</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Prioritize List</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">81</div><div class="agent-stat-label">Priority</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">40%</div><div class="agent-stat-label">Time Save</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">High</div><div class="agent-stat-label">ROI</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('conversion-predictor')">✨ View AI Build Prompt</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy</button>
+                    <button class="modal-btn close" onclick="closeModal()">✕ Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section"><h4>🎯 Purpose</h4><div class="prompt-box" id="promptPurpose"></div></div>
+                <div class="prompt-section"><h4>📝 Full Build Prompt</h4><div class="prompt-box" id="promptFull"></div></div>
+                <div class="prompt-section"><h4>🔗 Integration Points</h4><div class="prompt-box" id="promptIntegration"></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="copy-success" id="copySuccess">✓ Copied to clipboard!</div>
+
+    <script>
+        const agentPrompts = {
+            'lead-nurture': {
+                title: 'Lead Nurture Agent',
+                tags: ['Communication', 'Automation', 'Lead Management', 'Email'],
+                purpose: 'Automatically nurture opportunity leads with personalized, timely follow-up communications to improve conversion rates.',
+                fullPrompt: `You are a Lead Nurture Agent for CMG Financial's Loan Officers.
+
+ROLE: Automatically send personalized follow-up communications to opportunity leads.
+
+TRIGGER RULES:
+- New lead: Send welcome email within 1 hour
+- No response after 3 days: Send follow-up #1
+- No response after 7 days: Send follow-up #2 (different angle)
+- No response after 14 days: Send "still interested?" message
+- After positive response: Send next steps information
+
+MESSAGE PERSONALIZATION:
+- Use borrower's first name
+- Reference loan purpose if known
+- Include LO's name and contact info
+- Vary message content to avoid repetition
+- Match tone to lead source (referral vs web lead)
+
+CONTENT TYPES:
+1. Welcome/Introduction
+2. Rate update (if rates changed significantly)
+3. Educational content (buying process, refi benefits)
+4. Soft check-in
+5. Time-sensitive offers
+
+ESCALATION:
+- After 30 days no response: Reduce frequency to monthly
+- After 90 days: Move to long-term nurture track
+- Hot lead signals: Alert LO immediately`,
+                integration: `Integration Points:
+• CLEAR 2.0 Opportunity Pipeline
+• Email/SMS Communication System
+• LO Calendar for task creation
+• Rate Watch Service (for rate alerts)
+• Lead Source Tracking
+
+Metrics Tracked:
+• Open rates by message type
+• Response rates
+• Time to conversion
+• Lead engagement score`
+            },
+            'conversion-predictor': {
+                title: 'Conversion Predictor',
+                tags: ['Analytics', 'Scoring', 'Pipeline Management', 'Prioritization'],
+                purpose: 'Score and prioritize opportunity leads based on conversion likelihood to help LOs focus on highest-potential prospects.',
+                fullPrompt: `You are a Conversion Predictor Agent for CMG Financial.
+
+ROLE: Score opportunity leads and predict conversion likelihood.
+
+SCORING FACTORS (weighted):
+
+ENGAGEMENT (40%):
+- Email open rate: High/Med/Low
+- Response time: <24hr = High, 1-3 days = Med, >3 days = Low
+- Information requests: More = Higher score
+- Website visits (if tracked)
+
+DATA COMPLETENESS (25%):
+- Full contact info: +10 points
+- Loan purpose specified: +5 points
+- Property address known: +10 points
+- Estimated loan amount: +5 points
+
+TIMING INDICATORS (20%):
+- Pre-approval requested: +15 points
+- Specific timeline mentioned: +10 points
+- Rate lock question asked: +10 points
+
+LEAD SOURCE (15%):
+- Referral: +15 points (highest conversion)
+- Repeat customer: +12 points
+- Partner/Builder: +10 points
+- Website organic: +5 points
+- Paid lead: +3 points
+
+OUTPUT:
+{
+  "lead_score": 78,
+  "conversion_likelihood": "High",
+  "estimated_timeline": "30-60 days",
+  "recommended_action": "Schedule call this week",
+  "priority_rank": 3
+}`,
+                integration: `Integration Points:
+• CLEAR 2.0 Opportunity Data
+• Communication History
+• Website Analytics (if available)
+• Lead Source Tracking
+• LO Dashboard/Pipeline View
+
+Output Uses:
+• Daily prioritized lead list
+• Pipeline forecast reporting
+• Resource allocation recommendations
+• Lead assignment optimization`
+            }
+        };
+
+        let currentPrompt = '';
+        function switchTab(tab) { document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.getElementById(tab + '-panel').classList.add('active'); document.getElementById('workflow-nav').style.display = tab === 'workflow' ? 'block' : 'none'; document.getElementById('agents-nav').style.display = tab === 'agents' ? 'block' : 'none'; }
+        function scrollToAgent(agentId) { const card = document.getElementById(agentId); if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('highlight'); setTimeout(() => card.classList.remove('highlight'), 2000); } }
+        function openPromptModal(agentKey) { const agent = agentPrompts[agentKey]; document.getElementById('modalTitle').textContent = '✨ ' + agent.title + ' - Build Prompt'; document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join(''); document.getElementById('promptPurpose').textContent = agent.purpose; document.getElementById('promptFull').textContent = agent.fullPrompt; document.getElementById('promptIntegration').textContent = agent.integration; currentPrompt = agent.fullPrompt; document.getElementById('promptModal').classList.add('show'); document.body.style.overflow = 'hidden'; }
+        function closeModal() { document.getElementById('promptModal').classList.remove('show'); document.body.style.overflow = ''; }
+        async function copyPrompt() { try { await navigator.clipboard.writeText(currentPrompt); document.getElementById('copySuccess').style.display = 'block'; setTimeout(() => document.getElementById('copySuccess').style.display = 'none', 2000); } catch (e) { alert('Failed to copy'); } }
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); }); });
+    </script>
+</body>
+</html>

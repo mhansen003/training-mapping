@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandbox - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-card: #1a2234; --accent-blue: #3b82f6; --accent-teal: #14b8a6; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-green: #22c55e; --accent-purple: #8b5cf6; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b; --border-subtle: rgba(255,255,255,0.08); --sidebar-width: 280px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; } html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; border: 1px solid var(--border-subtle); }
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+        .sidebar { position: fixed; top: 54px; left: 0; width: var(--sidebar-width); height: calc(100vh - 54px); background: var(--bg-secondary); overflow-y: auto; z-index: 1000; border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-tab { flex: 1; padding: 14px 10px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; background: none; border-left: none; border-right: none; border-top: none; }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--text-secondary); text-decoration: none; border-left: 3px solid transparent; transition: all 0.2s ease; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+        .nav-number { background: rgba(255,255,255,0.1); color: var(--text-secondary); width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2); }
+        .doc-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.95rem; }
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+        .tab-panel { display: none; } .tab-panel.active { display: block; }
+        .header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%); pointer-events: none; }
+        .header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+        .header .meta-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin-bottom: 25px; overflow: hidden; scroll-margin-top: 75px; }
+        .section-header { background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%); border-bottom: 1px solid var(--border-subtle); padding: 22px 25px; display: flex; align-items: center; gap: 18px; }
+        .section-number { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; }
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+        .workflow-diagram { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; margin-bottom: 22px; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+        .flow-node { padding: 14px 22px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 600; min-width: 150px; }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; }
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .field-table th { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 14px 18px; text-align: left; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid var(--border-subtle); }
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+        .tip-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; }
+        .tip-box p { color: var(--text-secondary); }
+        .info-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; }
+        .info-box p { color: var(--text-secondary); }
+        .exception-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; }
+        .exception-box p { color: var(--text-secondary); }
+        .quick-ref { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%); border: 1px solid var(--border-subtle); padding: 28px; border-radius: 16px; margin-top: 30px; }
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); overflow-x: auto; }
+        .agent-header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .agent-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .agent-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .agent-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .agent-summary-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 25px; text-align: center; }
+        .agent-summary-value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+        .info-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 30px; text-align: center; margin-top: 30px; }
+        .info-card h3 { color: var(--text-muted); margin-bottom: 10px; }
+        .info-card p { color: var(--text-secondary); }
+        @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 75px 20px 30px 20px; } }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏦 CLEAR 2.0</a>
+        <span class="separator">›</span>
+        <span class="current">🧪 Sandbox</span>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🧪 Sandbox</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active"><span class="nav-number">1</span><span class="nav-label">Overview</span></a>
+            <a href="#section-2" class="nav-item"><span class="nav-number">2</span><span class="nav-label">Access Sandbox</span></a>
+            <a href="#section-3" class="nav-item"><span class="nav-number">3</span><span class="nav-label">Best Practices</span></a>
+        </nav>
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active"><span class="nav-number">📊</span><span class="nav-label">Summary</span></a>
+        </nav>
+        <div class="sidebar-footer"><a href="./index.html" class="doc-btn">← Back to CLEAR Index</a></div>
+    </aside>
+
+    <main class="main-content">
+        <div id="workflow-panel" class="tab-panel active">
+            <div class="header">
+                <h1>🧪 Sandbox Environment in CLEAR 2.0</h1>
+                <p class="subtitle">Testing environment for training and experimentation</p>
+                <div class="meta">
+                    <span class="meta-item">🏢 System: CLEAR 2.0</span>
+                    <span class="meta-item">👤 Role: All Users</span>
+                    <span class="meta-item">📅 Updated: Jan 2026</span>
+                    <span class="meta-item">⏱️ Duration: N/A</span>
+                </div>
+            </div>
+
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Sandbox Overview</h2>
+                        <span>Understanding the test environment</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>🧪 What is the Sandbox?</h4>
+                        <p>The Sandbox is a separate CLEAR 2.0 environment identical to production but used exclusively for training, testing, and experimentation. Changes made here do not affect real loans or data.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Feature</th><th>Sandbox</th><th>Production</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Data</strong></td><td>Test/sample data only</td><td>Real borrower data</td></tr>
+                            <tr><td><strong>Services</strong></td><td>Simulated responses</td><td>Live vendor connections</td></tr>
+                            <tr><td><strong>Impact</strong></td><td>No real-world effect</td><td>Affects actual loans</td></tr>
+                            <tr><td><strong>Access</strong></td><td>All users (with credentials)</td><td>Role-based access</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>💡 When to Use Sandbox</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-secondary);">
+                            <li>Learning new CLEAR features</li>
+                            <li>Practicing workflows before going live</li>
+                            <li>Testing scenarios without risk</li>
+                            <li>Training new team members</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Accessing the Sandbox</h2>
+                        <span>How to log into the test environment</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Open Browser</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Go to Sandbox URL</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Enter Credentials</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Sandbox Ready</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Item</th><th>Details</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>URL</strong></td><td>sandbox.clear.cmgfi.com (example)</td></tr>
+                            <tr><td><strong>Username</strong></td><td>Same as production + "_sandbox" suffix</td></tr>
+                            <tr><td><strong>Password</strong></td><td>Provided by IT/Training team</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>⚠️ Important: Know Your Environment</h4>
+                        <p>Always verify you're in the Sandbox before testing. Look for visual indicators (banner, different color scheme) that distinguish Sandbox from Production.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Sandbox Best Practices</h2>
+                        <span>Getting the most from the test environment</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Practice</th><th>Why It Matters</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Use test SSNs</strong></td><td>Sandbox has designated test SSN ranges</td></tr>
+                            <tr><td><strong>Create realistic scenarios</strong></td><td>Better preparation for production</td></tr>
+                            <tr><td><strong>Clean up after testing</strong></td><td>Keeps sandbox organized</td></tr>
+                            <tr><td><strong>Document findings</strong></td><td>Share learnings with team</td></tr>
+                            <tr><td><strong>Report issues</strong></td><td>Help improve the environment</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>🎯 Pro Tips</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-secondary);">
+                            <li>Bookmark the Sandbox URL separately from Production</li>
+                            <li>Use different browser or incognito for Sandbox sessions</li>
+                            <li>Take screenshots of successful workflows for reference</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="quick-ref" class="quick-ref">
+                <h3>⚡ Quick Reference Card</h3>
+                <pre>
+╔══════════════════════════════════════════════════════════════════╗
+║                    SANDBOX QUICK GUIDE                           ║
+╠══════════════════════════════════════════════════════════════════╣
+║  PURPOSE: Training & testing without production impact           ║
+║                                                                  ║
+║  ACCESS:                                                         ║
+║  • URL: sandbox.clear.cmgfi.com                                  ║
+║  • Credentials: Contact IT/Training                              ║
+║                                                                  ║
+║  BEST PRACTICES:                                                 ║
+║  ✓ Use designated test SSNs                                      ║
+║  ✓ Verify environment before starting                            ║
+║  ✓ Create realistic test scenarios                               ║
+║  ✓ Document learnings                                            ║
+║                                                                  ║
+║  REMEMBER: Sandbox = Safe to experiment!                         ║
+╚══════════════════════════════════════════════════════════════════╝
+                </pre>
+            </section>
+        </div>
+
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Sandbox Workflow</p>
+            </div>
+
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card"><div class="agent-summary-value">0</div><div class="agent-summary-label">Agent Candidates</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">N/A</div><div class="agent-summary-label">Time Savings</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">Low</div><div class="agent-summary-label">Automation Potential</div></div>
+            </div>
+
+            <div class="info-card">
+                <h3>Limited Automation Opportunity</h3>
+                <p>The Sandbox is a testing environment with minimal automation potential. Its primary value is for manual exploration and learning. Consider AI agents for production workflows instead.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tab) { document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.getElementById(tab + '-panel').classList.add('active'); document.getElementById('workflow-nav').style.display = tab === 'workflow' ? 'block' : 'none'; document.getElementById('agents-nav').style.display = tab === 'agents' ? 'block' : 'none'; }
+        document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); }); });
+    </script>
+</body>
+</html>
