@@ -612,6 +612,126 @@
 
         .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
 
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Heat Map Clickable */
+        .heat-item {
+            cursor: pointer;
+        }
+
+        .heat-item:active {
+            transform: scale(0.98);
+        }
+
+        /* Agent Card Highlight Animation */
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        /* AI Prompt Modal */
+        .prompt-modal .modal {
+            max-width: 800px;
+        }
+
+        .prompt-modal .modal-header {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+        }
+
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-box .highlight-text {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .prompt-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .prompt-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        }
+
         /* Summary Stats */
         .agent-summary {
             display: grid;
@@ -824,7 +944,7 @@
 
         <div class="sidebar-footer">
             <button class="doc-btn" onclick="openDocModal()">
-                📄 View Full Documentation
+                📄 View Workflow Markdown
             </button>
         </div>
     </aside>
@@ -1046,9 +1166,9 @@ PRO TIPS:
 
             <!-- Heat Map Grid -->
             <div class="heat-map-container">
-                <div class="heat-map-title">🔥 Automation Priority Heat Map</div>
+                <div class="heat-map-title">🔥 Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
                 <div class="heat-map-grid">
-                    <div class="heat-item critical">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-autopopulate')" title="Click to view agent details">
                         <div class="heat-score">95</div>
                         <div class="heat-name">Scenario Auto-Populate</div>
                         <div class="heat-desc">Pre-fill scenarios from CRM lead data</div>
@@ -1058,7 +1178,7 @@ PRO TIPS:
                             <div class="heat-metric">Step: <span>1</span></div>
                         </div>
                     </div>
-                    <div class="heat-item high">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-mi')" title="Click to view agent details">
                         <div class="heat-score">82</div>
                         <div class="heat-name">MI Auto-Select</div>
                         <div class="heat-desc">Recommend optimal MI based on profile</div>
@@ -1068,7 +1188,7 @@ PRO TIPS:
                             <div class="heat-metric">Step: <span>3</span></div>
                         </div>
                     </div>
-                    <div class="heat-item high">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-product')" title="Click to view agent details">
                         <div class="heat-score">78</div>
                         <div class="heat-name">Product Recommender</div>
                         <div class="heat-desc">AI-driven product selection</div>
@@ -1078,7 +1198,7 @@ PRO TIPS:
                             <div class="heat-metric">Step: <span>4</span></div>
                         </div>
                     </div>
-                    <div class="heat-item medium">
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-rate')" title="Click to view agent details">
                         <div class="heat-score">65</div>
                         <div class="heat-name">Rate Alert Monitor</div>
                         <div class="heat-desc">Notify when saved scenarios improve</div>
@@ -1088,7 +1208,7 @@ PRO TIPS:
                             <div class="heat-metric">Step: <span>6</span></div>
                         </div>
                     </div>
-                    <div class="heat-item medium">
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-compare')" title="Click to view agent details">
                         <div class="heat-score">58</div>
                         <div class="heat-name">Scenario Comparator</div>
                         <div class="heat-desc">Auto-generate comparison reports</div>
@@ -1105,8 +1225,8 @@ PRO TIPS:
             <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">🤖 Agent Specifications</h2>
 
             <div class="agent-grid">
-                <!-- Agent 1 -->
-                <div class="agent-card">
+                <!-- Agent 1: Scenario Auto-Populate -->
+                <div class="agent-card" id="agent-autopopulate">
                     <div class="agent-card-header">
                         <div class="agent-icon">📥</div>
                         <div class="agent-info">
@@ -1134,11 +1254,14 @@ PRO TIPS:
                             <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
                             <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('autopopulate')">
+                            ✨ View AI Prompt to Build This Agent
+                        </button>
                     </div>
                 </div>
 
-                <!-- Agent 2 -->
-                <div class="agent-card">
+                <!-- Agent 2: MI Optimization -->
+                <div class="agent-card" id="agent-mi">
                     <div class="agent-card-header">
                         <div class="agent-icon">🛡️</div>
                         <div class="agent-info">
@@ -1166,11 +1289,14 @@ PRO TIPS:
                             <div class="agent-stat"><div class="agent-stat-value">$200</div><div class="agent-stat-label">Avg Savings</div></div>
                             <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('mi')">
+                            ✨ View AI Prompt to Build This Agent
+                        </button>
                     </div>
                 </div>
 
-                <!-- Agent 3 -->
-                <div class="agent-card">
+                <!-- Agent 3: Smart Product Recommender -->
+                <div class="agent-card" id="agent-product">
                     <div class="agent-card-header">
                         <div class="agent-icon">📦</div>
                         <div class="agent-info">
@@ -1198,11 +1324,14 @@ PRO TIPS:
                             <div class="agent-stat"><div class="agent-stat-value">+15%</div><div class="agent-stat-label">Conversion</div></div>
                             <div class="agent-stat"><div class="agent-stat-value">High</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('product')">
+                            ✨ View AI Prompt to Build This Agent
+                        </button>
                     </div>
                 </div>
 
-                <!-- Agent 4 -->
-                <div class="agent-card">
+                <!-- Agent 4: Rate Alert Monitor -->
+                <div class="agent-card" id="agent-rate">
                     <div class="agent-card-header">
                         <div class="agent-icon">🔔</div>
                         <div class="agent-info">
@@ -1230,11 +1359,14 @@ PRO TIPS:
                             <div class="agent-stat"><div class="agent-stat-value">+8%</div><div class="agent-stat-label">Lock Rate</div></div>
                             <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('rate')">
+                            ✨ View AI Prompt to Build This Agent
+                        </button>
                     </div>
                 </div>
 
-                <!-- Agent 5 -->
-                <div class="agent-card">
+                <!-- Agent 5: Scenario Comparison Report -->
+                <div class="agent-card" id="agent-compare">
                     <div class="agent-card-header">
                         <div class="agent-icon">📊</div>
                         <div class="agent-info">
@@ -1262,6 +1394,9 @@ PRO TIPS:
                             <div class="agent-stat"><div class="agent-stat-value">Pro</div><div class="agent-stat-label">Output</div></div>
                             <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('compare')">
+                            ✨ View AI Prompt to Build This Agent
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1272,7 +1407,7 @@ PRO TIPS:
     <div class="modal-overlay" id="docModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>📄 Scenario Pricing Documentation</h3>
+                <h3>📄 Scenario Pricing - Workflow Markdown</h3>
                 <div class="modal-actions">
                     <button class="modal-btn copy" onclick="copyToClipboard()">📋 Copy</button>
                     <button class="modal-btn close" onclick="closeDocModal()">✕ Close</button>
@@ -1285,6 +1420,34 @@ PRO TIPS:
     </div>
 
     <div class="copy-success" id="copySuccess">✓ Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">✨ AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">📋 Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">✕ Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>🎯 Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>📝 Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔧 Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Tab switching
@@ -1362,6 +1525,552 @@ PRO TIPS:
         document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
 
         document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // ====== AGENT PROMPT SYSTEM ======
+        const agentPrompts = {
+            autopopulate: {
+                name: 'Scenario Auto-Populate Agent',
+                tags: ['Data Integration', 'CRM', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically pre-fills Scenario Pricing fields by extracting data from CRM lead records, reducing manual entry from 3+ minutes to seconds while eliminating transcription errors.`,
+                prompt: `You are building a Data Integration Agent for CMG Financial's CLEAR 2.0 Scenario Pricing system.
+
+AGENT NAME: Scenario Auto-Populate Agent
+TYPE: Data Integration / Form Pre-fill
+
+OBJECTIVE:
+Create an agent that monitors for new lead records in the CRM (Salesforce/Velocify) and automatically populates Scenario Pricing fields when a Loan Officer opens a pricing session.
+
+INPUT DATA SOURCES:
+1. CRM Lead Record (Salesforce/Velocify)
+   - Contact: First Name, Last Name, Email, Phone
+   - Property: Address, City, State, Zip Code
+   - Loan Intent: Purchase Price, Down Payment %, Loan Purpose
+   - Credit: Estimated FICO (if provided)
+
+2. Previous Borrower History (if returning client)
+   - Last known FICO
+   - Previous loan products
+   - Preferred communication method
+
+FIELD MAPPING:
+CRM Field → Scenario Pricing Field
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+lead.lastName → Applicant Last Name [REQUIRED]
+lead.propertyPrice → Purchase Price [REQUIRED]
+lead.estimatedFico → FICO [REQUIRED]
+lead.propertyZip → Zip Code [REQUIRED]
+(calculate) → DTI [REQUIRED - prompt if missing]
+lead.loanPurpose → Loan Purpose
+lead.propertyType → Property Type
+lead.occupancy → Occupancy Type
+
+VALIDATION RULES:
+- FICO must be 300-850; if outside range, flag for manual entry
+- Zip Code must be 5 digits and valid US zip
+- Purchase Price must be > $50,000
+- If any REQUIRED field is missing, highlight it in the UI
+
+OUTPUT FORMAT:
+Return a JSON object with:
+{
+  "autoFilled": { field: value, ... },
+  "flagged": [ { field, reason }, ... ],
+  "confidence": 0.0-1.0,
+  "source": "CRM Lead #12345"
+}
+
+ERROR HANDLING:
+- If CRM connection fails: Show manual entry mode with cached suggestions
+- If lead not found: Allow manual entry, offer to save as new lead
+- If data conflicts exist: Present both values, let LO choose`,
+                integration: `INTEGRATION POINTS:
+1. CRM API (Salesforce REST API / Velocify API)
+   - Webhook trigger on lead assignment
+   - Real-time lead lookup by ID or email
+
+2. CLEAR 2.0 Frontend
+   - Inject auto-fill values via browser extension or embedded iframe
+   - Add "Auto-Populate" button to Scenario Pricing toolbar
+
+3. Data Storage
+   - Cache recent lead lookups (5 min TTL)
+   - Log all auto-fills for audit trail
+
+DEPLOYMENT:
+- Chrome Extension for LO workstations
+- Or: CLEAR API integration (if available)
+- Or: RPA bot using UI automation`
+            },
+            mi: {
+                name: 'MI Optimization Agent',
+                tags: ['Decision Support', 'Cost Analysis', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent analyzes borrower profiles and recommends the optimal Mortgage Insurance configuration, comparing BestX automated quotes against manual MI factors to identify cost savings opportunities.`,
+                prompt: `You are building a Decision Support Agent for CMG Financial's CLEAR 2.0 Scenario Pricing system.
+
+AGENT NAME: MI Optimization Agent
+TYPE: Decision Support / Cost Analysis
+
+OBJECTIVE:
+Create an agent that analyzes the borrower's scenario and recommends the optimal Mortgage Insurance (MI) configuration, explaining the trade-offs between BestX (automated) and Manual MI entry.
+
+INPUT PARAMETERS:
+1. Loan Scenario Data
+   - Loan Amount
+   - LTV (Loan-to-Value ratio)
+   - FICO Score
+   - DTI (Debt-to-Income ratio)
+   - Property Type
+   - Occupancy Type
+   - Loan Purpose (Purchase/Refi/Cash-Out)
+
+2. MI Provider Rates (from BestX)
+   - MGIC, Radian, Essent, National MI, Genworth, Arch
+   - Monthly vs Single Premium options
+   - Borrower-Paid vs Lender-Paid
+
+DECISION LOGIC:
+
+┌─────────────────────────────────────────────┐
+│ IF Loan Type = Conventional AND LTV > 80%   │
+│ THEN Private MI Required                     │
+├─────────────────────────────────────────────┤
+│ IF using Scenario Optimizer feature         │
+│ THEN must use Manual MI (BestX incompatible)│
+├─────────────────────────────────────────────┤
+│ IF FICO >= 760 AND LTV <= 85%              │
+│ THEN BestX likely optimal (competitive bids)│
+├─────────────────────────────────────────────┤
+│ IF FICO < 700 OR LTV > 95%                 │
+│ THEN Manual MI may find better niche rates  │
+└─────────────────────────────────────────────┘
+
+RECOMMENDATION OUTPUT:
+{
+  "recommendation": "BestX" | "Manual MI",
+  "reasoning": "string explaining why",
+  "bestProvider": "Provider Name",
+  "monthlyPremium": 0.00,
+  "annualSavings": 0.00,
+  "alternatives": [
+    { "provider": "...", "premium": 0.00, "note": "..." }
+  ],
+  "warnings": ["string if any restrictions apply"]
+}
+
+COST COMPARISON FORMAT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Provider     │ Monthly   │ Annual    │ Note
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MGIC         │ $185      │ $2,220    │ Best rate
+Radian       │ $192      │ $2,304    │
+Essent       │ $188      │ $2,256    │
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Savings vs worst option: $200/year`,
+                integration: `INTEGRATION POINTS:
+1. BestX MI API
+   - Real-time quote requests
+   - Parse response for all provider rates
+
+2. CLEAR 2.0 MI Selection Screen
+   - Add "Get AI Recommendation" button
+   - Display recommendation card with reasoning
+   - One-click apply suggested configuration
+
+3. Historical Data
+   - Track which recommendations were accepted
+   - Learn from LO overrides to improve suggestions
+
+TECHNICAL REQUIREMENTS:
+- Response time < 3 seconds
+- Cache MI rates for 15 minutes
+- Support offline mode with last-known rates`
+            },
+            product: {
+                name: 'Smart Product Recommender',
+                tags: ['ML Classification', 'Product Matching', 'High Complexity', 'High Priority'],
+                purpose: `This agent uses machine learning to analyze borrower scenarios and recommend the top 3 most suitable loan products based on eligibility, pricing competitiveness, and historical conversion rates.`,
+                prompt: `You are building an ML Classification Agent for CMG Financial's CLEAR 2.0 Scenario Pricing system.
+
+AGENT NAME: Smart Product Recommender
+TYPE: ML Classification / Product Matching
+
+OBJECTIVE:
+Create an agent that analyzes the borrower scenario and recommends the top 3 loan products most likely to close, considering eligibility rules, pricing competitiveness, and historical success rates.
+
+INPUT FEATURES:
+1. Borrower Profile
+   - FICO Score (300-850)
+   - DTI Ratio (0-65%)
+   - Employment Type (W2, Self-Employed, Retired)
+   - Income Documentation (Full Doc, Bank Statements, Asset Depletion)
+
+2. Property Details
+   - Property Type (SFR, Condo, Multi-Unit, etc.)
+   - Occupancy (Primary, Second Home, Investment)
+   - Location (State, County, Urban/Rural)
+
+3. Loan Parameters
+   - Loan Amount
+   - LTV
+   - Loan Purpose
+   - Desired Rate Type (Fixed, ARM)
+
+PRODUCT CATEGORIES TO CONSIDER:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Category        │ Products
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Conventional    │ Conforming, High Balance, Jumbo
+Government      │ FHA, VA, USDA
+Specialty       │ HomeReady, Home Possible
+Affordable      │ Community Lending, DPA Programs
+Non-QM          │ Bank Statement, DSCR, Asset Qual
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ML MODEL APPROACH:
+1. ELIGIBILITY FILTER (Rules Engine)
+   - Hard requirements (LTV limits, FICO minimums)
+   - Geographic restrictions
+   - Investor overlays
+
+2. SCORING MODEL (Gradient Boosted Trees)
+   Features weighted by:
+   - Historical close rate for similar profiles
+   - Current pricing competitiveness
+   - Processing complexity (faster = higher score)
+   - Borrower preference signals
+
+3. RANKING OUTPUT
+   Return top 3 with confidence scores:
+
+{
+  "recommendations": [
+    {
+      "rank": 1,
+      "product": "Conventional 30-Year Fixed",
+      "confidence": 0.89,
+      "rate_estimate": "6.25%",
+      "why": "Best rate for your FICO; standard processing",
+      "close_probability": 0.78
+    },
+    {
+      "rank": 2,
+      "product": "FHA 30-Year Fixed",
+      "confidence": 0.72,
+      "rate_estimate": "5.875%",
+      "why": "Lower rate but MIP adds cost; good backup",
+      "close_probability": 0.65
+    },
+    {
+      "rank": 3,
+      "product": "HomeReady",
+      "confidence": 0.68,
+      "rate_estimate": "6.125%",
+      "why": "Income qualifies; reduced MI; explore if budget-conscious",
+      "close_probability": 0.61
+    }
+  ],
+  "excluded": [
+    { "product": "VA", "reason": "Borrower not eligible (no COE)" },
+    { "product": "USDA", "reason": "Property not in eligible area" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. CLEAR 2.0 Product Selection Grid
+   - Add "AI Recommend" button above product list
+   - Highlight recommended products with badges
+   - Show confidence % and reasoning on hover
+
+2. ML Model Infrastructure
+   - Train on 24 months of closed loan data
+   - Retrain monthly with new conversion data
+   - A/B test recommendations vs LO selections
+
+3. Feedback Loop
+   - Track which recommendations were selected
+   - Track which loans actually closed
+   - Adjust model weights based on outcomes
+
+TRAINING DATA REQUIRED:
+- 50,000+ historical scenarios with outcomes
+- Product selected vs products eligible
+- Days to close, fallout reasons`
+            },
+            rate: {
+                name: 'Rate Alert Monitor',
+                tags: ['Monitoring', 'Notifications', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent continuously monitors saved scenarios against live rate feeds and alerts Loan Officers when a saved scenario would now qualify for better pricing or when rates hit their target thresholds.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's CLEAR 2.0 Scenario Pricing system.
+
+AGENT NAME: Rate Alert Monitor
+TYPE: Real-time Monitoring / Push Notifications
+
+OBJECTIVE:
+Create an agent that monitors saved scenarios against current rate sheets and sends alerts when pricing improves, helping LOs lock at optimal times and re-engage prospects.
+
+MONITORING TRIGGERS:
+
+1. RATE IMPROVEMENT ALERT
+   Trigger when:
+   - Saved scenario rate drops by >= 0.125%
+   - Or monthly payment decreases by >= $25
+
+   Alert Message:
+   "🔔 Rate Alert: [Borrower Name]'s scenario now qualifies for 6.25%
+   (was 6.5%). Monthly payment reduced by $45. [View Scenario] [Lock Now]"
+
+2. TARGET RATE HIT
+   Trigger when:
+   - LO sets a target rate for a scenario
+   - Current rates hit or beat that target
+
+   Alert Message:
+   "🎯 Target Hit: Rates just dropped to 6.125% - your target for
+   [Borrower Name] was 6.25%. [Lock Now] [Update Target]"
+
+3. RATE TREND WARNING
+   Trigger when:
+   - Rates increase 0.25%+ in 24 hours
+   - Saved scenarios may lose eligibility
+
+   Alert Message:
+   "⚠️ Rates Rising: 3 of your saved scenarios may see higher rates
+   tomorrow if not locked today. [Review All]"
+
+SCENARIO TRACKING DATA:
+{
+  "scenarioId": "SP-2026-001234",
+  "borrowerName": "John Smith",
+  "savedRate": 6.500,
+  "savedDate": "2026-01-15",
+  "targetRate": 6.250,
+  "loanAmount": 450000,
+  "productType": "Conv 30 Fixed",
+  "loUserId": "LO-5678",
+  "alertPreferences": {
+    "rateImprovement": true,
+    "targetHit": true,
+    "trendWarning": true,
+    "channels": ["email", "sms", "push"]
+  }
+}
+
+RATE COMPARISON LOGIC:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Saved Rate │ Current Rate │ Action
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6.500%     │ 6.250%       │ ALERT: 0.25% improvement!
+6.500%     │ 6.500%       │ No change - continue monitoring
+6.500%     │ 6.625%       │ INFO: Rates up, consider locking
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTIFICATION CHANNELS:
+- Email (immediate + daily digest)
+- SMS (critical alerts only)
+- Push notification (mobile app)
+- CLEAR dashboard notification bell`,
+                integration: `INTEGRATION POINTS:
+1. Rate Feed Subscription
+   - Connect to CMG rate sheet API
+   - Poll every 5 minutes during market hours
+   - Subscribe to real-time webhooks if available
+
+2. Saved Scenarios Database
+   - Access CLEAR saved scenarios store
+   - Index by product type for efficient comparison
+   - Track alert history to prevent spam
+
+3. Notification Services
+   - SendGrid/Mailgun for email
+   - Twilio for SMS
+   - Firebase for push notifications
+
+4. LO Preferences
+   - Alert frequency settings (immediate/hourly/daily)
+   - Quiet hours configuration
+   - Channel preferences per alert type
+
+SCALABILITY:
+- Support 100,000+ saved scenarios
+- Process rate updates within 60 seconds
+- Rate limit: max 10 alerts/LO/day`
+            },
+            compare: {
+                name: 'Scenario Comparison Report',
+                tags: ['Reporting', 'PDF Generation', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent generates professional, borrower-ready PDF comparison reports showing side-by-side analysis of multiple loan scenarios with payment breakdowns and personalized recommendations.`,
+                prompt: `You are building a Reporting Agent for CMG Financial's CLEAR 2.0 Scenario Pricing system.
+
+AGENT NAME: Scenario Comparison Report Generator
+TYPE: Document Generation / PDF Builder
+
+OBJECTIVE:
+Create an agent that generates professional, branded PDF reports comparing multiple loan scenarios side-by-side, suitable for sharing with borrowers to help them make informed decisions.
+
+REPORT SECTIONS:
+
+1. COVER PAGE
+   - CMG Financial logo and branding
+   - "Personalized Loan Comparison"
+   - Prepared for: [Borrower Name]
+   - Prepared by: [LO Name, NMLS#, Contact]
+   - Date generated
+
+2. EXECUTIVE SUMMARY
+   - Recommended option with 1-sentence rationale
+   - Key comparison: lowest payment vs lowest total cost
+   - "Based on your goals of [X], we recommend Option [Y]"
+
+3. SIDE-BY-SIDE COMPARISON TABLE
+   ┌─────────────────┬──────────────┬──────────────┬──────────────┐
+   │ Feature         │ Option A     │ Option B     │ Option C     │
+   ├─────────────────┼──────────────┼──────────────┼──────────────┤
+   │ Product         │ Conv 30-Yr   │ FHA 30-Yr    │ Conv 15-Yr   │
+   │ Interest Rate   │ 6.250%       │ 5.875%       │ 5.750%       │
+   │ APR             │ 6.412%       │ 6.892%       │ 5.823%       │
+   │ Monthly P&I     │ $2,469       │ $2,364       │ $3,254       │
+   │ Monthly MI      │ $0           │ $312         │ $0           │
+   │ Total Payment   │ $2,469       │ $2,676       │ $3,254       │
+   │ Cash to Close   │ $95,000      │ $65,000      │ $95,000      │
+   │ Total Interest  │ $489,240     │ $498,040     │ $185,720     │
+   └─────────────────┴──────────────┴──────────────┴──────────────┘
+
+4. DETAILED BREAKDOWN (per option)
+   - Monthly payment waterfall chart
+   - Amortization schedule (first 5 years)
+   - Cash to close itemization
+   - Total cost over 5/10/30 years
+
+5. RECOMMENDATION & NEXT STEPS
+   - AI-generated recommendation based on borrower profile
+   - Clear call to action: "Ready to proceed? Call [LO] at [phone]"
+   - QR code linking to online application
+
+INPUT DATA REQUIRED:
+{
+  "borrower": {
+    "name": "John & Jane Smith",
+    "email": "jsmith@email.com"
+  },
+  "scenarios": [
+    {
+      "id": "scenario-1",
+      "product": "Conventional 30-Year Fixed",
+      "rate": 6.250,
+      "loanAmount": 400000,
+      "propertyValue": 500000,
+      // ... full scenario data
+    },
+    // ... additional scenarios (max 4)
+  ],
+  "loanOfficer": {
+    "name": "Sarah Johnson",
+    "nmls": "123456",
+    "phone": "(555) 123-4567",
+    "email": "sjohnson@cmgfi.com",
+    "photo": "base64 or URL"
+  },
+  "borrowerGoal": "lowest_monthly_payment" | "lowest_total_cost" | "fastest_payoff"
+}`,
+                integration: `INTEGRATION POINTS:
+1. PDF Generation Library
+   - Use Puppeteer/Playwright for HTML-to-PDF
+   - Or: React-PDF for component-based generation
+   - Ensure print-quality resolution (300 DPI)
+
+2. CLEAR 2.0 Integration
+   - "Generate Report" button on comparison screen
+   - Pre-select scenarios to include
+   - Email/download options
+
+3. Template System
+   - HTML/CSS template with CMG branding
+   - Dynamic data binding
+   - Responsive for letter/A4 sizes
+
+4. Delivery Options
+   - Download PDF immediately
+   - Email to borrower (with tracking)
+   - Save to loan file/CRM
+   - Generate shareable link (expires in 30 days)
+
+OUTPUT:
+- PDF file (8-12 pages)
+- Filename: "Loan-Comparison-[BorrowerName]-[Date].pdf"
+- File size target: < 2MB`
+            }
+        };
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                // Remove any existing highlights
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                // Scroll to the agent card
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Add highlight animation
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                // Remove highlight after animation
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            // Set modal title
+            document.getElementById('promptModalTitle').textContent = `✨ ${agent.name} - Build Prompt`;
+
+            // Set tags
+            const tagsHtml = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            // Set content sections
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            // Store for copy function
+            currentPromptContent = `# ${agent.name}\n\n## Purpose\n${agent.purpose}\n\n## Build Prompt\n${agent.prompt}\n\n## Integration Points\n${agent.integration}`;
+
+            // Show modal
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        // Close prompt modal on escape or outside click
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
     </script>
 </body>
 </html>
