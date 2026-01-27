@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Truv Order - Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+        .layout { display: flex; padding-top: 54px; }
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); height: calc(100vh - 54px); position: fixed; top: 54px; left: 0; overflow-y: auto; padding: 20px 0; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 15px; }
+        .sidebar-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .workflow-name { font-size: 1.1rem; font-weight: 700; }
+        .nav-section { padding: 0 12px; margin-bottom: 20px; }
+        .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: rgba(139, 92, 246, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .nav-item .step-num { width: 22px; height: 22px; background: var(--bg-card); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .nav-item.active .step-num { background: var(--accent-purple); color: white; }
+        .main-content { flex: 1; margin-left: 280px; padding: 30px 40px; max-width: calc(100% - 280px); }
+        .workflow-header { margin-bottom: 35px; }
+        .workflow-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-rose) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .workflow-meta { display: flex; gap: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .workflow-meta span { display: flex; align-items: center; gap: 6px; }
+        .workflow-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 30px; margin-bottom: 25px; }
+        .workflow-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .section-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-rose) 0%, var(--accent-amber) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .step-list { display: flex; flex-direction: column; gap: 16px; }
+        .step-item { display: flex; gap: 16px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-subtle); }
+        .step-number { width: 32px; height: 32px; background: var(--accent-rose); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+        .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+        .callout { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; padding: 18px 22px; margin-top: 20px; }
+        .callout-title { font-weight: 700; color: var(--accent-rose); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+        .info-callout { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); }
+        .info-callout .callout-title { color: var(--accent-purple); }
+        .success-callout { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); }
+        .success-callout .callout-title { color: var(--accent-green); }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">✅ Truv</a>
+        <span class="separator">›</span>
+        <span class="current">Cancel an Order</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Workflow</div>
+                <div class="workflow-name">Cancel Truv Order</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Sections</div>
+                <a class="nav-item active" href="#when"><span class="step-num">1</span> When to Cancel</a>
+                <a class="nav-item" href="#steps"><span class="step-num">2</span> Cancellation Steps</a>
+                <a class="nav-item" href="#confirmation"><span class="step-num">3</span> Confirmation</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="workflow-header">
+                <h1>Cancel Truv Order</h1>
+                <div class="workflow-meta">
+                    <span>📅 Updated: October 2025</span>
+                    <span>⏱️ ~2 min to complete</span>
+                    <span>👤 LO / PA / Processor</span>
+                </div>
+            </div>
+
+            <section class="workflow-section" id="when">
+                <h2><span class="section-icon">❓</span> When to Cancel</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Cancel a Truv order when you need to stop borrower notifications and invitations. Common reasons include:</p>
+                <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.8;">
+                    <li>Borrower requests to stop text/email notifications</li>
+                    <li>Order was placed in error</li>
+                    <li>Loan was withdrawn or cancelled</li>
+                    <li>Using alternative verification method instead</li>
+                    <li>Wrong borrower or employer was selected</li>
+                </ul>
+                <div class="callout">
+                    <div class="callout-title">⚠️ Important</div>
+                    <p>Orders can ONLY be cancelled through the Truv SSO website. They cannot be cancelled directly within CLEAR or Byte.</p>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="steps">
+                <h2><span class="section-icon">🛑</span> Cancellation Steps</h2>
+                <div class="step-list">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Access Truv via SSO</h3>
+                            <p>Open Single Sign-On (SSO) dashboard. Find <strong>Truv</strong> in Organizational Apps and click to open.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Navigate to Orders</h3>
+                            <p>In the Truv left navigation menu, click <strong>Activity → Orders</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Search for the Order</h3>
+                            <p>Use the search bar to find the order by borrower name, email, phone, employer, order ID, or loan number.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Open Actions Menu</h3>
+                            <p>Click the <strong>3 ellipses (⋮)</strong> on the right end of the order row to open the Actions menu.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Click Cancel Order</h3>
+                            <p>Select <strong>Cancel order</strong> from the Actions dropdown menu.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h3>Confirm Cancellation</h3>
+                            <p>A confirmation dialog appears: "Are you sure you want to cancel this order? User will not be able to open the link." Click <strong>Cancel order</strong> button to confirm.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="confirmation">
+                <h2><span class="section-icon">✅</span> Confirmation</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">After cancellation, you will receive a confirmation email with the following details:</p>
+
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <p style="font-weight: 700; margin-bottom: 15px; color: var(--text-primary);">📧 Cancellation Email Contents:</p>
+                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Name:</strong> Borrower's full name</li>
+                        <li><strong>Email:</strong> Borrower's email address</li>
+                        <li><strong>Product Type:</strong> Income and Employment</li>
+                        <li><strong>Employer(s):</strong> Selected employer(s)</li>
+                        <li><strong>Status:</strong> Canceled</li>
+                    </ul>
+                </div>
+
+                <div class="callout success-callout">
+                    <div class="callout-title">✅ What Happens After Cancellation</div>
+                    <p>• The borrower will no longer receive invitation emails or text messages<br>
+                    • The borrower cannot use any previously sent verification links<br>
+                    • The order status changes to "Canceled" in the Truv dashboard<br>
+                    • You can place a new order if needed</p>
+                </div>
+
+                <div class="callout info-callout" style="margin-top: 15px;">
+                    <div class="callout-title">💡 Note</div>
+                    <p>If you need to change order details (different borrower, employer, or contact info), cancel the existing order first, then create a new order with the correct information in CLEAR or Byte.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

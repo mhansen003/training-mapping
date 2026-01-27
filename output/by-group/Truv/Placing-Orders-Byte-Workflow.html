@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placing Truv Orders in Byte - Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+
+        .layout { display: flex; padding-top: 54px; }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            height: calc(100vh - 54px);
+            position: fixed;
+            top: 54px;
+            left: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .workflow-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav-section { padding: 0 12px; margin-bottom: 20px; }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(139, 92, 246, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+        .nav-item .step-num {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .nav-item.active .step-num { background: var(--accent-purple); color: white; }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+            max-width: calc(100% - 280px);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover { background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); }
+        .tab-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .workflow-header { margin-bottom: 35px; }
+
+        .workflow-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .workflow-meta {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .workflow-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .workflow-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .workflow-section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .step-list { display: flex; flex-direction: column; gap: 16px; }
+
+        .step-item {
+            display: flex;
+            gap: 16px;
+            padding: 18px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-purple);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .callout {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-top: 20px;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+        .warning-callout { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .warning-callout .callout-title { color: var(--accent-amber); }
+
+        /* Coverage Legend */
+        .coverage-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .coverage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .coverage-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+        .coverage-badge.high { background: #22c55e; color: white; }
+        .coverage-badge.low { background: #eab308; color: #1a1a1a; }
+        .coverage-badge.not-verified { background: #6b7280; color: white; }
+        .coverage-badge.not-supported { background: #ef4444; color: white; }
+        .coverage-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
+        /* AI Agents */
+        .heat-map-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .heat-map-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .heat-map-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .heat-map-item:hover { transform: translateY(-2px); border-color: var(--accent-purple); }
+        .heat-map-item .agent-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+        .heat-map-item .score-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+        .heat-map-item .score-fill { height: 100%; border-radius: 3px; }
+        .heat-map-item .score-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .agent-card.highlight { animation: highlightPulse 2s ease-out; }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.5); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 92, 246, 0.2); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+
+        .agent-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .agent-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .agent-score { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%); padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
+        .agent-description { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+        .agent-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .detail-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; }
+        .detail-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px; }
+        .detail-value { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+
+        .view-prompt-btn {
+            margin-top: 18px;
+            padding: 12px 20px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .view-prompt-btn:hover { background: rgba(139, 92, 246, 0.25); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 { font-size: 1.2rem; font-weight: 700; }
+
+        .modal-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .modal-body { padding: 25px; overflow-y: auto; }
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section:last-child { margin-bottom: 0; }
+        .prompt-section h4 { font-size: 0.9rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .prompt-content { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">✅ Truv</a>
+        <span class="separator">›</span>
+        <span class="current">Placing Orders in Byte</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Workflow</div>
+                <div class="workflow-name">Placing Truv Orders in Byte</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Sections</div>
+                <a class="nav-item active" href="#access"><span class="step-num">1</span> Access VOE Truv Screen</a>
+                <a class="nav-item" href="#order-info"><span class="step-num">2</span> Order Information</a>
+                <a class="nav-item" href="#coverage"><span class="step-num">3</span> Coverage Check</a>
+                <a class="nav-item" href="#submit"><span class="step-num">4</span> Submit & Manage</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
+                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
+            </div>
+
+            <div id="workflow-panel" class="tab-panel active">
+                <div class="workflow-header">
+                    <h1>Placing Truv Orders in Byte</h1>
+                    <div class="workflow-meta">
+                        <span>📅 Updated: November 2025</span>
+                        <span>⏱️ ~5 min to complete</span>
+                        <span>👤 LO / PA / Processor</span>
+                    </div>
+                </div>
+
+                <section class="workflow-section" id="access">
+                    <h2><span class="section-icon">🔐</span> Access VOE Truv Screen</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Open the Loan in Byte</h3>
+                                <p>Navigate to the loan file in Byte LOS.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Access VOE Truv Screen</h3>
+                                <p>Go to <strong>Verifications → VOE Truv</strong> in the screen menu. Note: Do NOT use the standard Verifications screen/tool for Truv orders.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout warning-callout">
+                        <div class="callout-title">⚠️ Important - Always Use LOS</div>
+                        <p>As of 7/17/2025, reports should NOT be ordered directly via the CMG SSO menu. Orders placed via SSO will require manual Reference ID entry and won't autoflow to AUS screens or doc manager.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="order-info">
+                    <h2><span class="section-icon">📝</span> Order Information</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Select Application & Borrower</h3>
+                                <p>Use the dropdown menus to select the application and borrower for the VOE order.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Verify Auto-Populated Info</h3>
+                                <p>Borrower information auto-populates from the URLA. Verify First Name, Last Name, Mobile, Email, and SSN. Updates save back to URLA.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Configure SMS (Optional)</h3>
+                                <p>Toggle <strong>Add SMS</strong> to enable text message invitations. Orders with Email + Mobile complete approximately 2x faster.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <div class="callout-title">📱 SMS Note</div>
+                        <p>If your borrower does not want to receive text messages, do not click Add SMS in the New VOE Order. They will receive email-only invitations.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="coverage">
+                    <h2><span class="section-icon">🔍</span> Coverage Check</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Select Employer/Provider</h3>
+                                <p>Select "Yes" under <strong>Specify Employers/Providers in the Order</strong>, then search for the borrower's employer.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Review Coverage Indicator</h3>
+                                <p>Check the color-coded coverage indicator before selecting. Proceed only if coverage is High, Low, or Not Verified (contact borrower for payroll provider info).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="coverage-legend">
+                        <div class="coverage-item">
+                            <span class="coverage-badge high">High</span>
+                            <span class="coverage-desc">Expected to succeed - send order</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge low">Low</span>
+                            <span class="coverage-desc">May succeed if borrower knows payroll provider</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge not-verified">Not Verified</span>
+                            <span class="coverage-desc">Ask borrower about payroll provider</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge not-supported">Not Supported</span>
+                            <span class="coverage-desc">Use alternative verification method</span>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <div class="callout-title">💡 Multiple Employers</div>
+                        <p>You can add additional employers as needed. For previous employers, best practice is to create a separate order to avoid delaying the current employer report.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="submit">
+                    <h2><span class="section-icon">📤</span> Submit & Manage</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Click Submit</h3>
+                                <p>Click Submit to process the order. Borrower receives email and/or SMS invitation with verification link.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Order Log Actions</h3>
+                                <p><strong>Email Icon:</strong> Resend invitation link to borrower<br>
+                                <strong>View Timeline:</strong> Access detailed order info in Truv Dashboard<br>
+                                <strong>Retrieve:</strong> Refresh if instant connection made<br>
+                                <strong>Import:</strong> Add (new record) or Replace (overwrite) URLA employment</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Document Flow</h3>
+                                <p>VOIE report autoflows to Stored Documents. Paystubs and W-2s flow to Draft docs. AUS reference number autoflows to respective AUS order screen.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout warning-callout">
+                        <div class="callout-title">⚠️ Manual Income Entry Required</div>
+                        <p>Income will NOT be imported automatically. By design, users must review the VOIE report data, analyze, calculate, and manually update the URLA Borrower employment section fields.</p>
+                    </div>
+                </section>
+            </div>
+
+            <div id="agents-panel" class="tab-panel">
+                <div class="workflow-header">
+                    <h1>AI Agent Opportunities</h1>
+                    <div class="workflow-meta">
+                        <span>🤖 2 Identified Agents</span>
+                        <span>📊 Avg Score: 84</span>
+                    </div>
+                </div>
+
+                <div class="heat-map-container">
+                    <div class="heat-map-title">🎯 Agent Impact Heat Map</div>
+                    <div class="heat-map-grid">
+                        <div class="heat-map-item" onclick="scrollToAgent('agent-1')">
+                            <div class="agent-name">URLA Sync Validator</div>
+                            <div class="score-bar"><div class="score-fill" style="width: 87%; background: linear-gradient(90deg, #22c55e, #14b8a6);"></div></div>
+                            <div class="score-label">Score: 87</div>
+                        </div>
+                        <div class="heat-map-item" onclick="scrollToAgent('agent-2')">
+                            <div class="agent-name">Income Calculator Assistant</div>
+                            <div class="score-bar"><div class="score-fill" style="width: 81%; background: linear-gradient(90deg, #eab308, #22c55e);"></div></div>
+                            <div class="score-label">Score: 81</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-1">
+                    <div class="agent-header">
+                        <div class="agent-title">🔄 URLA Sync Validator</div>
+                        <div class="agent-score">87</div>
+                    </div>
+                    <p class="agent-description">Validates that Truv employment data matches URLA entries after import. Identifies discrepancies in employer names, dates, and job titles that could cause underwriting issues.</p>
+                    <div class="agent-details">
+                        <div class="detail-box">
+                            <div class="detail-label">Trigger</div>
+                            <div class="detail-value">Post-Import</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Integration</div>
+                            <div class="detail-value">URLA Employment</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">ROI Impact</div>
+                            <div class="detail-value">High - Prevents UW conditions</div>
+                        </div>
+                    </div>
+                    <button class="view-prompt-btn" onclick="openModal('agent-1-modal')">View Full Agent Prompt</button>
+                </div>
+
+                <div class="agent-card" id="agent-2">
+                    <div class="agent-header">
+                        <div class="agent-title">🧮 Income Calculator Assistant</div>
+                        <div class="agent-score">81</div>
+                    </div>
+                    <p class="agent-description">Analyzes Truv VOIE reports and calculates qualifying income based on pay frequency, YTD earnings, and employment start date. Suggests correct values for URLA income fields.</p>
+                    <div class="agent-details">
+                        <div class="detail-box">
+                            <div class="detail-label">Trigger</div>
+                            <div class="detail-value">VOIE Report Ready</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Integration</div>
+                            <div class="detail-value">Stored Documents</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">ROI Impact</div>
+                            <div class="detail-value">Medium - Faster processing</div>
+                        </div>
+                    </div>
+                    <button class="view-prompt-btn" onclick="openModal('agent-2-modal')">View Full Agent Prompt</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="agent-1-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔄 URLA Sync Validator</h3>
+                <button class="modal-close" onclick="closeModal('agent-1-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <h4>📋 Purpose</h4>
+                    <div class="prompt-content">Ensure Truv employment data imported to URLA is accurate and consistent, preventing underwriting conditions related to employment verification discrepancies.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🤖 Full Prompt</h4>
+                    <div class="prompt-content">You are a URLA Sync Validator for Truv employment imports.
+
+After Truv data is imported to the URLA, validate:
+1. Employer name matches exactly (watch for abbreviations, Inc/LLC differences)
+2. Employment dates align within reasonable tolerance (30 days)
+3. Job title is consistent between VOIE and URLA
+4. Employment status (Current/Previous) is correctly set
+5. Primary employer designation is appropriate
+
+Flag discrepancies by severity:
+- CRITICAL: Name mismatch, missing data, wrong status
+- WARNING: Date variance > 30 days, title discrepancy
+- INFO: Minor formatting differences
+
+Provide specific correction recommendations.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔌 Integration Points</h4>
+                    <div class="prompt-content">• Trigger: After Import action in Truv Order Log
+• Input: VOIE report data, URLA employment section
+• Output: Validation report with discrepancy list
+• Action: Alert user before saving, suggest corrections</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="agent-2-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🧮 Income Calculator Assistant</h3>
+                <button class="modal-close" onclick="closeModal('agent-2-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <h4>📋 Purpose</h4>
+                    <div class="prompt-content">Analyze Truv VOIE reports and calculate qualifying income, reducing manual calculation errors and speeding up the income entry process.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🤖 Full Prompt</h4>
+                    <div class="prompt-content">You are an Income Calculator Assistant for Truv VOIE reports.
+
+When a VOIE report is available, extract and calculate:
+1. Base income from annual salary or hourly rate × hours
+2. YTD income and verify against "Current as of" date
+3. Pay frequency (weekly, biweekly, semi-monthly, monthly)
+4. Calculate monthly qualifying income
+
+Income calculation rules:
+- Use "Current as of" date for YTD income calculations
+- Salaried: Annual salary ÷ 12
+- Hourly: Rate × Avg hours × pay periods per year ÷ 12
+- Variable income: Requires 2-year history analysis
+
+Output suggested URLA field values:
+- Monthly Income amount
+- Pay period frequency
+- Employment start date to use</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔌 Integration Points</h4>
+                    <div class="prompt-content">• Trigger: VOIE report added to Stored Documents
+• Input: VOIE report PDF data, URLA employment dates
+• Output: Calculated income values, field suggestions
+• Action: Display recommendations, allow one-click apply</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            if (tab === 'workflow') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+            }
+        }
+
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            agent.classList.add('highlight');
+            setTimeout(() => agent.classList.remove('highlight'), 2000);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal(overlay.id);
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+            }
+        });
+    </script>
+</body>
+</html>

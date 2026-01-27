@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placing Truv Orders in CLEAR - Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+
+        .layout { display: flex; padding-top: 54px; }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            height: calc(100vh - 54px);
+            position: fixed;
+            top: 54px;
+            left: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .workflow-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav-section {
+            padding: 0 12px;
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+        }
+
+        .nav-item .step-num {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-card);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .nav-item.active .step-num {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+            max-width: calc(100% - 280px);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            color: white;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .workflow-header {
+            margin-bottom: 35px;
+        }
+
+        .workflow-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .workflow-meta {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .workflow-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .workflow-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .workflow-section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 16px;
+            padding: 18px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-purple);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .callout {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-top: 20px;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .callout p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .warning-callout {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .warning-callout .callout-title {
+            color: var(--accent-amber);
+        }
+
+        /* Coverage Indicator Legend */
+        .coverage-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .coverage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .coverage-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .coverage-badge.high { background: #22c55e; color: white; }
+        .coverage-badge.low { background: #eab308; color: #1a1a1a; }
+        .coverage-badge.not-verified { background: #6b7280; color: white; }
+        .coverage-badge.not-supported { background: #ef4444; color: white; }
+
+        .coverage-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* AI Agents Section */
+        .heat-map-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .heat-map-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .heat-map-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .heat-map-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-purple);
+        }
+
+        .heat-map-item .agent-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .heat-map-item .score-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .heat-map-item .score-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .heat-map-item .score-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease-out;
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.5); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 92, 246, 0.2); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .agent-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .agent-score {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .agent-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .agent-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .detail-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .view-prompt-btn {
+            margin-top: 18px;
+            padding: 12px 20px;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            color: var(--accent-purple);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .view-prompt-btn:hover {
+            background: rgba(139, 92, 246, 0.25);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .prompt-section:last-child { margin-bottom: 0; }
+
+        .prompt-section h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-content {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">✅ Truv</a>
+        <span class="separator">›</span>
+        <span class="current">Placing Orders in CLEAR</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Workflow</div>
+                <div class="workflow-name">Placing Truv Orders in CLEAR</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Sections</div>
+                <a class="nav-item active" href="#access"><span class="step-num">1</span> Access Truv in CLEAR</a>
+                <a class="nav-item" href="#borrower-info"><span class="step-num">2</span> Borrower Information</a>
+                <a class="nav-item" href="#coverage"><span class="step-num">3</span> Coverage Check</a>
+                <a class="nav-item" href="#submit"><span class="step-num">4</span> Submit Order</a>
+                <a class="nav-item" href="#management"><span class="step-num">5</span> Order Management</a>
+                <a class="nav-item" href="#aus"><span class="step-num">6</span> AUS Integration</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
+                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
+            </div>
+
+            <div id="workflow-panel" class="tab-panel active">
+                <div class="workflow-header">
+                    <h1>Placing Truv Orders in CLEAR</h1>
+                    <div class="workflow-meta">
+                        <span>📅 Updated: November 2025</span>
+                        <span>⏱️ ~5 min to complete</span>
+                        <span>👤 LO / PA / Processor</span>
+                    </div>
+                </div>
+
+                <section class="workflow-section" id="access">
+                    <h2><span class="section-icon">🔐</span> Access Truv in CLEAR</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Open the Loan File</h3>
+                                <p>Access the loan in CLEAR 2.0 by navigating to the loan in your pipeline or using Global Search.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Navigate to VOE</h3>
+                                <p><strong>Option A:</strong> Click the <strong>VOE</strong> button in the URLA Employment Section.<br>
+                                <strong>Option B:</strong> Go to Hamburger Menu → Verifications → VOE</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout warning-callout">
+                        <div class="callout-title">⚠️ Important</div>
+                        <p>Orders placed via SSO are no longer automatically imported into CLEAR. Always place Truv orders directly within CLEAR to ensure full automation including document retrieval and AUS reference number assignment.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="borrower-info">
+                    <h2><span class="section-icon">👤</span> Borrower Information</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Select Borrower</h3>
+                                <p>Select the appropriate borrower from the dropdown. Information will auto-populate from the URLA.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Verify Contact Info</h3>
+                                <p>Confirm First Name, Last Name, Email, and SSN. Updates made here will save back to the URLA.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Add SMS (Optional)</h3>
+                                <p>Toggle <strong>Add SMS</strong> to send text message invitations. Orders with Email + Mobile complete 2x faster.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <div class="callout-title">💡 Pro Tip</div>
+                        <p>If your borrower does not want text messages, leave Add SMS toggled off. They will receive email-only invitations.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="coverage">
+                    <h2><span class="section-icon">🔍</span> Coverage Check</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Search for Employer</h3>
+                                <p>Click "Click to view Truv's Coverage" and search for the borrower's employer name.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Review Coverage Indicator</h3>
+                                <p>Before selecting, check the color-coded coverage indicator to assess connection likelihood.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="coverage-legend">
+                        <div class="coverage-item">
+                            <span class="coverage-badge high">High</span>
+                            <span class="coverage-desc">Expected to succeed - send the order</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge low">Low</span>
+                            <span class="coverage-desc">May succeed if borrower knows their payroll provider</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge not-verified">Not Verified</span>
+                            <span class="coverage-desc">Contact borrower to identify payroll provider</span>
+                        </div>
+                        <div class="coverage-item">
+                            <span class="coverage-badge not-supported">Not Supported</span>
+                            <span class="coverage-desc">Use alternative verification method</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="submit">
+                    <h2><span class="section-icon">📤</span> Submit Order</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Select Employer(s)</h3>
+                                <p>Find and select the borrower's employer and/or payroll provider. You can add multiple employers if needed.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Click Submit</h3>
+                                <p>Click the Submit button to process the order. Borrower will receive email (and SMS if enabled) invitations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <div class="callout-title">📧 Borrower Notifications</div>
+                        <p>Once submitted, the borrower receives an email with "Verify Instantly" button. If SMS enabled, they'll also get a text with direct link. Completion emails are sent to order creator and LO when results are ready.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="management">
+                    <h2><span class="section-icon">⚙️</span> Order Management</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Truv Order Log</h3>
+                                <p>View all orders in the Order Log with Status, Date, Invite Expiration, and available Actions.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Available Actions</h3>
+                                <p><strong>Email Icon:</strong> Resend invitation link<br>
+                                <strong>View Timeline:</strong> See detailed order status in Truv Dashboard<br>
+                                <strong>Retrieve:</strong> Refresh CLEAR if connection made instantly<br>
+                                <strong>Import:</strong> Add or Replace URLA employment info</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout warning-callout">
+                        <div class="callout-title">⚠️ Income Entry Required</div>
+                        <p>Income will NOT be imported automatically. Review the VOIE Report in Clear Docs and enter income manually in the URLA employment section.</p>
+                    </div>
+                </section>
+
+                <section class="workflow-section" id="aus">
+                    <h2><span class="section-icon">🔗</span> AUS Integration</h2>
+                    <div class="step-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Automatic VOIE Retrieval</h3>
+                                <p>CLEAR automatically retrieves the VOIE report for AUS. If manual retrieval is needed, follow steps below.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Desktop Underwriter (DU)</h3>
+                                <p>Click AUS Tile → Verification Services → Add icon<br>
+                                • Verification Type = Income<br>
+                                • Vendor Type = Truv (DU)<br>
+                                • Reference Number = SSN:ReportID (no dashes, no spaces)</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Loan Product Advisor (LPA)</h3>
+                                <p>Same process but select Vendor Type = Truv (LPA). Reference Number format: SSN:ReportID</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <div class="callout-title">📄 Rep & Warrant Relief</div>
+                        <p>If rep and warrant relief are not received in AUS response, move the paystubs and W-2s from Draft docs to Final in Clear Docs to satisfy documentation requirements.</p>
+                    </div>
+                </section>
+            </div>
+
+            <div id="agents-panel" class="tab-panel">
+                <div class="workflow-header">
+                    <h1>AI Agent Opportunities</h1>
+                    <div class="workflow-meta">
+                        <span>🤖 3 Identified Agents</span>
+                        <span>📊 Avg Score: 87</span>
+                    </div>
+                </div>
+
+                <div class="heat-map-container">
+                    <div class="heat-map-title">🎯 Agent Impact Heat Map</div>
+                    <div class="heat-map-grid">
+                        <div class="heat-map-item" onclick="scrollToAgent('agent-1')">
+                            <div class="agent-name">Coverage Predictor</div>
+                            <div class="score-bar"><div class="score-fill" style="width: 91%; background: linear-gradient(90deg, #22c55e, #14b8a6);"></div></div>
+                            <div class="score-label">Score: 91</div>
+                        </div>
+                        <div class="heat-map-item" onclick="scrollToAgent('agent-2')">
+                            <div class="agent-name">Order Completion Monitor</div>
+                            <div class="score-bar"><div class="score-fill" style="width: 88%; background: linear-gradient(90deg, #22c55e, #14b8a6);"></div></div>
+                            <div class="score-label">Score: 88</div>
+                        </div>
+                        <div class="heat-map-item" onclick="scrollToAgent('agent-3')">
+                            <div class="agent-name">AUS Reference Validator</div>
+                            <div class="score-bar"><div class="score-fill" style="width: 82%; background: linear-gradient(90deg, #eab308, #22c55e);"></div></div>
+                            <div class="score-label">Score: 82</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-1">
+                    <div class="agent-header">
+                        <div class="agent-title">🎯 Coverage Predictor Agent</div>
+                        <div class="agent-score">91</div>
+                    </div>
+                    <p class="agent-description">Analyzes employer data and payroll provider patterns to predict Truv coverage success probability before order submission. Recommends optimal verification path based on historical success rates.</p>
+                    <div class="agent-details">
+                        <div class="detail-box">
+                            <div class="detail-label">Trigger</div>
+                            <div class="detail-value">Employer Search</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Integration</div>
+                            <div class="detail-value">CLEAR VOE Screen</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">ROI Impact</div>
+                            <div class="detail-value">High - Reduces failed orders</div>
+                        </div>
+                    </div>
+                    <button class="view-prompt-btn" onclick="openModal('agent-1-modal')">View Full Agent Prompt</button>
+                </div>
+
+                <div class="agent-card" id="agent-2">
+                    <div class="agent-header">
+                        <div class="agent-title">📊 Order Completion Monitor</div>
+                        <div class="agent-score">88</div>
+                    </div>
+                    <p class="agent-description">Monitors pending Truv orders and proactively follows up with borrowers who haven't completed verification. Sends intelligent reminders based on optimal engagement timing.</p>
+                    <div class="agent-details">
+                        <div class="detail-box">
+                            <div class="detail-label">Trigger</div>
+                            <div class="detail-value">Order Pending > 24hrs</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Integration</div>
+                            <div class="detail-value">Truv Order Log</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">ROI Impact</div>
+                            <div class="detail-value">High - Faster completion</div>
+                        </div>
+                    </div>
+                    <button class="view-prompt-btn" onclick="openModal('agent-2-modal')">View Full Agent Prompt</button>
+                </div>
+
+                <div class="agent-card" id="agent-3">
+                    <div class="agent-header">
+                        <div class="agent-title">🔗 AUS Reference Validator</div>
+                        <div class="agent-score">82</div>
+                    </div>
+                    <p class="agent-description">Validates that Truv reference IDs are correctly formatted and populated in AUS verification services before submission. Alerts on missing or malformed reference numbers.</p>
+                    <div class="agent-details">
+                        <div class="detail-box">
+                            <div class="detail-label">Trigger</div>
+                            <div class="detail-value">Pre-AUS Submission</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Integration</div>
+                            <div class="detail-value">AUS Tile</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">ROI Impact</div>
+                            <div class="detail-value">Medium - Prevents resubmission</div>
+                        </div>
+                    </div>
+                    <button class="view-prompt-btn" onclick="openModal('agent-3-modal')">View Full Agent Prompt</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="agent-1-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎯 Coverage Predictor Agent</h3>
+                <button class="modal-close" onclick="closeModal('agent-1-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <h4>📋 Purpose</h4>
+                    <div class="prompt-content">Predict Truv verification success probability based on employer name, payroll provider patterns, and historical CMG success rates. Provide actionable recommendations before order submission.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🤖 Full Prompt</h4>
+                    <div class="prompt-content">You are a Coverage Predictor Agent for Truv employment verification orders.
+
+When an employer name is searched:
+1. Check Truv's coverage database for direct match
+2. Analyze payroll provider associations (ADP, Workday, Paychex, etc.)
+3. Review CMG historical success rate for similar employers
+4. Consider employer size and industry patterns
+
+Output a recommendation:
+- HIGH CONFIDENCE: Proceed with Truv order
+- MEDIUM CONFIDENCE: Proceed but prep backup verification
+- LOW CONFIDENCE: Ask borrower about payroll provider first
+- NOT RECOMMENDED: Use alternative verification method
+
+Include specific reasoning and suggested next steps.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔌 Integration Points</h4>
+                    <div class="prompt-content">• Trigger: Employer search in CLEAR VOE screen
+• Input: Employer name, borrower employment data from URLA
+• Output: Coverage prediction with confidence score and recommendation
+• Action: Display recommendation before Submit button enabled</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="agent-2-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📊 Order Completion Monitor</h3>
+                <button class="modal-close" onclick="closeModal('agent-2-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <h4>📋 Purpose</h4>
+                    <div class="prompt-content">Monitor pending Truv verification orders and proactively engage borrowers to complete the verification process, reducing cycle time and improving completion rates.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🤖 Full Prompt</h4>
+                    <div class="prompt-content">You are an Order Completion Monitor for Truv verifications.
+
+Monitor all pending Truv orders and:
+1. Identify orders pending > 24 hours without borrower engagement
+2. Check if invitation emails were delivered successfully
+3. Determine optimal follow-up timing based on borrower timezone
+4. Generate personalized reminder messages
+
+Escalation rules:
+- 24 hours: Send friendly reminder via preferred channel
+- 48 hours: Alert LO for phone follow-up
+- 72 hours: Recommend alternative verification method
+
+Track engagement metrics and optimize timing patterns.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔌 Integration Points</h4>
+                    <div class="prompt-content">• Trigger: Scheduled check every 4 hours
+• Input: Truv Order Log, borrower contact preferences
+• Output: Follow-up actions, reminder messages, escalation alerts
+• Action: Update task list, send notifications to loan team</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="agent-3-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔗 AUS Reference Validator</h3>
+                <button class="modal-close" onclick="closeModal('agent-3-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-section">
+                    <h4>📋 Purpose</h4>
+                    <div class="prompt-content">Validate Truv reference ID format and presence in AUS verification services before submission to ensure Day 1 Certainty/AIM eligibility and prevent resubmission errors.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🤖 Full Prompt</h4>
+                    <div class="prompt-content">You are an AUS Reference Validator for Truv verifications.
+
+Before AUS submission, validate:
+1. Reference ID format: SSN:ReportID (no dashes in SSN, no spaces)
+2. Vendor Type matches AUS system (Truv DU vs Truv LPA)
+3. Verification Type set to "Income"
+4. All active income sources have corresponding Truv references
+
+Validation rules:
+- SSN must be 9 digits, no dashes
+- ReportID must be 32-character alphanumeric
+- Colon separator required between SSN and ReportID
+- No leading/trailing spaces allowed
+
+Flag errors with specific correction instructions.</div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔌 Integration Points</h4>
+                    <div class="prompt-content">• Trigger: Pre-AUS submission validation
+• Input: AUS Verification Services section, Truv reports
+• Output: Validation status, error details, correction steps
+• Action: Block submission if errors found, provide fix guidance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+            }
+        }
+
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            agent.classList.add('highlight');
+            setTimeout(() => agent.classList.remove('highlight'), 2000);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeModal(overlay.id);
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
+            }
+        });
+    </script>
+</body>
+</html>

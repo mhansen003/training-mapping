@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truv Borrower Communication - Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+        .layout { display: flex; padding-top: 54px; }
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); height: calc(100vh - 54px); position: fixed; top: 54px; left: 0; overflow-y: auto; padding: 20px 0; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 15px; }
+        .sidebar-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .workflow-name { font-size: 1.1rem; font-weight: 700; }
+        .nav-section { padding: 0 12px; margin-bottom: 20px; }
+        .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: rgba(139, 92, 246, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .nav-item .step-num { width: 22px; height: 22px; background: var(--bg-card); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .nav-item.active .step-num { background: var(--accent-purple); color: white; }
+        .main-content { flex: 1; margin-left: 280px; padding: 30px 40px; max-width: calc(100% - 280px); }
+        .workflow-header { margin-bottom: 35px; }
+        .workflow-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .workflow-meta { display: flex; gap: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .workflow-meta span { display: flex; align-items: center; gap: 6px; }
+        .workflow-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 30px; margin-bottom: 25px; }
+        .workflow-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .section-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .benefit-item { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 15px; }
+        .benefit-item .icon { font-size: 1.5rem; margin-bottom: 8px; }
+        .benefit-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: var(--accent-teal); }
+        .benefit-item p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+        .script-box { background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .script-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-teal); font-weight: 700; margin-bottom: 12px; }
+        .script-content { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; font-style: italic; }
+        .objection-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .objection-question { font-size: 1rem; font-weight: 700; color: var(--accent-amber); margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .objection-answer { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; padding-left: 28px; }
+        .email-template { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 25px; margin-top: 20px; }
+        .email-subject { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+        .email-subject strong { color: var(--accent-teal); }
+        .email-body { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8; white-space: pre-line; }
+        .email-body strong { color: var(--text-primary); }
+        .copy-btn { margin-top: 15px; padding: 10px 18px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 8px; color: var(--accent-teal); font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.85rem; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(20, 184, 166, 0.25); }
+        .callout { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 18px 22px; margin-top: 20px; }
+        .callout-title { font-weight: 700; color: var(--accent-amber); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">✅ Truv</a>
+        <span class="separator">›</span>
+        <span class="current">Borrower Communication</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Workflow</div>
+                <div class="workflow-name">Borrower Communication</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Sections</div>
+                <a class="nav-item active" href="#pitch"><span class="step-num">1</span> Opening Pitch</a>
+                <a class="nav-item" href="#benefits"><span class="step-num">2</span> Key Benefits</a>
+                <a class="nav-item" href="#objections"><span class="step-num">3</span> Handling Objections</a>
+                <a class="nav-item" href="#email"><span class="step-num">4</span> Email Template</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="workflow-header">
+                <h1>Borrower Communication</h1>
+                <div class="workflow-meta">
+                    <span>📅 Updated: April 2025</span>
+                    <span>🎯 LO Sales Tool</span>
+                    <span>👤 Loan Officer / PA</span>
+                </div>
+            </div>
+
+            <section class="workflow-section" id="pitch">
+                <h2><span class="section-icon">🎙️</span> Opening Pitch</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Use this script when introducing Truv to borrowers. Keep it conversational and focus on the benefits to them.</p>
+
+                <div class="script-box">
+                    <div class="script-label">📝 Recommended Script</div>
+                    <div class="script-content">"To make the process faster and easier for you, we use a secure platform called Truv to verify your income and employment. It allows you to connect directly with your payroll provider — which means we can verify everything in real-time instead of waiting for documents or pay stubs."</div>
+                </div>
+
+                <div class="script-box" style="margin-top: 15px; background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3);">
+                    <div class="script-label" style="color: var(--accent-green);">✅ Optional Close</div>
+                    <div class="script-content">"It's totally up to you, but I always recommend Truv to my clients who want a smooth and fast loan process. Would you like me to send over the link to get started?"</div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="benefits">
+                <h2><span class="section-icon">⭐</span> Key Benefits to Highlight</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Emphasize these benefits when explaining Truv to borrowers:</p>
+
+                <div class="benefit-grid">
+                    <div class="benefit-item">
+                        <div class="icon">⚡</div>
+                        <h4>Speed</h4>
+                        <p>"It helps us move your loan forward faster — we can often cut days off the process."</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="icon">🔒</div>
+                        <h4>Security</h4>
+                        <p>"Truv uses bank-grade encryption, and you stay in control — we only access what's needed for your application."</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="icon">🎯</div>
+                        <h4>Convenience</h4>
+                        <p>"No need to hunt down pay stubs, W-2s, or wait on HR — just a few clicks and you're done."</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="icon">✓</div>
+                        <h4>Accuracy</h4>
+                        <p>"Since it pulls the data directly from your employer, it reduces the chance of errors or needing to re-submit documents."</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="objections">
+                <h2><span class="section-icon">💬</span> Handling Common Objections</h2>
+
+                <div class="objection-card">
+                    <div class="objection-question">
+                        <span>🤔</span> "I don't feel comfortable sharing my payroll login."
+                    </div>
+                    <div class="objection-answer">
+                        "Totally understandable — your privacy is important. Just so you know, Truv is designed with the same security standards as major banks. It doesn't store your login info, and it only pulls what we need for the loan. You're always in control."
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-question">
+                        <span>📄</span> "Can't I just send in my pay stubs?"
+                    </div>
+                    <div class="objection-answer">
+                        "You definitely can, but using Truv is faster and usually smoother. It avoids delays that can happen with document reviews — and it can help us spot things like bonus income or overtime that sometimes get missed in pay stubs."
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-question">
+                        <span>🖥️</span> "I'm not tech-savvy / not sure how to use it."
+                    </div>
+                    <div class="objection-answer">
+                        "No worries — it's super user-friendly. I can walk you through it if you like, or we can send step-by-step instructions. It usually only takes a couple of minutes."
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <div class="callout-title">⚠️ Important Reminder for Borrowers</div>
+                    <p>Reverifications are FREE within 90 days, as long as the borrower doesn't change their password with their payroll provider. <strong>Ask borrowers not to change anything until after the loan closes.</strong></p>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="email">
+                <h2><span class="section-icon">📧</span> Email Template</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Copy and personalize this email to send to borrowers before or after placing a Truv order:</p>
+
+                <div class="email-template">
+                    <div class="email-subject"><strong>Subject:</strong> Quick & Secure: Let's Make Your Loan Process Easier</div>
+                    <div class="email-body">
+Hi [Borrower First Name],
+
+To help speed up your loan process, we use a secure platform called <strong>Truv</strong> to verify your income and employment. Instead of digging up pay stubs or waiting on HR, you can connect directly to your payroll provider — all in just a few clicks.
+
+<strong>Why Truv?</strong>
+• ✅ It's fast: Verification happens instantly.
+• 🔒 It's secure: Your info is encrypted and protected.
+• 🧾 It's simple: No need to scan or upload documents.
+• 🎯 It's accurate: Data comes directly from your employer.
+
+<strong>What to expect</strong>
+You'll soon receive a link to Truv via email and text. Once you click, it'll prompt you to log in to your payroll provider — just like checking your pay online. It's quick and easy, and I'm here if you have questions!
+
+Let me know if you'd like help walking through it.
+
+Looking forward to moving your loan forward!
+
+Best,
+[Loan Officer Name]
+[Phone] | [Email] | [Company Name]
+                    </div>
+                    <button class="copy-btn" onclick="copyEmail()">📋 Copy Email Template</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function copyEmail() {
+            const emailText = `Subject: Quick & Secure: Let's Make Your Loan Process Easier
+
+Hi [Borrower First Name],
+
+To help speed up your loan process, we use a secure platform called Truv to verify your income and employment. Instead of digging up pay stubs or waiting on HR, you can connect directly to your payroll provider — all in just a few clicks.
+
+Why Truv?
+• ✅ It's fast: Verification happens instantly.
+• 🔒 It's secure: Your info is encrypted and protected.
+• 🧾 It's simple: No need to scan or upload documents.
+• 🎯 It's accurate: Data comes directly from your employer.
+
+What to expect
+You'll soon receive a link to Truv via email and text. Once you click, it'll prompt you to log in to your payroll provider — just like checking your pay online. It's quick and easy, and I'm here if you have questions!
+
+Let me know if you'd like help walking through it.
+
+Looking forward to moving your loan forward!
+
+Best,
+[Loan Officer Name]
+[Phone] | [Email] | [Company Name]`;
+
+            navigator.clipboard.writeText(emailText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => btn.textContent = '📋 Copy Email Template', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
