@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Conditions for Operations - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Flag Colors */
+        .flag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .flag-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .flag-yellow { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .flag-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .flag-orange { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .flag-purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Flag Cards */
+        .flag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .flag-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .flag-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .flag-card h4 { color: var(--text-primary); font-size: 0.95rem; margin-bottom: 6px; }
+        .flag-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Conditions for Operations</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Conditions for Operations</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Submission Notes</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Submit to UW</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">CLA Distribution</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Attach Documents</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Color Coding</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Resubmission</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Clear to Close</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Byte Conditions for Operations</h1>
+                <p class="subtitle">Underwriting Submission, Condition Management & Clear to Close Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Roles: Processor / Underwriter</span>
+                    <span class="meta-item">Updated: Dec 13, 2022</span>
+                    <span class="meta-item">Duration: Varies by loan</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Submission Notes -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Cover Letter - Submission Notes</h2><span>Provide context for the Underwriter before submission</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start Submission</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open Cover Letter Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Add Submission Notes</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Required Submission Notes</h4>
+                        <p>Processors must document any challenging items for the Underwriter:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Complex income calculations and methodology</li>
+                            <li>Work history explanations</li>
+                            <li>Asset documentation concerns</li>
+                            <li>Credit issues or explanations</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Adding Notes Process</h3>
+                        <div class="tree-node level-1"><span class="tree-label">To Add Notes:</span></div>
+                        <div class="tree-node">Hit <strong style="color: var(--text-primary);">Enter/Return key</strong> next to the time/date stamp</div>
+                        <div class="tree-node">Type relevant notes for the Underwriter</div>
+                        <div class="tree-node">Notes are <strong style="color: var(--accent-green);">automatically saved</strong></div>
+                        <div class="tree-node">New users add notes by hitting Enter on the new time/date stamp</div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Paper Submission Sheet Option</h4>
+                        <p>If using a paper submission sheet, add <strong>"See Cover Sheet in Stored Docs"</strong> in the Cover Letter - Submission Notes Screen and mark <strong>Reviewed</strong>. Underwriters mark Cover Sheet <strong>Inactive</strong> after review.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Submit to Underwriting -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Submit to Underwriting</h2><span>Update loan status in the Status Screen</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Status Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click UW Received</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Pipeline Updates</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Pipeline Visibility</h4>
+                        <p>All Retail pipelines reflect the status update for both Processing and Underwriting teams immediately upon submission.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Meaning</th><th>Visibility</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">UW Received</strong></td><td>Loan submitted to underwriting</td><td>All Retail pipelines</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Conditions for Review</strong></td><td>Resubmission with conditions addressed</td><td>Processing & Underwriting</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">CTC Requested</strong></td><td>File ready for Clear to Close</td><td>Management + LO notification</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 3: CLA Distribution -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Conditional Loan Approval Distribution</h2><span>Underwriter creates and distributes CLA document</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">UW Creates PDF of CLA</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Email to LO, PA, Processor</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Stored in Conditional Commitment</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>CLA Recipients</h4>
+                            <div class="value">3</div>
+                            <div class="label">LO + PA + Processor</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Storage Location</h4>
+                            <div class="value">SD</div>
+                            <div class="label">Stored Documents</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Document Name</h4>
+                            <div class="value">CC</div>
+                            <div class="label">Conditional Commitment</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Finding Conditions Document</h4>
+                        <p>Processors can locate a copy of the conditions document anytime by clicking the <strong>printer icon</strong> and searching for <strong>"Processor Condition List"</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Attach Documents to Conditions -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Adding Documents to Conditions</h2><span>Attach supporting documents to each condition</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Conditions Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Drag & Drop Document</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Document Attached</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Attachment Methods</h4>
+                        <p>Drag and drop documents from:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>Stored Documents</strong> - Documents already in the loan file</li>
+                            <li><strong>File Explorer</strong> - Documents from your local machine</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Viewing Attached Documents</h4>
+                        <p>Click on the <strong>file folder icon</strong> to view documents attached to a condition. Multiple documents can be attached to one condition.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Document Attachment Rule</h4>
+                        <p>Once a document is attached to a condition, it <strong>cannot be attached to another condition</strong>. If a document can satisfy multiple conditions, <strong>color coding must be used</strong> instead.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Color Coding System -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Follow Up Flag Color Coding</h2><span>Communication system between Processors and Underwriters</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Double-Click Condition</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Select Follow Up Flag Color</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click Append Notes</div>
+                        </div>
+                    </div>
+
+                    <div class="flag-grid">
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #ef4444;"></div>
+                            <div>
+                                <h4>Red Flag</h4>
+                                <p>Items submitted to underwriting and <strong>unable to clear condition(s)</strong>. Underwriter must remove the received date on the condition.</p>
+                            </div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #3b82f6;"></div>
+                            <div>
+                                <h4>Blue Flag</h4>
+                                <p><strong>Processor take notice.</strong> The Processing Manager uses this flag when leaving notes on conditions when assisting with a loan.</p>
+                            </div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #eab308;"></div>
+                            <div>
+                                <h4>Yellow Flag</h4>
+                                <p><strong>Processor take notice.</strong> Underwriters use this flag when leaving notes on conditions for something other than not clearing it.</p>
+                            </div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #22c55e;"></div>
+                            <div>
+                                <h4>Green Flag</h4>
+                                <p><strong>Underwriter take notice.</strong> Processors use this flag when leaving notes on conditions for the Underwriter.</p>
+                            </div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #f97316;"></div>
+                            <div>
+                                <h4>Orange Flag</h4>
+                                <p>Processor would like to <strong>move condition to a PTF (Prior to Funding)</strong> condition.</p>
+                            </div>
+                        </div>
+                        <div class="flag-card">
+                            <div class="flag-indicator" style="background: #8b5cf6;"></div>
+                            <div>
+                                <h4>Purple Flag</h4>
+                                <p><strong>Underwriter take notice.</strong> The Underwriting Manager uses this flag when leaving notes on conditions when assisting with a loan.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Important: Remove Highlights</h4>
+                        <p>The user <strong>must remove the highlight</strong> once the item has been addressed to maintain accurate condition tracking.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Resubmission -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Underwriting Resubmission</h2><span>Prepare and submit conditions for review</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Condition Lifecycle</h3>
+                        <div class="flow-row">
+                            <div class="flow-node input">Add Documents</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Mark as Received</div>
+                        </div>
+                        <div class="flow-row" style="margin-top: 25px;">
+                            <div class="flow-node input">Request Conditions</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Mark as Requested</div>
+                        </div>
+                        <div class="flow-row" style="margin-top: 25px;">
+                            <div class="flow-node action">UW Review Documents</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Mark as Cleared</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Role</th><th>Action</th><th>Status Update</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge calculated-badge">Processor</span></td>
+                                <td>Add documents to conditions</td>
+                                <td>Mark as <strong style="color: var(--accent-green);">Received</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge calculated-badge">Processor</span></td>
+                                <td>Request conditions from borrower</td>
+                                <td>Mark as <strong style="color: var(--accent-amber);">Requested</strong></td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge required-badge">Underwriter</span></td>
+                                <td>Review and add documents to conditions</td>
+                                <td>Mark as <strong style="color: var(--accent-teal);">Cleared</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Resubmission Process</h4>
+                        <p>When ready for resubmission, move status to <strong>"Conditions for Review"</strong> in the Status Screen.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Clear to Close -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Clear to Close (CTC)</h2><span>Final approval workflow</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">File Ready for CTC?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Click CTC Requested</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">LO Notified</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node exception">Continue Conditions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>CTC Requested Actions</h4>
+                        <p>Clicking the <strong>CTC Requested</strong> radio button:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Updates pipelines for management visibility</li>
+                            <li>Sends notification to the Loan Officer</li>
+                            <li>Records the CTC request date</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Underwriter Note - CTC Cannot Be Granted</h4>
+                        <p>If CTC Requested is checked and the loan <strong>cannot be moved to CTC</strong>, the Underwriter <strong>must remove the CTC Requested date</strong> to maintain accurate pipeline tracking.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+UNDERWRITING SUBMISSION WORKFLOW
+================================
+
+STEP 1: SUBMISSION NOTES
+- Open Cover Letter - Submission Notes Screen
+- Document: Income calculations, work history, assets, credit concerns
+- Hit Enter to add notes (auto-saved)
+
+STEP 2: SUBMIT TO UW
+- Status Screen -> Click "UW Received"
+- All Retail pipelines update automatically
+
+STEP 3: CLA DISTRIBUTION
+- UW creates PDF of Conditional Loan Approval
+- Email to: LO, Production Assistant, Processor
+- Stored in: Stored Documents -> Conditional Commitment
+
+COLOR CODE REFERENCE
+====================
+RED    = Unable to clear (UW removes received date)
+BLUE   = Processing Manager notes
+YELLOW = UW notes (not about clearing)
+GREEN  = Processor notes for UW
+ORANGE = Move to PTF request
+PURPLE = UW Manager notes
+
+CONDITION STATUSES
+==================
+PROCESSOR:  Add docs -> Mark RECEIVED
+            Request   -> Mark REQUESTED
+UNDERWRITER: Review   -> Mark CLEARED
+
+CTC PROCESS
+===========
+1. Move status to "Conditions for Review"
+2. Click "CTC Requested" when ready
+3. LO receives notification automatically
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Conditions Management Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">7 Process Steps Analyzed</span>
+                    <span class="meta-item">5 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 45% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">5</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">45%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">90%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-docmatch')" title="Click to view agent details">
+                        <div class="heat-score">95</div>
+                        <div class="heat-name">Document Matcher</div>
+                        <div class="heat-desc">Auto-match documents to conditions</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>4</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-submission')" title="Click to view agent details">
+                        <div class="heat-score">88</div>
+                        <div class="heat-name">Submission Notes Generator</div>
+                        <div class="heat-desc">Auto-generate UW submission notes</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>1</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-flagrouter')" title="Click to view agent details">
+                        <div class="heat-score">82</div>
+                        <div class="heat-name">Condition Flag Router</div>
+                        <div class="heat-desc">Auto-assign flag colors based on notes</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>5</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-ctccheck')" title="Click to view agent details">
+                        <div class="heat-score">72</div>
+                        <div class="heat-name">CTC Readiness Checker</div>
+                        <div class="heat-desc">Validate all conditions before CTC</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>7</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-statustracker')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Condition Status Tracker</div>
+                        <div class="heat-desc">Monitor condition progress automatically</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Document Matcher -->
+                <div class="agent-card" id="agent-docmatch">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">D</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Document Matcher Agent</div>
+                            <div class="agent-type">Document Classification Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically analyzes incoming documents and matches them to outstanding conditions using AI document classification. Reduces manual drag-and-drop operations and ensures accurate condition-document pairing.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">New Document</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">OCR & Classify</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Match Condition</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Auto-Attach</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">98%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('docmatch')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Submission Notes Generator -->
+                <div class="agent-card" id="agent-submission">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">S</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Submission Notes Generator</div>
+                            <div class="agent-type">Content Generation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Analyzes the loan file and automatically generates comprehensive submission notes highlighting income calculations, credit concerns, and asset documentation issues for the Underwriter.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Loan File</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Identify Issues</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Generate Notes</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Insert to Cover</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">8min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">90%</div><div class="agent-stat-label">Coverage</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('submission')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Flag Router -->
+                <div class="agent-card" id="agent-flagrouter">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">F</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Condition Flag Router</div>
+                            <div class="agent-type">Classification Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Analyzes condition notes and automatically assigns the appropriate flag color based on content, sender role, and action required. Ensures consistent communication standards.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Read Notes</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Identify Role</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Classify Intent</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Set Flag</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('flagrouter')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: CTC Readiness Checker -->
+                <div class="agent-card" id="agent-ctccheck">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">C</div>
+                        <div class="agent-info">
+                            <div class="agent-name">CTC Readiness Checker</div>
+                            <div class="agent-type">Validation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Performs comprehensive validation of all conditions before CTC request. Identifies any outstanding items, missing documents, or unresolved flags to prevent premature CTC requests.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Conditions</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check Cleared</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate Docs</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Report Status</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">10min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">99%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('ctccheck')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 5: Status Tracker -->
+                <div class="agent-card" id="agent-statustracker">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">T</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Condition Status Tracker</div>
+                            <div class="agent-type">Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors condition progress across all loans, tracks aging conditions, and sends proactive alerts when conditions are approaching SLA thresholds or require attention.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Monitor Queue</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check SLAs</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Identify Aging</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Send Alerts</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-20%</div><div class="agent-stat-label">Turn Time</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('statustracker')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Conditions for Operations - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Byte Conditions for Operations
+
+## Overview
+This workflow covers the complete process for underwriting submission, condition management, and clear to close procedures in Byte LOS.
+
+## 1. Submission Notes
+- Open Cover Letter - Submission Notes Screen
+- Document challenging income, work history, assets, credit items
+- Hit Enter to add timestamped notes (auto-saved)
+- Paper option: Add "See Cover Sheet in Stored Docs"
+
+## 2. Submit to Underwriting
+- Open Status Screen
+- Click "UW Received" to submit
+- All Retail pipelines reflect the update
+
+## 3. CLA Distribution
+- Underwriter creates PDF of Conditional Loan Approval
+- Email to: Loan Officer, Production Assistant, Processor
+- Stored in: Conditional Commitment (Stored Documents)
+
+## 4. Adding Documents to Conditions
+- Open Conditions Screen
+- Drag & drop from Stored Documents or File Explorer
+- Click file folder to view attachments
+- Note: One document = One condition only
+
+## 5. Color Coding System
+| Color  | Meaning                           |
+|--------|-----------------------------------|
+| Red    | Unable to clear (UW action)       |
+| Blue   | Processing Manager notes          |
+| Yellow | UW notes (not clearing related)   |
+| Green  | Processor notes for UW            |
+| Orange | Move to PTF request               |
+| Purple | UW Manager notes                  |
+
+## 6. Resubmission Process
+- Processor: Add docs -> Mark Received
+- Processor: Request -> Mark Requested
+- Underwriter: Review -> Mark Cleared
+
+## 7. Clear to Close
+- Move to "Conditions for Review" status
+- Click "CTC Requested" when ready
+- LO receives automatic notification
+- UW removes CTC date if cannot proceed</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav clicks with scroll flag
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Update active state immediately
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Reset flag after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Agent nav scroll spy
+        const agentSections = document.querySelectorAll('#agents-panel > div[id]');
+        const agentNavItems = document.querySelectorAll('#agents-nav .nav-item');
+
+        function updateAgentNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            agentSections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            agentNavItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        agentNavItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                agentNavItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        // Scroll to agent from heat map
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) {
+                agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                agent.classList.add('highlight');
+                setTimeout(() => agent.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Agent Prompt System
+        const agentPrompts = {
+            docmatch: {
+                name: 'Document Matcher Agent',
+                tags: ['Document Classification', 'OCR', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically analyzes incoming documents using OCR and AI classification to match them with outstanding loan conditions, eliminating manual drag-and-drop operations and reducing document handling time by 80%.`,
+                prompt: `You are building a Document Classification Agent for CMG Financial's Byte LOS Conditions Management.
+
+AGENT NAME: Document Matcher Agent
+TYPE: Document Classification / Auto-Attachment
+
+OBJECTIVE:
+Create an agent that monitors the Stored Documents folder for new uploads, analyzes document content using OCR, and automatically matches them to outstanding conditions.
+
+INPUT DATA SOURCES:
+1. Stored Documents (newly uploaded files)
+2. Outstanding Conditions List
+3. Document type classification model
+
+MATCHING LOGIC:
+Document Type -> Condition Match
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Pay Stubs -> Income verification conditions
+Bank Statements -> Asset verification conditions
+Tax Returns -> Income verification conditions
+Insurance Declarations -> Hazard insurance conditions
+VOE Forms -> Employment verification conditions
+Credit Explanations -> Credit-related conditions
+
+VALIDATION RULES:
+- Confidence threshold: 85% minimum for auto-attach
+- Below threshold: Queue for manual review
+- Flag duplicates: Alert if document already attached elsewhere
+
+OUTPUT FORMAT:
+{
+  "documentName": "filename.pdf",
+  "detectedType": "Pay Stub",
+  "matchedCondition": "Condition #507",
+  "confidence": 0.95,
+  "action": "auto-attached" | "queued-for-review"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Document API
+   - Monitor Stored Documents for new uploads
+   - Access Conditions Screen data
+   - Trigger document attachment
+
+2. OCR Service
+   - Extract text from PDFs and images
+   - Identify document type from content
+
+3. Notification System
+   - Alert processor when auto-match occurs
+   - Flag items requiring manual review
+
+DEPLOYMENT:
+- Background service monitoring document uploads
+- Real-time processing with <30 second latency
+- Audit log for all auto-attachments`
+            },
+            submission: {
+                name: 'Submission Notes Generator',
+                tags: ['Content Generation', 'Loan Analysis', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent scans the entire loan file and automatically generates comprehensive submission notes for the Underwriter, highlighting income calculations, work history concerns, asset documentation issues, and credit explanations.`,
+                prompt: `You are building a Content Generation Agent for CMG Financial's Byte LOS Underwriting Submission process.
+
+AGENT NAME: Submission Notes Generator
+TYPE: Content Generation / Loan Analysis
+
+OBJECTIVE:
+Create an agent that analyzes the loan file and generates structured submission notes following CMG guidelines for processor-to-underwriter communication.
+
+ANALYSIS AREAS:
+1. INCOME ANALYSIS
+   - Identify income calculation methodology
+   - Flag variable income (bonus, commission, OT)
+   - Note employment gaps or job changes
+   - Calculate and explain DTI factors
+
+2. ASSET ANALYSIS
+   - Large deposits requiring explanation
+   - Gift fund documentation
+   - Business fund usage
+   - Liquidation of assets
+
+3. CREDIT ANALYSIS
+   - Derogatory items requiring LOE
+   - Recent inquiries
+   - Authorized user accounts
+   - Credit score factors
+
+4. PROPERTY/TITLE
+   - Vesting changes
+   - Title issues
+   - Property condition concerns
+
+OUTPUT FORMAT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUBMISSION NOTES - [Borrower Name]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INCOME:
+[Bullet points of income-related items]
+
+ASSETS:
+[Bullet points of asset-related items]
+
+CREDIT:
+[Bullet points of credit-related items]
+
+ADDITIONAL NOTES:
+[Any other relevant observations]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Data Access
+   - Income screens (1003, VOE, pay stubs)
+   - Asset screens (bank statements, gift letters)
+   - Credit report data
+   - Property/title information
+
+2. Cover Letter Screen
+   - Auto-populate generated notes
+   - Add timestamp per CMG format
+   - Preserve existing notes
+
+3. Processor Review Queue
+   - Present draft for processor approval
+   - Allow edits before final submission
+
+DEPLOYMENT:
+- Trigger on "Prepare for Submission" action
+- Generate draft within 30 seconds
+- Processor confirms before inserting`
+            },
+            flagrouter: {
+                name: 'Condition Flag Router',
+                tags: ['Classification', 'Workflow Automation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent analyzes condition notes and user roles to automatically assign the correct flag color per CMG's communication protocol, ensuring consistent and efficient processor-underwriter communication.`,
+                prompt: `You are building a Classification Agent for CMG Financial's Byte LOS Condition Management.
+
+AGENT NAME: Condition Flag Router
+TYPE: Classification / Workflow Automation
+
+OBJECTIVE:
+Create an agent that reads condition notes, identifies the author's role and intent, and automatically assigns the appropriate Follow Up Flag color.
+
+FLAG CLASSIFICATION RULES:
+
+RED FLAG - Unable to Clear
+Triggers:
+- Note contains: "unable to clear", "cannot accept", "condition not met"
+- UW role + rejection language
+Action: Set RED, alert processor
+
+BLUE FLAG - Processing Manager Notes
+Triggers:
+- Author role = Processing Manager
+- Assistance/guidance language
+Action: Set BLUE, alert processor
+
+YELLOW FLAG - UW Notes (Non-Clearing)
+Triggers:
+- Author role = Underwriter
+- Informational notes without rejection
+- Questions or clarifications
+Action: Set YELLOW, alert processor
+
+GREEN FLAG - Processor Notes for UW
+Triggers:
+- Author role = Processor
+- Notes directed to underwriter
+- Explanation or clarification provided
+Action: Set GREEN, alert underwriter
+
+ORANGE FLAG - PTF Request
+Triggers:
+- Note contains: "move to PTF", "prior to funding"
+- Request to defer condition
+Action: Set ORANGE, alert UW
+
+PURPLE FLAG - UW Manager Notes
+Triggers:
+- Author role = UW Manager
+- Assistance/guidance language
+Action: Set PURPLE, alert underwriter
+
+OUTPUT:
+{
+  "conditionId": "507",
+  "detectedRole": "Processor",
+  "detectedIntent": "explanation for UW",
+  "assignedFlag": "GREEN",
+  "confidence": 0.92
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Conditions API
+   - Monitor for new/updated notes
+   - Access user role information
+   - Update flag color field
+
+2. User Authentication
+   - Identify note author
+   - Determine role (Processor, UW, Manager)
+
+3. Notification System
+   - Alert appropriate party based on flag
+   - Track flag changes for audit
+
+DEPLOYMENT:
+- Real-time trigger on note save
+- Sub-second classification
+- Audit trail of all flag assignments`
+            },
+            ctccheck: {
+                name: 'CTC Readiness Checker',
+                tags: ['Validation', 'Quality Control', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent performs comprehensive validation of all loan conditions before CTC request, identifying outstanding items, missing documents, unresolved flags, and potential issues to prevent premature or failed CTC requests.`,
+                prompt: `You are building a Validation Agent for CMG Financial's Byte LOS Clear to Close process.
+
+AGENT NAME: CTC Readiness Checker
+TYPE: Validation / Quality Control
+
+OBJECTIVE:
+Create an agent that validates all conditions and requirements before allowing CTC request, preventing premature submissions and reducing UW rejections.
+
+VALIDATION CHECKLIST:
+
+1. CONDITION STATUS CHECK
+   [ ] All PTD conditions marked CLEARED
+   [ ] No RED flags outstanding
+   [ ] No pending flag items unaddressed
+
+2. DOCUMENT VERIFICATION
+   [ ] All conditions have attached documents
+   [ ] No missing required documents
+   [ ] Document dates within acceptable range
+
+3. DATA INTEGRITY
+   [ ] Final 1003 matches conditions
+   [ ] Income calculations reconcile
+   [ ] Asset totals verified
+
+4. COMPLIANCE CHECK
+   [ ] All disclosures sent/signed
+   [ ] Timing requirements met
+   [ ] Required waiting periods satisfied
+
+5. STACKING ORDER
+   [ ] Documents in correct order
+   [ ] No missing pages
+   [ ] All signatures present
+
+VALIDATION OUTPUT:
+{
+  "loanNumber": "12345678",
+  "ctcReady": true | false,
+  "passedChecks": 12,
+  "failedChecks": 0,
+  "warnings": [],
+  "blockers": [],
+  "recommendation": "Ready for CTC" | "Address items before CTC"
+}
+
+BLOCKER EXAMPLES:
+- Outstanding RED flag on condition #507
+- Missing hazard insurance declaration page
+- VOE dated more than 120 days ago`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Full Loan Data
+   - Conditions Screen
+   - Stored Documents
+   - Disclosure History
+   - 1003 Data
+
+2. CTC Request Button
+   - Intercept CTC request
+   - Display validation results
+   - Block if critical failures
+
+3. Reporting Dashboard
+   - Track CTC attempt success rate
+   - Identify common failure reasons
+   - Manager visibility
+
+DEPLOYMENT:
+- Trigger on CTC Request click
+- Complete validation in <10 seconds
+- Provide actionable failure report`
+            },
+            statustracker: {
+                name: 'Condition Status Tracker',
+                tags: ['Monitoring', 'SLA Management', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent continuously monitors condition progress across all loans, tracks aging conditions, and sends proactive alerts when conditions approach or exceed SLA thresholds, improving turn times and preventing delays.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Byte LOS Condition Management.
+
+AGENT NAME: Condition Status Tracker
+TYPE: Monitoring / SLA Management
+
+OBJECTIVE:
+Create an agent that monitors condition aging across the pipeline and proactively alerts processors and managers when conditions require attention.
+
+MONITORING RULES:
+
+CONDITION AGING THRESHOLDS:
+- Green Zone: 0-24 hours (on track)
+- Yellow Zone: 24-48 hours (attention needed)
+- Orange Zone: 48-72 hours (escalation warning)
+- Red Zone: 72+ hours (SLA breach)
+
+ALERT TRIGGERS:
+1. Condition enters Yellow Zone
+   -> Alert assigned processor
+
+2. Condition enters Orange Zone
+   -> Alert processor + Processing Manager
+
+3. Condition enters Red Zone
+   -> Alert all + Ops Manager
+   -> Flag loan in pipeline view
+
+STATUS TRACKING:
+- Requested: When condition requested from borrower
+- Received: When document received
+- Submitted: When submitted to UW
+- Cleared: When UW clears condition
+
+DAILY SUMMARY REPORT:
+{
+  "date": "2026-01-27",
+  "totalConditions": 245,
+  "byZone": {
+    "green": 180,
+    "yellow": 42,
+    "orange": 18,
+    "red": 5
+  },
+  "topAgingLoans": [
+    { "loan": "123456", "oldestCondition": "72h", "processor": "Jane Smith" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Pipeline API
+   - Monitor all active loans
+   - Track condition timestamps
+   - Access processor assignments
+
+2. Notification System
+   - Email alerts by threshold
+   - Teams/Slack integration
+   - Pipeline flag indicators
+
+3. Reporting Dashboard
+   - Real-time aging visualization
+   - Processor performance metrics
+   - Trend analysis
+
+DEPLOYMENT:
+- Continuous background monitoring
+- Alert check every 15 minutes
+- Daily summary at 7 AM`
+            }
+        };
+
+        let currentPrompt = null;
+
+        function showAgentPrompt(agentKey) {
+            currentPrompt = agentPrompts[agentKey];
+            if (!currentPrompt) return;
+
+            document.getElementById('promptModalTitle').textContent = currentPrompt.name + ' - Build Prompt';
+
+            // Tags
+            const tagsContainer = document.getElementById('promptTags');
+            tagsContainer.innerHTML = currentPrompt.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+
+            // Content
+            document.getElementById('promptPurpose').textContent = currentPrompt.purpose;
+            document.getElementById('promptContent').textContent = currentPrompt.prompt;
+            document.getElementById('promptIntegration').textContent = currentPrompt.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            if (!currentPrompt) return;
+            const fullPrompt = `${currentPrompt.purpose}\n\n${currentPrompt.prompt}\n\n${currentPrompt.integration}`;
+            try {
+                await navigator.clipboard.writeText(fullPrompt);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>
