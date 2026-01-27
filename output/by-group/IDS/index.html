@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDS Training | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-teal: #14b8a6;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding: 30px; }
+
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-teal); font-weight: 600; }
+
+        .container { max-width: 1200px; margin: 70px auto 0; }
+
+        .header { text-align: center; margin-bottom: 50px; }
+        .header-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; }
+        .header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header p { color: var(--text-secondary); font-size: 1.1rem; max-width: 700px; margin: 0 auto; line-height: 1.7; }
+
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-bottom: 50px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--accent-teal); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+
+        .module-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 25px; transition: all 0.3s; }
+        .module-card:hover { border-color: rgba(20, 184, 166, 0.4); transform: translateY(-4px); }
+        .module-card.featured { border-color: rgba(20, 184, 166, 0.5); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(20, 184, 166, 0.1) 100%); }
+        .module-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+        .module-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .module-info { flex: 1; }
+        .module-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+        .module-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .module-description { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .module-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .tag-role { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+        .tag-ai { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+        .tag-featured { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+
+        .view-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 10px; color: var(--accent-teal); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; }
+        .view-btn:hover { background: rgba(20, 184, 166, 0.2); transform: translateX(4px); }
+
+        .section-title { font-size: 1.3rem; font-weight: 700; margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; }
+
+        .quick-links { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 25px; margin-top: 40px; }
+        .quick-links h3 { font-size: 1.1rem; margin-bottom: 20px; color: var(--accent-teal); }
+        .quick-links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .quick-link { padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; text-align: center; }
+        .quick-link-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
+        .quick-link-value { font-size: 0.95rem; color: var(--text-primary); word-break: break-all; }
+        .quick-link-value a { color: var(--accent-teal); text-decoration: none; }
+        .quick-link-value a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <span class="current">📝 IDS</span>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">📝</div>
+            <h1>IDS Training</h1>
+            <p>International Document Services (IDS) is CMG's vendor of choice for all disclosures and documents. Learn to manage e-signing, track signatures, retrieve documents, and troubleshoot common issues.</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Workflow Module</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Process Steps</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">5</div>
+                <div class="stat-label">AI Agents</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Borrower Guides</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">📋 Training Modules</h2>
+
+        <div class="modules-grid">
+            <div class="module-card featured">
+                <div class="module-header">
+                    <div class="module-icon">📝</div>
+                    <div class="module-info">
+                        <div class="module-title">IDS Complete Workflow</div>
+                        <div class="module-meta">Comprehensive Guide • Updated Jan 2026</div>
+                    </div>
+                </div>
+                <p class="module-description">Complete training covering all IDS workflows: login & access, checking signatures, resending emails, retrieving documents, regenerating disclosures, and borrower instructions for e-signing and hybrid closings.</p>
+                <div class="module-tags">
+                    <span class="tag tag-featured">Featured</span>
+                    <span class="tag tag-role">LO</span>
+                    <span class="tag tag-role">Processor</span>
+                    <span class="tag tag-role">Closer</span>
+                    <span class="tag tag-ai">5 AI Agents</span>
+                </div>
+                <a href="./IDS-Complete-Workflow.html" class="view-btn">View Workflow →</a>
+            </div>
+        </div>
+
+        <div class="quick-links">
+            <h3>🔗 Quick Reference</h3>
+            <div class="quick-links-grid">
+                <div class="quick-link">
+                    <div class="quick-link-label">IDS Fulfillment URL</div>
+                    <div class="quick-link-value"><a href="https://fulfillment.idsdoc.com/Account/Login" target="_blank">fulfillment.idsdoc.com</a></div>
+                </div>
+                <div class="quick-link">
+                    <div class="quick-link-label">IDS Support Phone</div>
+                    <div class="quick-link-value">800-554-1872</div>
+                </div>
+                <div class="quick-link">
+                    <div class="quick-link-label">IDS Support Email</div>
+                    <div class="quick-link-value"><a href="mailto:service@idsdoc.com">service@idsdoc.com</a></div>
+                </div>
+                <div class="quick-link">
+                    <div class="quick-link-label">CMG Training Contact</div>
+                    <div class="quick-link-value"><a href="mailto:training@cmgfi.com">training@cmgfi.com</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
