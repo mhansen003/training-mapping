@@ -60,9 +60,9 @@
         }
 
         .breadcrumb a:hover {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-amber);
-            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
@@ -115,7 +115,7 @@
         }
 
         .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
-        .sidebar-tab.active { color: var(--accent-amber); border-bottom-color: var(--accent-amber); background: rgba(245, 158, 11, 0.08); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
         .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
 
         .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
@@ -133,7 +133,7 @@
         }
 
         .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
-        .nav-item.active { background: rgba(245, 158, 11, 0.1); border-left-color: var(--accent-amber); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
 
         .nav-number {
             background: rgba(255,255,255,0.1);
@@ -149,7 +149,7 @@
             flex-shrink: 0;
         }
 
-        .nav-item.active .nav-number { background: var(--accent-amber); color: var(--bg-primary); }
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
         .nav-label { font-size: 0.95rem; font-weight: 500; }
 
         .sidebar-footer {
@@ -165,7 +165,7 @@
             gap: 8px;
             width: 100%;
             padding: 14px 20px;
-            background: linear-gradient(135deg, var(--accent-amber) 0%, var(--accent-teal) 100%);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -176,7 +176,7 @@
             font-size: 0.95rem;
         }
 
-        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3); }
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
 
         /* Main Content */
         .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
@@ -200,7 +200,7 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background:
-                radial-gradient(ellipse at 20% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
             pointer-events: none;
         }
@@ -210,7 +210,7 @@
             font-weight: 800;
             margin-bottom: 10px;
             position: relative;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-amber) 100%);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -255,7 +255,7 @@
         }
 
         .section-header {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(245, 158, 11, 0.1) 100%);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
             border-bottom: 1px solid var(--border-subtle);
             padding: 22px 25px;
             display: flex;
@@ -264,8 +264,8 @@
         }
 
         .section-number {
-            background: linear-gradient(135deg, var(--accent-amber) 0%, var(--accent-teal) 100%);
-            color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
             width: 48px;
             height: 48px;
             border-radius: 12px;
@@ -303,13 +303,13 @@
         }
 
         .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
-        .flow-node.action { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
-        .flow-node.decision { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
-        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-amber); color: var(--text-primary); }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
         .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
         .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
 
-        .flow-arrow { color: var(--accent-amber); font-size: 1.5rem; }
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
         .flow-arrow.down { transform: rotate(90deg); }
 
         .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
@@ -329,8 +329,8 @@
         .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
 
         .field-table th {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-amber);
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
             padding: 14px 18px;
             text-align: left;
             font-weight: 600;
@@ -378,7 +378,7 @@
             margin: 22px 0;
         }
 
-        .decision-tree h3 { color: var(--accent-amber); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
 
         .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
         .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
@@ -395,7 +395,7 @@
         .summary-card .value {
             font-size: 2.2rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-amber) 0%, var(--accent-teal) 100%);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -406,7 +406,7 @@
         .file-type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
 
         .file-type-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
-        .file-type-card-header { background: linear-gradient(135deg, var(--accent-amber) 0%, var(--accent-teal) 100%); color: var(--bg-primary); padding: 18px; text-align: center; }
+        .file-type-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
         .file-type-card-header h4 { font-size: 1.05rem; }
         .file-type-card-body { padding: 22px; }
         .file-type-card ul { list-style: none; padding: 0; }
@@ -551,7 +551,7 @@
         .agent-icon {
             width: 55px;
             height: 55px;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -593,7 +593,7 @@
         .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
         .agent-step {
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
             color: white;
             padding: 8px 14px;
             border-radius: 6px;
@@ -628,7 +628,7 @@
             width: 100%;
             margin-top: 18px;
             padding: 14px 20px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
             border: 1px solid rgba(139, 92, 246, 0.4);
             border-radius: 10px;
             color: var(--accent-purple);
@@ -643,7 +643,7 @@
         }
 
         .agent-prompt-btn:hover {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
             border-color: var(--accent-purple);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
@@ -719,7 +719,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
             color: white;
             padding: 22px 28px;
             display: flex;
@@ -788,7 +788,7 @@
         }
 
         .copy-prompt-btn {
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -924,15 +924,15 @@
                     <span>Start/End</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);"></div>
                     <span>Action Step</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);"></div>
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
                     <span>Decision Point</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: var(--bg-secondary); border: 2px solid var(--accent-amber);"></div>
+                    <div class="legend-color" style="background: var(--bg-secondary); border: 2px solid var(--accent-blue);"></div>
                     <span>User Input</span>
                 </div>
                 <div class="legend-item">
@@ -1110,7 +1110,7 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--accent-amber); margin: 25px 0 15px;">Supported Tax Document Types</h3>
+                    <h3 style="color: var(--accent-blue); margin: 25px 0 15px;">Supported Tax Document Types</h3>
 
                     <div class="file-type-grid">
                         <div class="file-type-card">
@@ -1197,7 +1197,7 @@
                         </div>
                     </div>
 
-                    <h3 style="color: var(--accent-amber); margin: 25px 0 15px;">Files Available for Download</h3>
+                    <h3 style="color: var(--accent-blue); margin: 25px 0 15px;">Files Available for Download</h3>
 
                     <table class="field-table">
                         <thead>
@@ -1642,32 +1642,55 @@
         // Scroll spy for workflow nav
         const sections = document.querySelectorAll('.section');
         const navItems = document.querySelectorAll('#workflowNav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
 
-        window.addEventListener('scroll', () => {
+        // Prevent scroll-spy from interfering during navigation clicks
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => { isScrolling = false; }, 1000);
+            });
+        });
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
             let current = '';
+            const scrollPosition = window.scrollY + 150;
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 100) {
+                const sectionBottom = sectionTop + section.offsetHeight;
+
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
                     current = section.getAttribute('id');
                 }
             });
 
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('href') === '#' + current) {
-                    item.classList.add('active');
-                }
-            });
-        });
+            if (current) {
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === '#' + current) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
 
         // Scroll to agent card
         function scrollToAgent(agentId) {
             switchTab('agents');
             setTimeout(() => {
                 const agent = document.getElementById(agentId);
-                agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                agent.classList.add('highlight');
-                setTimeout(() => agent.classList.remove('highlight'), 2000);
+                if (agent) {
+                    agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    agent.classList.add('highlight');
+                    setTimeout(() => agent.classList.remove('highlight'), 2000);
+                }
             }, 100);
         }
 
