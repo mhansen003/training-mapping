@@ -1,0 +1,2454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Inquiry Letter - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Form Preview */
+        .form-preview {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 18px 0;
+        }
+
+        .form-preview h4 { color: var(--accent-teal); margin-bottom: 15px; font-size: 1rem; }
+
+        .form-field {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .form-field:last-child { border-bottom: none; }
+
+        .form-field-label {
+            min-width: 180px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-field-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed var(--accent-blue);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--accent-blue);
+            border-radius: 4px;
+            background: transparent;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Credit Inquiry Letter</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Credit Inquiry Letter</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Document Overview</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">When Required</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Form Completion</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Debt Obtained Handling</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Signatures & Dating</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Document Submission</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Common Scenarios</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Credit Inquiry Letter</h1>
+                <p class="subtitle">Complete guide for obtaining borrower explanations for recent credit inquiries within the last 120 days</p>
+                <div class="meta">
+                    <span class="meta-item">Document: CMG Form</span>
+                    <span class="meta-item">Role: Loan Officer / Processor</span>
+                    <span class="meta-item">Updated: Dec 19, 2018</span>
+                    <span class="meta-item">Duration: 5-15 min per borrower</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Document Overview -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Document Overview</h2><span>Understanding the Credit Inquiry Letter purpose and requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Credit Report Pulled</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Inquiries within 120 Days?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Send Credit Inquiry Letter</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Collect Signed LOE</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Document Purpose</h4>
+                        <p>The Credit Inquiry Letter is a standardized CMG Financial form used to obtain signed, dated letters of explanation from borrowers for <strong>all credit inquiries</strong> on their credit report made within the last <strong>120 days</strong>. This documentation is required for underwriting compliance.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Lookback Period</h4>
+                            <div class="value">120</div>
+                            <div class="label">Days</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Inquiries Per Page</h4>
+                            <div class="value">8</div>
+                            <div class="label">Max Entries</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Signatures Required</h4>
+                            <div class="value">2</div>
+                            <div class="label">Per Borrower</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Form Version</h4>
+                            <div class="value">2018</div>
+                            <div class="label">Dec Update</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Key Requirement</h4>
+                        <p>The borrower must explain the reason for each inquiry AND indicate whether any new debt was obtained from the credit pull. If debt was obtained, supporting documentation is required.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: When Required -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>When Credit Inquiry Letter is Required</h2><span>Identifying inquiries that need explanation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Credit Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Identify All Inquiries</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Within 120 Days?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Add to Credit Inquiry Letter</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">No Explanation Needed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Inquiry Type</th>
+                                <th>Explanation Required</th>
+                                <th>Common Reasons</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Auto Dealer / Finance Company</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Vehicle purchase, refinance, lease</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bank / Credit Union</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Credit card application, personal loan, line of credit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mortgage Lender</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Rate shopping, refinance quote, home purchase</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Retail Store</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Store credit card application, financing offer</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Utility Company</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>New service setup, security deposit check</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Insurance Company</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Insurance quote, policy application</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Employer / Background Check</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>Employment verification, security clearance</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Important: All Inquiries Need Explanation</h4>
+                        <p>Even if the borrower did not obtain new debt, an explanation is still required. The borrower must check "No" for debt obtained and provide a brief explanation (e.g., "Shopping for rates," "Did not proceed with application," "For insurance quote only").</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Form Completion -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Form Completion</h2><span>Step-by-step guide for completing the Credit Inquiry Letter</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Enter Loan Number</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Enter Borrower Name</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Fill Each Inquiry Row</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Complete All Entries</div>
+                        </div>
+                    </div>
+
+                    <div class="form-preview">
+                        <h4>Form Header Fields</h4>
+                        <div class="form-field">
+                            <span class="form-field-label">Loan Number:</span>
+                            <span class="form-field-input">[Enter CMG Loan Number]</span>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Borrower:</span>
+                            <span class="form-field-input">[Full Legal Name of Borrower]</span>
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Enter the <strong>Loan Number</strong> at the top of the form</li>
+                        <li><strong>Step 2:</strong> Enter the <strong>Borrower's Full Legal Name</strong></li>
+                        <li><strong>Step 3:</strong> For each credit inquiry, complete a row with the <strong>Inquiry Date/Lender</strong> information</li>
+                        <li><strong>Step 4:</strong> Check either <strong>Yes</strong> or <strong>No</strong> for "Debt Obtained"</li>
+                        <li><strong>Step 5:</strong> Provide a detailed <strong>Explanation</strong> for the inquiry</li>
+                        <li><strong>Step 6:</strong> Repeat for all inquiries within the 120-day period</li>
+                    </ul>
+
+                    <div class="form-preview">
+                        <h4>Inquiry Entry Row Example</h4>
+                        <div class="form-field">
+                            <span class="form-field-label">Inquiry Date/Lender:</span>
+                            <span class="form-field-input">11/15/2018 - ABC Auto Finance</span>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Debt Obtained:</span>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <div class="checkbox-box"></div>
+                                    <span>Yes</span>
+                                </div>
+                                <div class="checkbox-item">
+                                    <div class="checkbox-box" style="background: var(--accent-blue);"></div>
+                                    <span>No</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Explanation:</span>
+                            <span class="form-field-input">Shopping for auto loan rates. Did not proceed with this lender.</span>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Form Completion Methods</h4>
+                        <p>The form can be completed in two ways:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>Digital:</strong> Fill out by typing in the spaces provided, then print, sign, and return</li>
+                            <li><strong>Manual:</strong> Print the form and manually write in the explanations</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Clear Form Function</h4>
+                        <p>The form includes a "CLICK HERE TO CLEAR FORM" button that resets all fields. Use this if you need to start over or correct multiple entries.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Debt Obtained Handling -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Debt Obtained Handling</h2><span>What to do when new debt was incurred</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">Was Debt Obtained?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Check "Yes" Box</div>
+                                <span class="flow-arrow down">-></span>
+                                <div class="flow-node exception">Provide Supporting Docs</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Check "No" Box</div>
+                                <span class="flow-arrow down">-></span>
+                                <div class="flow-node output">Explanation Only</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>When "Yes" is Selected - Documentation Required</h3>
+                        <ul class="step-list">
+                            <li><strong>Account Statement:</strong> Provide a copy of the most recent account statement showing the account number, balance, and payment amount</li>
+                            <li><strong>Terms of Obligation:</strong> Alternatively, provide the terms/contract showing the loan amount, interest rate, monthly payment, and term length</li>
+                            <li><strong>Payment Verification:</strong> If payments have been made, provide evidence of payment history</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Debt Type</th>
+                                <th>Required Documentation</th>
+                                <th>Impact on Loan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Auto Loan</strong></td>
+                                <td>Loan agreement or first statement</td>
+                                <td>Added to DTI calculation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Credit Card</strong></td>
+                                <td>Card agreement and current statement</td>
+                                <td>Added to DTI (minimum payment)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Personal Loan</strong></td>
+                                <td>Loan agreement showing terms</td>
+                                <td>Added to DTI calculation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Retail Financing</strong></td>
+                                <td>Financing agreement or statement</td>
+                                <td>May affect DTI if payments due</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mortgage Inquiry</strong></td>
+                                <td>Closing Disclosure if closed</td>
+                                <td>Full analysis required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Critical: New Debt Affects Loan Qualification</h4>
+                        <p>Any new debt obtained must be factored into the debt-to-income (DTI) ratio calculation. This may require:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Re-running AUS (Automated Underwriting System)</li>
+                            <li>Updated DTI calculations by the processor</li>
+                            <li>Possible loan restructuring if DTI exceeds guidelines</li>
+                            <li>Communication with underwriting about the new liability</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Signatures & Dating -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Signatures & Dating</h2><span>Proper execution of the Credit Inquiry Letter</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Form Completed</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Borrower Signs</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Borrower Dates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Document Valid</div>
+                        </div>
+                    </div>
+
+                    <div class="form-preview">
+                        <h4>Signature Section</h4>
+                        <div class="form-field">
+                            <span class="form-field-label">Borrower Signature:</span>
+                            <span class="form-field-input">[Wet signature or e-signature]</span>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Date:</span>
+                            <span class="form-field-input">[Date of signing]</span>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Borrower Signature:</span>
+                            <span class="form-field-input">[Second borrower if applicable]</span>
+                        </div>
+                        <div class="form-field">
+                            <span class="form-field-label">Date:</span>
+                            <span class="form-field-input">[Date of signing]</span>
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Primary Borrower:</strong> Must sign and date the document in the first signature line</li>
+                        <li><strong>Co-Borrower:</strong> If applicable, must sign and date in the second signature line</li>
+                        <li><strong>Date Requirement:</strong> The date must be current (the day the borrower signs)</li>
+                        <li><strong>Signature Consistency:</strong> Signature should match other loan documents</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <h4>Electronic Signatures</h4>
+                        <p>If using e-signatures, ensure the document is signed through an approved e-signature platform that meets E-Sign Act compliance requirements.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Missing Signature Rejection</h4>
+                        <p>A Credit Inquiry Letter without a valid signature and date will be rejected by underwriting. Ensure both elements are present before submitting to the loan file.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Document Submission -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Document Submission</h2><span>Returning completed forms and supporting documentation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Complete Form</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Sign & Date</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Debt Obtained?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Attach Supporting Docs</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Submit LOE Only</div>
+                            </div>
+                        </div>
+                        <div class="flow-row" style="margin-top: 20px;">
+                            <div class="flow-node output">Return to LO or Processor</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Submission Method</th>
+                                <th>Instructions</th>
+                                <th>Preferred?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Email to Loan Officer</strong></td>
+                                <td>Scan/photograph and email as PDF attachment</td>
+                                <td><span class="badge calculated-badge">Preferred</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email to Processor</strong></td>
+                                <td>Send directly to assigned processor if known</td>
+                                <td><span class="badge calculated-badge">Preferred</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Secure Portal Upload</strong></td>
+                                <td>Upload through borrower portal if available</td>
+                                <td><span class="badge optional-badge">Acceptable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fax</strong></td>
+                                <td>Fax to loan officer's direct fax number</td>
+                                <td><span class="badge optional-badge">Acceptable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Physical Mail</strong></td>
+                                <td>Mail original to loan officer's office</td>
+                                <td><span class="badge required-badge">Last Resort</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Best Practices for Submission</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Scan as a clear, readable PDF (not a photo if possible)</li>
+                            <li>Include the loan number in the email subject line</li>
+                            <li>Attach all supporting documents in the same email</li>
+                            <li>Confirm receipt with your loan officer or processor</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Common Scenarios -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Common Scenarios & Explanations</h2><span>Sample explanations for typical credit inquiries</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Mortgage Rate Shopping (Multiple Inquiries)</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">When borrowers shop for the best mortgage rate and have multiple lender inquiries.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation</span>
+                            <p>"This inquiry was for mortgage rate shopping as I was comparing rates from multiple lenders for my home purchase. I did not obtain a loan from this lender."</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Auto Loan Rate Shopping</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Multiple auto dealer or finance company inquiries within a short period.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation - No Debt</span>
+                            <p>"This inquiry was from shopping for auto loan rates. I was comparing financing options but did not purchase a vehicle from this dealer."</p>
+                        </div>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation - Debt Obtained</span>
+                            <p>"This inquiry resulted in an auto loan for the purchase of a 2024 Honda Accord. Monthly payment is $425. Statement attached."</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Credit Card Application</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Retail or bank credit card inquiries.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation - Declined</span>
+                            <p>"Applied for a credit card but was declined. No new account was opened."</p>
+                        </div>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation - Approved</span>
+                            <p>"Applied for and received a new credit card with a $5,000 limit. Current balance is $0. Statement attached."</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Utility / Service Setup</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Inquiries from utility companies or service providers.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation</span>
+                            <p>"This inquiry was for setting up new electric service at my rental property. No credit was extended; this was a credit check for service deposit purposes only."</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Insurance Quote</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Soft or hard pulls from insurance companies.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation</span>
+                            <p>"This inquiry was for obtaining an auto/home insurance quote. I was comparing insurance rates. No debt or credit was obtained."</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Employment Background Check</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Inquiries from employers for pre-employment screening.</p>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Sample Explanation</span>
+                            <p>"This inquiry was for a pre-employment background check required by my new employer. No credit was obtained or applied for."</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Writing Effective Explanations</h4>
+                        <p>Good explanations should include:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>The reason for the inquiry (what you were shopping for)</li>
+                            <li>The outcome (approved, declined, did not proceed)</li>
+                            <li>Whether any debt/credit was obtained</li>
+                            <li>If debt was obtained, the basic terms (amount, payment)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Credit Inquiry Letter Quick Reference</h3>
+                <pre>
+CREDIT INQUIRY LETTER CHECKLIST
+================================
+
+WHEN REQUIRED:
+- All credit inquiries within the last 120 days
+- Applies to all borrowers on the loan
+- Required regardless of whether debt was obtained
+
+FORM COMPLETION:
+[ ] Loan Number entered at top
+[ ] Borrower full name entered
+[ ] Each inquiry has Date and Lender name
+[ ] Yes or No checked for "Debt Obtained"
+[ ] Explanation provided for EVERY inquiry
+[ ] Borrower signature (wet or e-signature)
+[ ] Date of signing
+
+IF DEBT WAS OBTAINED (Yes checked):
+[ ] Account statement OR
+[ ] Terms of obligation document
+[ ] New debt disclosed to processor
+
+COMMON INQUIRY TYPES:
+- Auto Dealer/Finance Company
+- Bank/Credit Union
+- Mortgage Lender
+- Retail Store
+- Utility Company
+- Insurance Company
+- Employer (background check)
+
+SAMPLE EXPLANATIONS:
+
+Rate Shopping (No Debt):
+"Shopping for [mortgage/auto/etc.] rates.
+Did not proceed with this lender."
+
+Credit Card (Declined):
+"Applied for credit card but was declined.
+No new account opened."
+
+Credit Card (Approved):
+"New credit card obtained. $X limit,
+$Y current balance. Statement attached."
+
+Utility/Service:
+"Credit check for new [utility] service.
+No credit extended."
+
+Insurance Quote:
+"Inquiry for insurance quote only.
+No debt obtained."
+
+Employment:
+"Pre-employment background check.
+No credit applied for or obtained."
+
+SUBMISSION:
+- Return to Loan Officer or Processor
+- Include all supporting docs if debt obtained
+- Email preferred (PDF attachment)
+- Include loan number in subject line
+
+CMG FINANCIAL COMPLIANCE NOTE:
+All credit inquiries require explanation.
+Failure to provide may delay processing.
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Credit Inquiry Letter process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-inquiry-extractor')">
+                        <div class="heat-score">9.5</div>
+                        <div class="heat-name">Inquiry Extractor Agent</div>
+                        <div class="heat-desc">Auto-extract credit inquiries from credit report and pre-populate form</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-explanation-generator')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Explanation Generator</div>
+                        <div class="heat-desc">Generate compliant explanations based on inquiry type</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-debt-tracker')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">New Debt Tracker</div>
+                        <div class="heat-desc">Monitor for new debts and alert for DTI recalculation</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>N/A</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-doc-validator')">
+                        <div class="heat-score">6.4</div>
+                        <div class="heat-name">Document Validator</div>
+                        <div class="heat-desc">Validate form completeness and supporting docs</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>1 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Inquiry Extractor Agent -->
+                    <div class="agent-card" id="agent-inquiry-extractor">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">E</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Inquiry Extractor Agent</div>
+                                <div class="agent-type">Document Processing / OCR</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically parses credit reports to identify all inquiries within the 120-day lookback period, extracts inquiry dates and creditor names, and pre-populates the Credit Inquiry Letter form. Eliminates manual data entry and reduces errors.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Credit Report</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Filter 120 Days</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Extract Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Populate Form</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('inquiryextractor')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Explanation Generator Agent -->
+                    <div class="agent-card" id="agent-explanation-generator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">G</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Explanation Generator</div>
+                                <div class="agent-type">NLP / Text Generation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Generates compliant, borrower-friendly explanations based on the creditor type and inquiry context. Provides template suggestions that borrowers can customize, ensuring explanations meet underwriting requirements.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Identify Creditor Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Match Template</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Text</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Present Options</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('explanationgenerator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- New Debt Tracker Agent -->
+                    <div class="agent-card" id="agent-debt-tracker">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">New Debt Tracker</div>
+                                <div class="agent-type">Monitoring / Alerts</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Monitors Credit Inquiry Letter responses for "Yes" debt obtained selections, automatically flags the loan for DTI recalculation, alerts the processor and underwriter, and tracks required supporting documentation status.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Scan Responses</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Detect New Debt</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Loan</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Track Docs</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">N/A</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('debttracker')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Document Validator Agent -->
+                    <div class="agent-card" id="agent-doc-validator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Document Validator</div>
+                                <div class="agent-type">Quality Assurance</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates completed Credit Inquiry Letters for completeness: checks for missing signatures, dates, explanations, and verifies supporting documentation is attached when debt was obtained. Prevents submission of incomplete documents.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Scan Document</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Fields</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Verify Attachments</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Issues</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">1 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docvalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Credit Inquiry Letter Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Credit Inquiry Letter - CMG Financial
+
+## Overview
+A signed and dated letter of explanation is needed for all credit inquiries on a borrower's credit report made within the last 120 days.
+
+## Purpose
+- Document borrower explanations for recent credit inquiries
+- Identify any new debt obtained from credit pulls
+- Ensure compliance with underwriting requirements
+
+## Form Requirements
+
+### Header Information
+- Loan Number
+- Borrower Name
+
+### For Each Inquiry
+- Inquiry Date/Lender name
+- Debt Obtained: Yes or No (checkbox)
+- Explanation of the inquiry reason
+
+### Signatures
+- Borrower Signature with Date
+- Co-Borrower Signature with Date (if applicable)
+
+## If Debt Was Obtained
+When "Yes" is checked for debt obtained:
+- Provide account statement OR
+- Provide terms of the obligation document
+- New debt must be factored into DTI calculation
+
+## Common Inquiry Types
+- Auto Dealer/Finance Company
+- Bank/Credit Union
+- Mortgage Lender
+- Retail Store
+- Utility Company
+- Insurance Company
+- Employer Background Check
+
+## Submission
+- Return completed form to Loan Officer or Processor
+- Include supporting documentation if debt obtained
+- Email preferred (PDF attachment)
+- Include loan number in subject line</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            inquiryextractor: {
+                name: 'Inquiry Extractor Agent',
+                tags: ['Document Processing', 'OCR', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically parses credit reports to identify all inquiries within the 120-day lookback period, extracts inquiry dates and creditor names, and pre-populates the Credit Inquiry Letter form. This eliminates manual data entry, reduces errors, and saves approximately 8 minutes per loan file.`,
+                prompt: `You are building a Document Processing Agent for CMG Financial's Credit Inquiry Letter process.
+
+AGENT NAME: Inquiry Extractor Agent
+TYPE: Document Processing / OCR
+
+OBJECTIVE:
+Create an agent that automatically parses credit reports (tri-merge or single bureau) to extract all credit inquiries within the last 120 days and pre-populate the Credit Inquiry Letter form.
+
+INPUT DATA:
+- Credit report PDF (tri-merge from Equifax, Experian, TransUnion)
+- Current date for 120-day lookback calculation
+- Loan number
+- Borrower name(s)
+
+PARSING REQUIREMENTS:
+1. Locate "Inquiries" or "Credit Inquiries" section in report
+2. Extract for each inquiry:
+   - Inquiry date (MM/DD/YYYY format)
+   - Creditor/Company name
+   - Type of business (auto, mortgage, retail, etc.)
+3. Filter inquiries to only those within 120 days of current date
+
+OUTPUT FORMAT:
+{
+  "loan_number": "string",
+  "borrower_name": "string",
+  "extraction_date": "YYYY-MM-DD",
+  "inquiries": [
+    {
+      "date": "MM/DD/YYYY",
+      "creditor_name": "string",
+      "creditor_type": "auto|mortgage|retail|bank|utility|insurance|employer|other",
+      "days_ago": number
+    }
+  ],
+  "total_inquiries": number
+}
+
+FORM POPULATION:
+- Populate Loan Number field
+- Populate Borrower Name field
+- For each inquiry, fill one row with:
+  - Inquiry Date/Lender: "{date} - {creditor_name}"
+  - Leave Debt Obtained checkboxes blank (borrower must complete)
+  - Leave Explanation blank (borrower must complete)
+
+ERROR HANDLING:
+- If credit report format unrecognized: Flag for manual review
+- If inquiry section not found: Alert user, provide manual entry option
+- If date parsing fails: Log error, include raw text for review`,
+                integration: `INTEGRATION POINTS:
+1. Credit Report Sources
+   - Merge report from credit vendors (Equifax, Experian, TransUnion)
+   - Support multiple PDF formats
+   - Handle encrypted PDFs with proper credentials
+
+2. Form Generation
+   - Pre-populate CMG Credit Inquiry Letter template
+   - Generate fillable PDF or web form
+   - Support multiple pages if >8 inquiries
+
+3. LOS Integration
+   - Push populated form to loan file
+   - Store extraction metadata for audit
+   - Link to original credit report
+
+DEPLOYMENT:
+- Triggered when credit report is added to loan file
+- Runs as background process
+- Results available within 30 seconds
+- Manual override available`
+            },
+            explanationgenerator: {
+                name: 'Explanation Generator Agent',
+                tags: ['NLP', 'Text Generation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent generates compliant, borrower-friendly explanations based on the creditor type and inquiry context. It provides template suggestions that borrowers can customize, ensuring explanations meet underwriting requirements while saving time.`,
+                prompt: `You are building a Text Generation Agent for CMG Financial's Credit Inquiry Letter process.
+
+AGENT NAME: Explanation Generator Agent
+TYPE: NLP / Text Generation
+
+OBJECTIVE:
+Generate compliant, underwriting-acceptable explanations for credit inquiries based on the creditor type and common scenarios.
+
+INPUT DATA:
+- Creditor name
+- Creditor type (auto, mortgage, retail, bank, utility, insurance, employer)
+- Inquiry date
+- Optional: borrower-provided context
+
+EXPLANATION TEMPLATES BY TYPE:
+
+AUTO DEALER/FINANCE:
+- No debt: "This inquiry was for auto loan rate shopping. I was comparing financing options and did not proceed with this lender."
+- Debt obtained: "This inquiry resulted in an auto loan for [vehicle]. Monthly payment is $[amount]. Statement attached."
+
+MORTGAGE LENDER:
+- No debt: "This inquiry was for mortgage rate shopping as I compared rates from multiple lenders. I did not obtain a loan from this lender."
+- Debt obtained: "This inquiry resulted in a mortgage loan that [closed/is pending]. Closing Disclosure attached."
+
+BANK/CREDIT UNION:
+- No debt (credit card): "Applied for a credit card but was declined/did not proceed with application."
+- Debt obtained (credit card): "New credit card obtained with $[limit] limit. Current balance is $[amount]. Statement attached."
+- No debt (loan): "Inquired about personal loan rates but did not proceed."
+
+RETAIL STORE:
+- No debt: "Declined store credit card offer at checkout. No account opened."
+- Debt obtained: "Store credit card obtained for $[limit] limit. Statement attached."
+
+UTILITY COMPANY:
+- "Credit check for new [electric/gas/cable] service setup. No credit extended; deposit check only."
+
+INSURANCE COMPANY:
+- "Inquiry for [auto/home] insurance quote. No debt or credit obtained."
+
+EMPLOYER:
+- "Pre-employment background check required by [employer name]. No credit applied for or obtained."
+
+OUTPUT FORMAT:
+{
+  "inquiry_date": "MM/DD/YYYY",
+  "creditor_name": "string",
+  "suggested_explanations": [
+    {
+      "scenario": "no_debt",
+      "explanation": "string",
+      "compliant": true
+    },
+    {
+      "scenario": "debt_obtained",
+      "explanation": "string",
+      "requires_documentation": true
+    }
+  ]
+}
+
+COMPLIANCE RULES:
+- Explanations must be factual and specific
+- Avoid vague language ("I think", "maybe")
+- Include outcome (approved, declined, did not proceed)
+- Mention debt status explicitly`,
+                integration: `INTEGRATION POINTS:
+1. Inquiry Extractor Agent
+   - Receives creditor type classification
+   - Chains to generate explanations automatically
+
+2. Borrower Portal
+   - Present explanation options to borrower
+   - Allow customization of templates
+   - Save selected explanations to form
+
+3. Compliance Database
+   - Validate explanations against underwriting rules
+   - Flag non-compliant language
+   - Track approval rates by explanation type
+
+DEPLOYMENT:
+- Triggered after inquiry extraction
+- Real-time generation (<2 seconds)
+- Borrower-facing interface
+- Edit capability for personalization`
+            },
+            debttracker: {
+                name: 'New Debt Tracker Agent',
+                tags: ['Monitoring', 'Alerts', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent monitors Credit Inquiry Letter responses for "Yes" debt obtained selections, automatically flags the loan for DTI recalculation, alerts the processor and underwriter, and tracks required supporting documentation status.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Credit Inquiry Letter process.
+
+AGENT NAME: New Debt Tracker Agent
+TYPE: Monitoring / Alerts
+
+OBJECTIVE:
+Monitor submitted Credit Inquiry Letters for new debt disclosures and ensure proper handling for DTI recalculation and documentation collection.
+
+INPUT DATA:
+- Completed Credit Inquiry Letter (PDF or form data)
+- Loan file data (current DTI, loan type, etc.)
+- Borrower information
+
+MONITORING LOGIC:
+1. Parse submitted Credit Inquiry Letter
+2. Identify all inquiries marked "Debt Obtained: Yes"
+3. For each new debt:
+   - Extract creditor name
+   - Flag for documentation requirement
+   - Calculate impact severity (estimated)
+
+NEW DEBT DETECTION:
+{
+  "loan_number": "string",
+  "borrower_name": "string",
+  "submission_date": "YYYY-MM-DD",
+  "new_debts_detected": [
+    {
+      "creditor": "string",
+      "type": "auto|credit_card|personal_loan|retail|other",
+      "documentation_status": "pending|received|not_required",
+      "estimated_monthly_payment": number | null
+    }
+  ],
+  "total_new_debts": number,
+  "dti_recalc_required": boolean
+}
+
+ALERT TRIGGERS:
+1. Any "Yes" selection triggers processor alert
+2. Multiple new debts trigger underwriter alert
+3. Auto/mortgage debt triggers high-priority flag
+4. Missing documentation after 48 hours triggers reminder
+
+ALERT CONTENT:
+- Loan number and borrower name
+- List of new debts disclosed
+- Documentation requirements
+- Link to Credit Inquiry Letter
+- Action required (recalculate DTI, collect docs)
+
+TRACKING DASHBOARD:
+- List of loans with new debt disclosures
+- Documentation status by loan
+- Days since disclosure
+- Escalation status
+
+ERROR HANDLING:
+- If form parsing fails: Queue for manual review
+- If loan file not found: Alert admin
+- If duplicate submission: Merge and dedupe`,
+                integration: `INTEGRATION POINTS:
+1. LOS System
+   - Update loan flags when new debt detected
+   - Push documentation requirements to conditions
+   - Trigger AUS rerun workflow
+
+2. Notification System
+   - Email alerts to processor
+   - Dashboard notifications
+   - Escalation to underwriting manager
+
+3. Document Management
+   - Track supporting doc uploads
+   - Match docs to specific debts
+   - Verify document completeness
+
+4. DTI Calculator
+   - Feed new debt data for recalculation
+   - Compare before/after DTI
+   - Flag if exceeds guidelines
+
+DEPLOYMENT:
+- Triggered on Credit Inquiry Letter submission
+- Real-time processing
+- Persistent tracking until loan closes
+- Audit trail for compliance`
+            },
+            docvalidator: {
+                name: 'Document Validator Agent',
+                tags: ['Quality Assurance', 'Validation', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent validates completed Credit Inquiry Letters for completeness: checks for missing signatures, dates, explanations, and verifies supporting documentation is attached when debt was obtained. Prevents submission of incomplete documents.`,
+                prompt: `You are building a Quality Assurance Agent for CMG Financial's Credit Inquiry Letter process.
+
+AGENT NAME: Document Validator Agent
+TYPE: Quality Assurance / Validation
+
+OBJECTIVE:
+Validate submitted Credit Inquiry Letters for completeness and compliance before acceptance into the loan file.
+
+INPUT DATA:
+- Credit Inquiry Letter (PDF)
+- Associated attachments (if any)
+- Number of inquiries expected (from credit report)
+
+VALIDATION CHECKS:
+
+1. HEADER VALIDATION:
+   [ ] Loan Number present and valid format
+   [ ] Borrower Name present and matches loan file
+
+2. INQUIRY VALIDATION (per row):
+   [ ] Inquiry Date/Lender field populated
+   [ ] Date format valid (MM/DD/YYYY)
+   [ ] Debt Obtained checkbox selected (Yes OR No)
+   [ ] Explanation field not blank
+   [ ] Explanation has minimum 10 characters
+
+3. SIGNATURE VALIDATION:
+   [ ] Primary borrower signature present
+   [ ] Primary borrower date present
+   [ ] Date is current (within last 30 days)
+   [ ] Co-borrower signature (if applicable)
+   [ ] Co-borrower date (if applicable)
+
+4. DOCUMENTATION VALIDATION:
+   For each "Yes" debt obtained:
+   [ ] Supporting document attached
+   [ ] Document type matches debt type
+   [ ] Document is legible
+   [ ] Document shows account terms or balance
+
+OUTPUT FORMAT:
+{
+  "validation_status": "PASS" | "FAIL" | "WARN",
+  "loan_number": "string",
+  "checks_passed": number,
+  "checks_failed": number,
+  "issues": [
+    {
+      "severity": "error" | "warning",
+      "field": "string",
+      "message": "string",
+      "row_number": number | null
+    }
+  ],
+  "missing_documentation": [
+    {
+      "inquiry": "string",
+      "required_doc_type": "statement|terms|contract"
+    }
+  ]
+}
+
+VALIDATION RULES:
+- All error-level issues must be resolved before acceptance
+- Warning-level issues flagged but don't block submission
+- Missing docs for "Yes" selections are error-level
+- Missing explanation is error-level
+- Missing signature/date is error-level`,
+                integration: `INTEGRATION POINTS:
+1. Document Upload Portal
+   - Intercept submissions before processing
+   - Return validation results immediately
+   - Guide user to fix issues
+
+2. LOS Integration
+   - Only accept validated documents
+   - Update document status
+   - Log validation results
+
+3. Borrower Communication
+   - Generate clear error messages
+   - Provide specific fix instructions
+   - Allow resubmission
+
+4. Reporting
+   - Track validation failure rates
+   - Identify common issues
+   - Training opportunity identification
+
+DEPLOYMENT:
+- Triggered on document upload
+- Real-time validation (<5 seconds)
+- Clear pass/fail response
+- Detailed issue list for failures`
+            }
+        };
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const fullPrompt = document.getElementById('promptContent').textContent + '\n\n' + document.getElementById('promptIntegration').textContent;
+            try {
+                await navigator.clipboard.writeText(fullPrompt);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>

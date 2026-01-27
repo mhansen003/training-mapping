@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections & Judgements Reference - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.excluded-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Investor Comparison Cards */
+        .investor-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .investor-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .investor-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .investor-card-header h4 { font-size: 1.15rem; }
+        .investor-card-body { padding: 22px; }
+        .investor-card ul { list-style: none; padding: 0; }
+        .investor-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .investor-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; flex-shrink: 0; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; flex-shrink: 0; }
+        .info-icon { color: var(--accent-blue); font-weight: bold; flex-shrink: 0; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Collections & Judgements Reference</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Collections & Judgements</h2>
+            <p>Investor Guidelines Reference</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Fannie Mae Guidelines</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Freddie Mac Guidelines</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">FHA Guidelines</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">USDA Guidelines</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">VA Guidelines</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Decision Workflow</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Collections & Judgements Reference</h1>
+                <p class="subtitle">Complete investor guideline reference for handling collections and charge-off accounts across all loan types</p>
+                <div class="meta">
+                    <span class="meta-item">Topic: Credit Analysis</span>
+                    <span class="meta-item">Role: Processor / Underwriter</span>
+                    <span class="meta-item">Updated: July 10, 2025</span>
+                    <span class="meta-item">Investors: FNMA, FHLMC, FHA, USDA, VA</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>No Action Required</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Pay at Closing</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></div><span>Include in DTI</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Medical Excluded</span></div>
+            </div>
+
+            <!-- Section 1: Fannie Mae -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Fannie Mae Guidelines</h2><span>Collection and charge-off requirements by property type</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Identify Property Type</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Property Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">1 Unit Primary</span>
+                                <div class="flow-node output">No Payoff Required*</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">2-4 Unit/Second Home</span>
+                                <div class="flow-node action">Pay if > $5,000</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Investment</span>
+                                <div class="flow-node action">Pay if >= $250 or > $1,000 Total</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="investor-comparison">
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>1 Unit Principal Residence</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="check-icon">+</span>Borrowers are NOT required to pay off outstanding collections</li>
+                                    <li><span class="check-icon">+</span>Non-mortgage charge-offs do NOT need to be paid regardless of amount</li>
+                                    <li><span class="info-icon">i</span>If marked "to be paid at closing" in DU, accounts MUST be paid off</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>2-4 Unit Primary or Second Home</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="x-icon">!</span>Collections and non-mortgage charge-offs totaling more than <strong>$5,000</strong> must be paid in full</li>
+                                    <li><span class="info-icon">i</span>Payment required prior to or at closing</li>
+                                    <li><span class="check-icon">+</span>Amounts $5,000 or less do not require payoff</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>1-4 Unit Investment Property</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="x-icon">!</span>Individual accounts >= <strong>$250</strong> must be paid in full</li>
+                                    <li><span class="x-icon">!</span>Accounts totaling > <strong>$1,000</strong> must be paid in full</li>
+                                    <li><span class="info-icon">i</span>Payment required prior to or at closing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>DU Override Warning</h4>
+                        <p>Even for 1 Unit Principal Residence loans, if accounts are marked "to be paid at closing" in DU findings, they MUST be paid off regardless of the general policy. Always check DU feedback for specific requirements.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Property Type</th>
+                                <th>Individual Threshold</th>
+                                <th>Total Threshold</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1 Unit Principal Residence</strong></td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td><span class="badge optional-badge">None (unless DU requires)</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>2-4 Unit Primary / Second Home</strong></td>
+                                <td>N/A</td>
+                                <td>> $5,000</td>
+                                <td><span class="badge required-badge">Pay in Full</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>1-4 Unit Investment</strong></td>
+                                <td>>= $250</td>
+                                <td>> $1,000</td>
+                                <td><span class="badge required-badge">Pay in Full</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 2: Freddie Mac -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Freddie Mac Guidelines</h2><span>LPA Accept requirements for collections and charge-offs</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">LPA Accept</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Follow Feedback Certificate</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Freddie Mac LPA Accept</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>No documentation or additional assessment is required for collections/charge-offs</li>
+                            <li>Simply follow the LPA Feedback Certificate instructions</li>
+                            <li>Freddie Mac provides the most streamlined approach for LPA Accept loans</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Key Advantage</h4>
+                        <p>Freddie Mac's LPA Accept provides significant flexibility by not requiring additional documentation or assessment for collections and charge-off accounts. This can expedite loan processing when the loan receives an Accept through LPA.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: FHA -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>FHA Guidelines</h2><span>Cumulative collection balance requirements with $2,000 threshold</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Calculate Total Collections</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Total >= $2,000?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node decision">Payment Arrangement?</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">No Action Required</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>FHA Collections Decision Tree</h3>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Medical Collections/Charge-offs</span>
+                            <p><strong>NOT CONSIDERED</strong> - Exclude from calculations entirely</p>
+                        </div>
+                        <div class="tree-node">
+                            <span class="tree-label">Cumulative Balance < $2,000</span>
+                            <p>No documentation or action required</p>
+                        </div>
+                        <div class="tree-node">
+                            <span class="tree-label">Cumulative Balance >= $2,000</span>
+                            <p>Choose one of three options:</p>
+                        </div>
+                    </div>
+
+                    <div class="investor-comparison">
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>Option 1: Pay in Full</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="check-icon">+</span>Document that all debt is paid in full</li>
+                                    <li><span class="check-icon">+</span>Payment at or prior to settlement</li>
+                                    <li><span class="check-icon">+</span>Use acceptable sources of funds</li>
+                                    <li><span class="info-icon">i</span>No impact on DTI</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>Option 2: Payment Arrangement</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="check-icon">+</span>Verify payment arrangement with creditor</li>
+                                    <li><span class="x-icon">!</span>Include monthly payment in DTI</li>
+                                    <li><span class="info-icon">i</span>Provide documentation of arrangement</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>Option 3: Calculate 5% Payment</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="info-icon">i</span>Use when no payment arrangement available</li>
+                                    <li><span class="x-icon">!</span>Calculate 5% of outstanding balance for EACH collection</li>
+                                    <li><span class="x-icon">!</span>Include calculated amount in DTI</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Community Property State Warning</h4>
+                        <p><strong>CRITICAL:</strong> Collection accounts of a <strong>non-borrower spouse</strong> in a Community Property State must be:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Included in the $2,000 cumulative balance calculation</li>
+                            <li>Analyzed as part of the ability to pay assessment</li>
+                            <li>Exception: May be excluded if allowed by state law</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Collection Type</th>
+                                <th>Threshold</th>
+                                <th>Action Options</th>
+                                <th>DTI Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Medical Collections</strong></td>
+                                <td>N/A</td>
+                                <td><span class="badge excluded-badge">Excluded</span></td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medical Charge-offs</strong></td>
+                                <td>N/A</td>
+                                <td><span class="badge excluded-badge">Excluded</span></td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical (< $2,000)</strong></td>
+                                <td>< $2,000</td>
+                                <td><span class="badge optional-badge">No Action</span></td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical (>= $2,000)</strong></td>
+                                <td>>= $2,000</td>
+                                <td><span class="badge required-badge">Pay/Arrange/5%</span></td>
+                                <td>Varies</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 4: USDA -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>USDA Guidelines</h2><span>Rural development collection requirements similar to FHA</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Calculate Collections</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Remove Medical & Charge-offs</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Remaining >= $2,000?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Pay/Arrange/5%</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">No Action Required</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>USDA Collection Calculation Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Determine total outstanding balance of ALL collection accounts for ALL applicants</li>
+                            <li><strong>Step 2:</strong> Include non-purchasing spouse accounts in Community Property States (unless excluded by state law)</li>
+                            <li><strong>Step 3:</strong> Remove ALL medical collections from the total balance</li>
+                            <li><strong>Step 4:</strong> Remove ALL types of charge-off accounts from the total balance</li>
+                            <li><strong>Step 5:</strong> Medical collections and charge-offs must be clearly identifiable on credit report</li>
+                            <li><strong>Step 6:</strong> If remaining balance >= $2,000, proceed with resolution options</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Key USDA Distinction</h4>
+                        <p>Unlike FHA which excludes only medical items, USDA excludes <strong>ALL charge-off accounts</strong> (both medical and non-medical) from the $2,000 threshold calculation. Only active collection accounts are counted.</p>
+                    </div>
+
+                    <div class="investor-comparison">
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>If Remaining Balance >= $2,000</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="info-icon">1</span><strong>Option A:</strong> Payment in full of collection accounts prior to or at closing</li>
+                                    <li><span class="info-icon">2</span><strong>Option B:</strong> Payment arrangement documented with each creditor; payment included in DTI</li>
+                                    <li><span class="info-icon">3</span><strong>Option C:</strong> If no payment arrangements available, 5% of outstanding balance will be used in DTI</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Underwriter Discretion</h4>
+                        <p>Underwriting will determine which collection accounts, if any, should be paid in full by the applicant prior to or at closing. This provides flexibility based on the overall loan profile.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Account Type</th>
+                                <th>Included in $2,000 Calculation?</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Medical Collections</strong></td>
+                                <td><span class="badge excluded-badge">No - Excluded</span></td>
+                                <td>Must be identifiable on credit report</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medical Charge-offs</strong></td>
+                                <td><span class="badge excluded-badge">No - Excluded</span></td>
+                                <td>All charge-offs excluded</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical Charge-offs</strong></td>
+                                <td><span class="badge excluded-badge">No - Excluded</span></td>
+                                <td>All charge-offs excluded</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical Collections</strong></td>
+                                <td><span class="badge required-badge">Yes - Included</span></td>
+                                <td>Count toward $2,000 threshold</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: VA -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>VA Guidelines</h2><span>Veterans Administration collection and charge-off requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Review Credit Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Collection Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">Medical</span>
+                                <div class="flow-node output">Not Considered</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Non-Medical</span>
+                                <div class="flow-node action">Include in DTI & Residual</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Charge-Off</span>
+                                <div class="flow-node action">Address in Credit Review</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>VA Non-Medical Collection Handling</h3>
+                        <ul class="step-list">
+                            <li><strong>Key Point:</strong> Non-medical collection accounts do NOT necessarily have to be paid off as a condition for loan approval</li>
+                            <li><strong>Underwriter Role:</strong> Underwriting will determine if any collections need to be paid off for the loan</li>
+                            <li><strong>Credit Impact:</strong> Non-medical collections ARE part of overall credit history evaluation</li>
+                            <li><strong>DTI Inclusion:</strong> MUST be used in DTI ratio calculation</li>
+                            <li><strong>Residual:</strong> MUST be included in residual cash calculation on VA Loan Analysis</li>
+                        </ul>
+                    </div>
+
+                    <div class="investor-comparison">
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>Non-Medical Collections</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="info-icon">i</span>If payment listed on credit report: Use that payment for DTI</li>
+                                    <li><span class="info-icon">i</span>If NO payment established: Calculate <strong>5% of outstanding balance</strong> as monthly payment</li>
+                                    <li><span class="x-icon">!</span>Include in both DTI and residual income calculations</li>
+                                    <li><span class="check-icon">+</span>Borrower should show re-established satisfactory credit</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="investor-card">
+                            <div class="investor-card-header">
+                                <h4>Charge-Off Accounts</h4>
+                            </div>
+                            <div class="investor-card-body">
+                                <ul>
+                                    <li><span class="info-icon">i</span>Typically collections where creditor is no longer pursuing collection</li>
+                                    <li><span class="x-icon">!</span>Underwriter MUST address circumstances regarding negative credit history</li>
+                                    <li><span class="info-icon">i</span>Review as part of overall credit evaluation of borrower(s)</li>
+                                    <li><span class="check-icon">+</span>No automatic payoff requirement</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>VA Loan Analysis Requirement</h4>
+                        <p>Non-medical collections MUST be included in the VA Loan Analysis for both:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>DTI Ratio:</strong> Use listed payment or 5% of balance</li>
+                            <li><strong>Residual Income:</strong> Deduct from gross income to calculate residual cash</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Re-established Credit</h4>
+                        <p>Borrowers should have re-established satisfactory credit in order to be considered a satisfactory risk. Review the overall credit profile, not just the collections/charge-offs in isolation.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Account Type</th>
+                                <th>Payoff Required?</th>
+                                <th>DTI Treatment</th>
+                                <th>Residual Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Medical Collections</strong></td>
+                                <td><span class="badge excluded-badge">Not Considered</span></td>
+                                <td>None</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Medical Charge-offs</strong></td>
+                                <td><span class="badge excluded-badge">Not Considered</span></td>
+                                <td>None</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical (w/payment)</strong></td>
+                                <td><span class="badge optional-badge">UW Discretion</span></td>
+                                <td>Listed Payment</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical (no payment)</strong></td>
+                                <td><span class="badge optional-badge">UW Discretion</span></td>
+                                <td>5% of Balance</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Non-Medical Charge-off</strong></td>
+                                <td><span class="badge optional-badge">UW Discretion</span></td>
+                                <td>Address in review</td>
+                                <td>Review required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 6: Decision Workflow -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Collections Decision Workflow</h2><span>Step-by-step process for handling collections across all investors</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Identify Loan Type</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Pull Credit Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Identify Collections</span>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Medical?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES (FHA/USDA/VA)</span>
+                                <div class="flow-node output">Exclude from Analysis</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Apply Investor Guidelines</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Fannie Mae</h4>
+                            <div class="value">$5K</div>
+                            <div class="label">2-4 Unit Threshold</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>FHA/USDA</h4>
+                            <div class="value">$2K</div>
+                            <div class="label">Cumulative Threshold</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Freddie Mac</h4>
+                            <div class="value">LPA</div>
+                            <div class="label">Follow Certificate</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>VA</h4>
+                            <div class="value">5%</div>
+                            <div class="label">DTI Calculation</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Universal Collection Handling Checklist</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Identify the loan type (Conventional FNMA/FHLMC, FHA, USDA, VA)</li>
+                            <li><strong>Step 2:</strong> For Conventional loans, identify property type (Primary 1-unit, Primary 2-4 unit, Second Home, Investment)</li>
+                            <li><strong>Step 3:</strong> Pull and review the credit report for all borrowers</li>
+                            <li><strong>Step 4:</strong> Identify and categorize all collections and charge-offs (Medical vs Non-Medical)</li>
+                            <li><strong>Step 5:</strong> Check for Community Property State implications (non-borrower spouse)</li>
+                            <li><strong>Step 6:</strong> Calculate totals per investor guidelines</li>
+                            <li><strong>Step 7:</strong> Apply appropriate thresholds and determine action required</li>
+                            <li><strong>Step 8:</strong> Document resolution method (pay off, payment arrangement, 5% calculation)</li>
+                            <li><strong>Step 9:</strong> Update DTI calculations if applicable</li>
+                            <li><strong>Step 10:</strong> For VA loans, ensure residual income calculations are updated</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Community Property States</h4>
+                        <p>The following states require consideration of non-borrower spouse collections: Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Texas, Washington, Wisconsin. Always verify current state law requirements.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Collections & Judgements Quick Reference</h3>
+                <pre>
+COLLECTIONS & JUDGEMENTS - INVESTOR COMPARISON MATRIX
+=====================================================
+
+INVESTOR       | MEDICAL        | NON-MEDICAL THRESHOLD    | ACTION OPTIONS
+---------------|----------------|--------------------------|---------------------------
+FANNIE MAE     | Not excluded   | 1-Unit Primary: None     | Pay if DU requires
+               |                | 2-4 Unit/2nd: >$5,000    | Pay at closing
+               |                | Investment: >=$250/>$1K  | Pay at closing
+---------------|----------------|--------------------------|---------------------------
+FREDDIE MAC    | Not specified  | LPA Accept               | Follow Feedback Certificate
+               |                | No additional assessment |
+---------------|----------------|--------------------------|---------------------------
+FHA            | EXCLUDED       | Cumulative >=$2,000      | 1. Pay in full
+               |                |                          | 2. Payment arrangement (DTI)
+               |                |                          | 3. 5% of balance (DTI)
+---------------|----------------|--------------------------|---------------------------
+USDA           | EXCLUDED       | Collections >=$2,000     | 1. Pay in full
+               | + ALL Charge-  | (after removing medical  | 2. Payment arrangement (DTI)
+               | offs excluded  | & ALL charge-offs)       | 3. 5% of balance (DTI)
+---------------|----------------|--------------------------|---------------------------
+VA             | EXCLUDED       | No automatic threshold   | UW discretion on payoff
+               |                | Include in DTI & Residual| Listed payment or 5%
+
+
+5% CALCULATION APPLIES TO:
+==========================
+- FHA: When no payment arrangement available (>=$2,000)
+- USDA: When no payment arrangement available (>=$2,000)
+- VA: When no payment listed on credit report (all non-medical)
+
+
+COMMUNITY PROPERTY STATES - NON-BORROWER SPOUSE:
+================================================
+FHA/USDA: Must include non-borrower spouse collections in cumulative balance
+          (unless excluded by state law)
+
+States: AZ, CA, ID, LA, NV, NM, TX, WA, WI
+
+
+KEY DISTINCTIONS:
+=================
+- FNMA: Property type matters; DU can override general policy
+- FHLMC: Most flexible - just follow LPA feedback
+- FHA: $2,000 cumulative threshold; medical excluded
+- USDA: $2,000 threshold; ALL charge-offs excluded (not just medical)
+- VA: DTI + Residual impact; underwriter discretion on payoff
+
+
+DOCUMENT UPDATED: July 10, 2025
+================================
+Always verify current investor guidelines as requirements may change.
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for collections and judgements analysis</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">85%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-analyzer')">
+                        <div class="heat-score">9.5</div>
+                        <div class="heat-name">Collections Analyzer Agent</div>
+                        <div class="heat-desc">Auto-analyze credit report and apply investor rules</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-dti')">
+                        <div class="heat-score">8.3</div>
+                        <div class="heat-name">DTI Calculator Agent</div>
+                        <div class="heat-desc">Auto-calculate 5% payment and update DTI</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-compliance')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Compliance Checker</div>
+                        <div class="heat-desc">Validate collections handling meets guidelines</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>N/A</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-state')">
+                        <div class="heat-score">6.2</div>
+                        <div class="heat-name">Community Property Agent</div>
+                        <div class="heat-desc">Flag community property state requirements</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Collections Analyzer Agent -->
+                    <div class="agent-card" id="agent-analyzer">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Collections Analyzer Agent</div>
+                                <div class="agent-type">Credit Analysis / Rules Engine</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically parses credit report data to identify collections and charge-offs, categorizes them as medical/non-medical, calculates cumulative balances, and applies investor-specific rules to determine required actions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Credit</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Categorize</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Apply Rules</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Recommend</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('analyzer')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- DTI Calculator Agent -->
+                    <div class="agent-card" id="agent-dti">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">DTI Calculator Agent</div>
+                                <div class="agent-type">Financial Calculation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically calculates the 5% monthly payment for collections without established payments, updates DTI ratios, and for VA loans, recalculates residual income with collection payments included.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Get Balances</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate 5%</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update DTI</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update Residual</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('dti')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Checker Agent -->
+                    <div class="agent-card" id="agent-compliance">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Compliance Checker</div>
+                                <div class="agent-type">Validation / QC</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates that collections handling meets investor guidelines before submission. Checks threshold calculations, verifies DTI updates, and confirms documentation for payment arrangements or payoffs.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Load Rules</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate File</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Issues</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">N/A</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('compliance')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Community Property Agent -->
+                    <div class="agent-card" id="agent-state">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">S</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Community Property Agent</div>
+                                <div class="agent-type">State Rules / Alert</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically identifies when a loan involves a community property state and flags the requirement to include non-borrower spouse collections in FHA/USDA calculations. Alerts processor to verify state-specific exclusions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Check State</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Loan Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Spouse</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Alert User</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('state')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Collections & Judgements Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Collections & Judgements Reference Guide
+
+## Overview
+This reference guide covers the requirements for handling collections and charge-off accounts across all major investors: Fannie Mae, Freddie Mac, FHA, USDA, and VA.
+
+## Fannie Mae Guidelines
+
+### 1 Unit Principal Residence
+- Borrowers are NOT required to pay off collections or charge-offs
+- Exception: If DU marks accounts "to be paid at closing"
+
+### 2-4 Unit Primary or Second Home
+- Collections/charge-offs > $5,000 must be paid in full
+- Payment required prior to or at closing
+
+### 1-4 Unit Investment Property
+- Individual accounts >= $250 must be paid
+- Total > $1,000 must be paid in full
+
+## Freddie Mac Guidelines
+- LPA Accept: No additional assessment required
+- Follow the Feedback Certificate instructions
+
+## FHA Guidelines
+- Medical collections/charge-offs: NOT CONSIDERED
+- Cumulative balance >= $2,000 requires action:
+  1. Pay in full, OR
+  2. Payment arrangement (include in DTI), OR
+  3. Calculate 5% of balance for DTI
+- Community property states: Include non-borrower spouse
+
+## USDA Guidelines
+- Medical collections: EXCLUDED
+- ALL charge-off accounts: EXCLUDED
+- Remaining collections >= $2,000 requires action:
+  1. Pay in full, OR
+  2. Payment arrangement (include in DTI), OR
+  3. Calculate 5% of balance for DTI
+- Community property states: Include non-borrower spouse
+
+## VA Guidelines
+- Medical collections/charge-offs: NOT CONSIDERED
+- Non-medical collections: Include in DTI and residual
+- Use listed payment OR 5% of balance
+- Underwriter discretion on payoff requirements
+- Charge-offs: Address in overall credit review
+
+## Community Property States
+AZ, CA, ID, LA, NV, NM, TX, WA, WI
+
+Updated: July 10, 2025</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            analyzer: {
+                name: 'Collections Analyzer Agent',
+                tags: ['Credit Analysis', 'Rules Engine', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically parses credit report data to identify collections and charge-offs, categorizes them as medical vs non-medical, calculates cumulative balances per investor requirements, and determines required actions based on loan type and property type.`,
+                prompt: `You are building a Credit Analysis Agent for CMG Financial's loan processing workflow.
+
+AGENT NAME: Collections Analyzer Agent
+TYPE: Credit Analysis / Rules Engine
+
+OBJECTIVE:
+Create an agent that automatically analyzes credit reports to identify, categorize, and evaluate collections and charge-off accounts against investor-specific guidelines.
+
+INPUT DATA:
+- Loan Type (FNMA, FHLMC, FHA, USDA, VA)
+- Property Type (1-unit Primary, 2-4 Unit, Second Home, Investment)
+- Property State
+- Credit Report Data (collections, charge-offs, balances)
+- Non-borrower Spouse Data (if applicable)
+
+CATEGORIZATION RULES:
+1. Identify Medical vs Non-Medical accounts
+   - Look for medical provider names
+   - Check account type codes
+   - Flag ambiguous accounts for manual review
+
+2. Identify Collections vs Charge-offs
+   - Active collections: creditor pursuing
+   - Charge-offs: creditor no longer pursuing
+
+INVESTOR RULE ENGINE:
+{
+  "FNMA": {
+    "1_UNIT_PRIMARY": { "threshold": null, "check_du": true },
+    "2_4_UNIT_PRIMARY": { "threshold": 5000, "action": "pay" },
+    "SECOND_HOME": { "threshold": 5000, "action": "pay" },
+    "INVESTMENT": { "individual": 250, "total": 1000, "action": "pay" }
+  },
+  "FHLMC": { "rule": "follow_lpa_feedback" },
+  "FHA": {
+    "medical_excluded": true,
+    "threshold": 2000,
+    "options": ["pay", "arrangement", "5_percent"]
+  },
+  "USDA": {
+    "medical_excluded": true,
+    "chargeoffs_excluded": true,
+    "threshold": 2000,
+    "options": ["pay", "arrangement", "5_percent"]
+  },
+  "VA": {
+    "medical_excluded": true,
+    "dti_required": true,
+    "residual_required": true,
+    "payment_calc": "listed_or_5_percent"
+  }
+}
+
+OUTPUT:
+{
+  "total_collections": 0,
+  "total_chargeoffs": 0,
+  "medical_excluded": 0,
+  "applicable_balance": 0,
+  "threshold_exceeded": false,
+  "recommended_action": "string",
+  "dti_impact": 0,
+  "items": []
+}`,
+                integration: `INTEGRATION POINTS:
+1. Credit Report Parser
+   - Parse MISMO 3.4 format
+   - Extract tradeline data
+   - Identify derogatory accounts
+
+2. Loan Origination System
+   - Read loan type and property data
+   - Write recommendations to conditions
+   - Update DTI calculations
+
+3. Decision Engine
+   - Apply investor rules
+   - Generate condition requirements
+   - Flag for underwriter review
+
+DEPLOYMENT:
+- Triggered on credit report receipt
+- Background analysis with results stored
+- Integrate with underwriting workflow`
+            },
+            dti: {
+                name: 'DTI Calculator Agent',
+                tags: ['Financial Calculation', 'DTI', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically calculates the 5% monthly payment for collections without established payment plans, updates the debt-to-income ratios, and for VA loans, recalculates residual income including collection payments.`,
+                prompt: `You are building a Financial Calculation Agent for CMG Financial's loan processing workflow.
+
+AGENT NAME: DTI Calculator Agent
+TYPE: Financial Calculation / DTI Update
+
+OBJECTIVE:
+Calculate and apply collection payment impacts to DTI and residual income calculations.
+
+INPUT DATA:
+- Collection accounts requiring DTI inclusion
+- Outstanding balances
+- Listed payments (if any)
+- Loan type (especially VA for residual)
+- Current DTI ratios
+- Current residual income (VA)
+
+CALCULATION RULES:
+1. Payment Determination:
+   - If payment listed on credit: Use listed payment
+   - If no payment listed: Balance * 0.05 = Monthly Payment
+
+2. DTI Update:
+   monthly_debt = sum(all_collection_payments)
+   new_dti = (existing_debt + monthly_debt) / gross_income
+
+3. VA Residual Update:
+   residual = gross_income - (housing_expense + monthly_debt + collection_payments)
+
+VALIDATION:
+- Ensure 5% calculation is per collection, not total
+- Round to nearest dollar
+- Verify DTI does not exceed limits after update
+
+OUTPUT:
+{
+  "collections_included": [
+    { "creditor": "string", "balance": 0, "payment": 0, "source": "listed|calculated" }
+  ],
+  "total_monthly_payment": 0,
+  "previous_dti": 0,
+  "new_dti": 0,
+  "va_residual_impact": 0,
+  "guideline_exceeded": false
+}`,
+                integration: `INTEGRATION POINTS:
+1. LOS Integration
+   - Read current DTI from loan file
+   - Write updated DTI values
+   - Update VA Loan Analysis form
+
+2. Calculation Engine
+   - 5% calculation formula
+   - DTI ratio computation
+   - Residual income computation
+
+3. Compliance Check
+   - Verify DTI within limits
+   - Flag if exceeds thresholds
+   - Generate exception requests
+
+DEPLOYMENT:
+- Triggered by Collections Analyzer
+- Real-time calculation
+- Results stored in loan file`
+            },
+            compliance: {
+                name: 'Compliance Checker',
+                tags: ['Validation', 'QC', 'Low Complexity', 'High Priority'],
+                purpose: `This agent validates that collections handling meets investor guidelines before loan submission. It checks threshold calculations, verifies DTI updates have been applied, and confirms proper documentation for payment arrangements or payoffs.`,
+                prompt: `You are building a Compliance Validation Agent for CMG Financial's QC workflow.
+
+AGENT NAME: Compliance Checker
+TYPE: Validation / Quality Control
+
+OBJECTIVE:
+Validate that all collection and charge-off handling meets investor guidelines before loan submission.
+
+VALIDATION CHECKS:
+1. Threshold Verification
+   - Confirm correct threshold applied for loan/property type
+   - Verify cumulative balance calculations
+   - Check individual account thresholds (FNMA Investment)
+
+2. Medical Exclusion Verification
+   - Confirm medical accounts properly excluded (FHA/USDA/VA)
+   - Verify categorization is accurate
+   - Check for misclassified accounts
+
+3. DTI Verification
+   - Confirm collection payments included in DTI
+   - Verify 5% calculation accuracy
+   - Check VA residual income updated
+
+4. Documentation Verification
+   - Payment arrangement documentation present
+   - Payoff letters obtained if required
+   - DU/LPA findings reviewed
+
+5. Community Property State Check
+   - Non-borrower spouse collections included
+   - State-specific exclusions documented
+
+COMPLIANCE RULES BY INVESTOR:
+{
+  "FNMA": ["check_du_findings", "verify_property_thresholds", "confirm_payoff_docs"],
+  "FHLMC": ["verify_lpa_followed"],
+  "FHA": ["medical_excluded", "threshold_2000", "dti_updated", "community_property"],
+  "USDA": ["medical_excluded", "chargeoffs_excluded", "threshold_2000", "dti_updated"],
+  "VA": ["medical_excluded", "dti_included", "residual_updated", "underwriter_review"]
+}
+
+OUTPUT:
+{
+  "compliant": true|false,
+  "issues": [],
+  "warnings": [],
+  "documentation_needed": [],
+  "ready_for_submission": true|false
+}`,
+                integration: `INTEGRATION POINTS:
+1. Document Management
+   - Check for required documents
+   - Verify document types
+   - Flag missing items
+
+2. LOS Integration
+   - Read loan data
+   - Compare against conditions
+   - Generate compliance report
+
+3. QC Workflow
+   - Pre-submission check
+   - Generate deficiency list
+   - Route for correction
+
+DEPLOYMENT:
+- Pre-submission trigger
+- QC review checkpoint
+- Stacking order validation`
+            },
+            state: {
+                name: 'Community Property Agent',
+                tags: ['State Rules', 'Alert System', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent automatically identifies when a loan involves a community property state and flags the requirement to include non-borrower spouse collections in FHA and USDA calculations. It alerts processors and ensures compliance with state-specific rules.`,
+                prompt: `You are building a State Rules Agent for CMG Financial's loan processing workflow.
+
+AGENT NAME: Community Property Agent
+TYPE: State Rules / Alert System
+
+OBJECTIVE:
+Identify community property state loans and ensure proper handling of non-borrower spouse collections for FHA and USDA loans.
+
+COMMUNITY PROPERTY STATES:
+["AZ", "CA", "ID", "LA", "NV", "NM", "TX", "WA", "WI"]
+
+TRIGGER CONDITIONS:
+1. Property state is community property state
+2. Loan type is FHA or USDA
+3. Borrower is married
+4. Non-borrower spouse exists
+
+REQUIRED ACTIONS:
+1. Flag loan for non-borrower spouse credit pull
+2. Alert processor of community property requirements
+3. Include spouse collections in cumulative balance
+4. Document any state-specific exclusions
+
+STATE-SPECIFIC RULES:
+{
+  "CA": { "exclusions": ["separate_property_agreement"] },
+  "TX": { "exclusions": ["partition_agreement"] },
+  "WA": { "exclusions": ["community_property_agreement"] },
+  // Add state-specific rules as needed
+}
+
+ALERT MESSAGE:
+"COMMUNITY PROPERTY STATE ALERT: This {loan_type} loan in {state} requires
+non-borrower spouse {spouse_name} collections to be included in the $2,000
+cumulative balance calculation unless excluded by state law. Please verify:
+1. Non-borrower spouse credit has been pulled
+2. All collections have been added to cumulative total
+3. Any applicable state exclusions are documented"
+
+OUTPUT:
+{
+  "community_property_state": true|false,
+  "state": "XX",
+  "loan_type": "FHA|USDA",
+  "spouse_collections_required": true|false,
+  "alert_generated": true|false,
+  "exclusions_available": []
+}`,
+                integration: `INTEGRATION POINTS:
+1. Loan Data
+   - Read property state
+   - Read loan type
+   - Read borrower marital status
+
+2. Alert System
+   - Generate processor alert
+   - Add to task queue
+   - Track acknowledgment
+
+3. Credit Integration
+   - Trigger spouse credit pull
+   - Merge collection data
+   - Update cumulative totals
+
+DEPLOYMENT:
+- Application intake trigger
+- Loan type change trigger
+- Property state change trigger`
+            }
+        };
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const fullPrompt = document.getElementById('promptContent').textContent + '\n\n' + document.getElementById('promptIntegration').textContent;
+            try {
+                await navigator.clipboard.writeText(fullPrompt);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>
