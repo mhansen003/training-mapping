@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Specific Entry (Sales) - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.byte-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.clear-badge { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* MI Comparison Cards */
+        .mi-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .mi-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .mi-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .mi-card-header h4 { font-size: 1.05rem; }
+        .mi-card-body { padding: 22px; }
+        .mi-card ul { list-style: none; padding: 0; }
+        .mi-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .mi-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal Styles */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Byte Specific Entry (Sales)</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Byte Specific Entry</h2>
+            <p>Sales Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active">
+                <span class="nav-number">0</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-1" class="nav-item">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Credit Credentials</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">IDS/CD Tracking</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Export 3.4 XML</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Loan Restructure</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">DPA/Bond Input</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Piggyback 2nd</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Byte Specific Entry (Sales)</h1>
+                <p class="subtitle">Tasks that must be completed in Byte for Sales operations</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Sales / Loan Officer</span>
+                    <span class="meta-item">Updated: Oct 10, 2025</span>
+                    <span class="meta-item">Duration: Varies by task</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 0: Overview -->
+            <section id="section-0" class="section">
+                <div class="section-header">
+                    <div class="section-number">0</div>
+                    <div class="section-title"><h2>Byte vs Clear - When to Use Byte</h2><span>Understanding system responsibilities</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="summary-grid">
+                        <div class="summary-card"><h4>Byte-Specific Tasks</h4><div class="value">4</div><div class="label">Must be done in Byte</div></div>
+                        <div class="summary-card"><h4>Product Entry</h4><div class="value">2</div><div class="label">Specialized loan types</div></div>
+                        <div class="summary-card"><h4>Clear Integration</h4><div class="value">Yes</div><div class="label">View-only in Clear after Byte entry</div></div>
+                    </div>
+
+                    <div class="mi-comparison">
+                        <div class="mi-card">
+                            <div class="mi-card-header"><h4>Byte-Only Tasks</h4></div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Enter Credit Credentials</li>
+                                    <li><span class="check-icon">*</span> IDS Packages / CD Tracking</li>
+                                    <li><span class="check-icon">*</span> Export Fannie Mae 3.4 (.XML)</li>
+                                    <li><span class="check-icon">*</span> Loan Restructure</li>
+                                    <li><span class="check-icon">*</span> DPA/Bond Input</li>
+                                    <li><span class="check-icon">*</span> CMG Piggyback 2nd Input</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mi-card">
+                            <div class="mi-card-header"><h4>Clear Capabilities</h4></div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Create 1st Lien loans</li>
+                                    <li><span class="check-icon">*</span> Run credit (after Byte credential setup)</li>
+                                    <li><span class="check-icon">*</span> Run AUS</li>
+                                    <li><span class="check-icon">*</span> Access verification screens</li>
+                                    <li><span class="check-icon">*</span> Track Docutech Initial Disclosures</li>
+                                    <li><span class="check-icon">*</span> View Byte-created seconds</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Key Integration Point</h4>
+                        <p>Once credit credentials are configured in Byte, all related services can be seamlessly performed in Clear. Second liens created in Byte can be viewed in Clear.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Credit Credentials -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Enter Credit Credentials</h2><span>Enable credit pulls, AUS, and verification screens</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Navigate to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Access Vendor Settings</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Enter Credit Credentials</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Save Configuration</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Services Available in Clear</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Why Byte?</h4>
+                        <p>Credit credentials must be entered across various sections within Byte to enable credit pulls, run AUS, and access verification screens. Once configured in Byte, all related services work seamlessly in Clear.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Service Enabled</th>
+                                <th>Configuration Location</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Credit Pulls</strong></td>
+                                <td>Vendor Services in Byte</td>
+                                <td>Run credit reports in Clear</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">AUS (Automated Underwriting)</strong></td>
+                                <td>Vendor Services in Byte</td>
+                                <td>Submit to DU/LPA from Clear</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Verification Screens</strong></td>
+                                <td>Vendor Services in Byte</td>
+                                <td>Access VOE/VOI in Clear</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Complete credential setup once per user account. After initial configuration, all credit-related functions will be available in Clear without returning to Byte.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: IDS Packages / CD Tracking -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>IDS Packages / Closing Disclosure Tracking</h2><span>Manage and track disclosure packages</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Navigate to Disclosure History</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node decision">Package Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">IDS Package</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">View in Byte</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Closing Disclosure</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Track in Byte</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Docutech Initial</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Track in Clear</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Disclosure History Tool</h4>
+                        <p>The Disclosure History tool in Byte offers effective management and tracking of IDS packages or Closing Disclosures, providing details on unsigned documents and the signing status.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Disclosure Type</th>
+                                <th>Tracking System</th>
+                                <th>Features Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">IDS Packages</strong></td>
+                                <td><span class="badge byte-badge">Byte Only</span></td>
+                                <td>Unsigned document details, signing status</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Closing Disclosure (CD)</strong></td>
+                                <td><span class="badge byte-badge">Byte Only</span></td>
+                                <td>Full tracking and management</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Docutech Initial Disclosures</strong></td>
+                                <td><span class="badge clear-badge">Clear</span></td>
+                                <td>Tracking available in Clear</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Important Distinction</h4>
+                        <p>While Docutech Initial Disclosures can be tracked in Clear, IDS packages and Closing Disclosures require Byte for full management capabilities.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Exporting 3.4 XML -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Exporting Fannie Mae 3.4 (.XML)</h2><span>Export loan files in Fannie Mae format</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open Loan in Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Navigate to Export</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Fannie Mae 3.4</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Configure Options</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Download .XML File</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Fannie Mae 3.4 Format</h4>
+                        <p>Navigate to Byte to export a Fannie Mae 3.4 (.xml) file. This standardized format is required for various investor and secondary market submissions.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Export Format</h4>
+                            <div class="value">.XML</div>
+                            <div class="label">Fannie Mae 3.4 Standard</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>System Required</h4>
+                            <div class="value">Byte</div>
+                            <div class="label">Not available in Clear</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Use Cases</h4>
+                            <div class="value">Many</div>
+                            <div class="label">Investor submissions, transfers</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Ensure all required loan data is complete before exporting. The 3.4 format requires specific data points that must be populated in the loan file.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Loan Restructure -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Loan Restructure</h2><span>Change loan status and parameters during restructure</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Restructure Needed</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open Loan in Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Change to Restructure Status</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Update Loan Parameters</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Save Changes</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Update Status Post-Restructure</div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical Limitation</h4>
+                        <p><strong>Clear users cannot edit loan parameters in Clear while in Restructure status.</strong> All restructure changes must be made in Byte.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Restructure Process Decision</h3>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Loan Needs Restructure?</span>
+                        </div>
+                        <div class="tree-node">
+                            <span class="tree-label" style="background: var(--accent-blue); color: white;">YES</span> -> Navigate to Byte (Required)
+                        </div>
+                        <div class="tree-node">
+                            Update status to Restructure in Byte
+                        </div>
+                        <div class="tree-node">
+                            Make all parameter changes in Byte
+                        </div>
+                        <div class="tree-node">
+                            Update status when complete
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>System</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Set Restructure Status</strong></td>
+                                <td><span class="badge byte-badge">Byte Only</span></td>
+                                <td>Must be done before parameter changes</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Edit Loan Parameters</strong></td>
+                                <td><span class="badge byte-badge">Byte Only</span></td>
+                                <td>Clear is locked during restructure</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Complete Restructure</strong></td>
+                                <td><span class="badge byte-badge">Byte Only</span></td>
+                                <td>Update status to release Clear editing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Video Resource Available</h4>
+                        <p>A 1:04 video tutorial "Loan Restructure in Byte" is available for detailed walkthrough of this process.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: DPA/Bond Input -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>DPA/Bond Loan Input</h2><span>Down Payment Assistance and Bond program entry</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create 1st Lien in Clear</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">DPA/Bond Needed?</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Navigate to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create Synchronized Second</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">View in Clear</div>
+                        </div>
+                    </div>
+
+                    <div class="mi-comparison">
+                        <div class="mi-card">
+                            <div class="mi-card-header"><h4>1st Lien (Clear)</h4></div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Create primary loan in Clear</li>
+                                    <li><span class="check-icon">*</span> Standard loan entry process</li>
+                                    <li><span class="check-icon">*</span> Full Clear functionality available</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mi-card">
+                            <div class="mi-card-header"><h4>DPA/Bond 2nd (Byte)</h4></div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Create synchronized second in Byte</li>
+                                    <li><span class="check-icon">*</span> Links to 1st lien automatically</li>
+                                    <li><span class="check-icon">*</span> Viewable in Clear after creation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Synchronized Piggyback Seconds</h4>
+                        <p>The 1st Lien can be created in Clear. To create the synchronized second, navigate to Byte. Once created, it can be viewed in Clear.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Available Resources</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Bond and DPA Loan Input Manual (Document)</li>
+                            <li>Synchronized Piggyback Seconds (Video)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: CMG Piggyback 2nd -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>CMG Delegated Piggyback 2nd Input</h2><span>CMG Piggyback seconds and HELOCs</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create 1st Lien in Clear</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">CMG 2nd Needed?</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Navigate to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create Synchronized Second</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">View in Clear</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>1st Lien</h4>
+                            <div class="value">Clear</div>
+                            <div class="label">Create primary mortgage</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>2nd Lien</h4>
+                            <div class="value">Byte</div>
+                            <div class="label">Synchronized piggyback</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>View Both</h4>
+                            <div class="value">Clear</div>
+                            <div class="label">After Byte creation</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>CMG Piggyback Seconds & HELOCs</h4>
+                        <p>The 1st Lien can be created in Clear. To create the synchronized second, navigate to Byte. Once created, it can be viewed in Clear.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Product Type</th>
+                                <th>Entry System</th>
+                                <th>View System</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">CMG Piggyback 2nd</strong></td>
+                                <td><span class="badge byte-badge">Byte</span></td>
+                                <td><span class="badge clear-badge">Clear</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">HELOC</strong></td>
+                                <td><span class="badge byte-badge">Byte</span></td>
+                                <td><span class="badge clear-badge">Clear</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Available Resource</h4>
+                        <p>CMG Piggyback seconds & HELOCs documentation provides detailed instructions for this process.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+BYTE SPECIFIC TASKS (Must use Byte):
+====================================
+1. Credit Credentials     - Enter in Byte, then use in Clear
+2. IDS/CD Tracking        - Disclosure History tool in Byte
+3. Export 3.4 XML         - Fannie Mae file export
+4. Loan Restructure       - Status & parameter changes
+
+PRODUCT SPECIFIC ENTRY:
+======================
+- DPA/Bond Input          - 1st in Clear, 2nd in Byte
+- CMG Piggyback 2nd       - 1st in Clear, 2nd in Byte
+- HELOCs                  - Create in Byte, view in Clear
+
+KEY RULES:
+==========
+* Clear users CANNOT edit loans in Restructure status
+* Docutech Initial Disclosures CAN be tracked in Clear
+* Synchronized seconds viewable in Clear after Byte creation
+
+RESOURCES:
+==========
+* Entering Credit Credentials for Vendor Services in Byte
+* Byte Disclosure History Tool
+* Exporting a Fannie Mae File
+* Loan Restructure in Byte (1:04 video)
+* Bond and DPA Loan Input Manual
+* Synchronized Piggyback Seconds
+* CMG Piggyback seconds & HELOCs
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Byte Specific Entry Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">6 Process Steps Analyzed</span>
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 35% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">35%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">75%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-credential')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Credential Setup Wizard</div>
+                        <div class="heat-desc">Guide users through credit credential configuration</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>1</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-disclosure')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Disclosure Tracker</div>
+                        <div class="heat-desc">Monitor signing status and alert on delays</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>2</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-restructure')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Restructure Assistant</div>
+                        <div class="heat-desc">Automate parameter updates and status tracking</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>4</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-piggyback')" title="Click to view agent details">
+                        <div class="heat-score">58</div>
+                        <div class="heat-name">Piggyback Sync Agent</div>
+                        <div class="heat-desc">Auto-create synchronized seconds from 1st lien</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>High</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>5-6</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Credential Setup Wizard -->
+                <div class="agent-card" id="agent-credential">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">K</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Credential Setup Wizard</div>
+                            <div class="agent-type">Configuration Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Guides new users through the credit credential setup process in Byte, validating entries, testing connections, and confirming services are enabled in Clear. Reduces setup errors and support calls.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Detect New User</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Guide Setup</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Test Connection</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">15m</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">90%</div><div class="agent-stat-label">Success Rate</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('credential')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Disclosure Tracker -->
+                <div class="agent-card" id="agent-disclosure">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">D</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Disclosure Status Tracker</div>
+                            <div class="agent-type">Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors IDS packages and Closing Disclosures for signing status. Sends alerts for unsigned documents, approaching deadlines, and compliance issues. Aggregates status across loan pipeline.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Monitor Disclosures</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Track Status</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Identify Delays</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Alert Team</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-2d</div><div class="agent-stat-label">Cycle Time</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('disclosure')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Restructure Assistant -->
+                <div class="agent-card" id="agent-restructure">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">R</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Restructure Assistant</div>
+                            <div class="agent-type">Workflow Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Assists with loan restructure workflow by managing status changes, pre-populating common parameter updates, and ensuring Clear editing is properly locked/unlocked during the process.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Initiate Restructure</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Lock Clear</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Guide Updates</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Complete & Unlock</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">10m</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">0</div><div class="agent-stat-label">Errors</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('restructure')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Piggyback Sync Agent -->
+                <div class="agent-card" id="agent-piggyback">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">P</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Piggyback Sync Agent</div>
+                            <div class="agent-type">Data Sync Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automates creation of synchronized second liens in Byte when DPA/Bond or CMG Piggyback products are selected. Pre-populates data from 1st lien and ensures proper synchronization.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Detect 2nd Need</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Extract 1st Data</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Create in Byte</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Sync to Clear</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">20m</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Sync Rate</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">High</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('piggyback')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Byte Specific Entry - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">X Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Byte Specific Entry (Sales)
+
+## Overview
+Tasks that must be completed in Byte for Sales operations.
+
+### Byte Specific Tasks
+
+#### 1. Enter Credit Credentials
+- Enable credit pulls, AUS, and verification screens
+- Must be configured in Byte vendor settings
+- Once set, services available in Clear
+
+#### 2. IDS Packages / Closing Disclosure Tracking
+- Use Disclosure History tool in Byte
+- Track unsigned documents and signing status
+- Note: Docutech Initial Disclosures can be tracked in Clear
+
+#### 3. Exporting Fannie Mae 3.4 (.XML)
+- Navigate to Byte for export
+- Standardized format for investor submissions
+
+#### 4. Loan Restructure
+- Status and parameter changes MUST be done in Byte
+- Clear users CANNOT edit while in Restructure status
+
+### Product Specific Entry
+
+#### 5. DPA/Bond Input
+- Create 1st Lien in Clear
+- Create synchronized second in Byte
+- View both in Clear after creation
+
+#### 6. CMG Delegated Piggyback 2nd Input
+- Same process as DPA/Bond
+- Includes CMG Piggyback seconds and HELOCs
+
+## Resources
+- Entering Credit Credentials for Vendor Services in Byte
+- Byte Disclosure History Tool
+- Exporting a Fannie Mae File
+- Loan Restructure in Byte (1:04 video)
+- Bond and DPA Loan Input Manual
+- Synchronized Piggyback Seconds
+- CMG Piggyback seconds & HELOCs
+
+Updated: 10/10/2025</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">X Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll-spy with click debounce
+        let isScrolling = false;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with debounce
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+        // Handle nav item clicks with debounce
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                isScrolling = true;
+
+                // Update active state immediately
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Scroll to section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Reset scrolling flag after animation
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                const content = document.getElementById('docContent').textContent;
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDocModal();
+                closePromptModal();
+            }
+        });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // ====== AGENT PROMPT SYSTEM ======
+        const agentPrompts = {
+            credential: {
+                name: 'Credential Setup Wizard',
+                tags: ['Configuration', 'Onboarding', 'Low Complexity', 'High Priority'],
+                purpose: `This agent guides new users through the credit credential setup process in Byte, ensuring all vendor services are properly configured so credit pulls, AUS, and verification screens work seamlessly in Clear.`,
+                prompt: `You are building a Configuration Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Credential Setup Wizard
+TYPE: Configuration / Onboarding Assistant
+
+OBJECTIVE:
+Create an agent that guides new Loan Officers through credit credential setup in Byte, validating each step and confirming services are enabled in Clear.
+
+SETUP STEPS TO GUIDE:
+1. Navigate to Byte Vendor Services section
+2. Locate Credit Provider configuration
+3. Enter credential fields:
+   - Username/User ID
+   - Password
+   - Account/Branch ID
+   - Provider-specific settings
+
+4. Save and validate configuration
+5. Test connection to credit bureau
+6. Verify services appear in Clear
+
+VALIDATION RULES:
+- Username: Required, alphanumeric
+- Password: Required, meets provider requirements
+- Account ID: Required format varies by provider
+- All fields must be non-empty before save
+
+AGENT FLOW:
+1. DETECT: New user without credentials OR manual trigger
+2. GUIDE: Step-by-step prompts with field explanations
+3. VALIDATE: Check each field before proceeding
+4. TEST: Attempt connection to credit provider
+5. CONFIRM: Verify Clear shows enabled services
+
+OUTPUT FORMAT:
+{
+  "setupStatus": "complete" | "incomplete" | "error",
+  "stepsCompleted": [1, 2, 3, 4],
+  "stepsPending": [5],
+  "validationErrors": [],
+  "connectionTest": {
+    "status": "success" | "failed",
+    "provider": "Equifax",
+    "timestamp": "2026-01-27T10:00:00Z"
+  },
+  "clearServicesEnabled": ["Credit Pull", "AUS", "Verifications"]
+}
+
+ERROR HANDLING:
+- Invalid credentials: Prompt for re-entry with hints
+- Connection timeout: Retry with exponential backoff
+- Provider unavailable: Queue for retry, notify user`,
+                integration: `INTEGRATION POINTS:
+1. Byte Vendor Services API
+   - Read/write credential configuration
+   - Test connection endpoints
+   - List available providers
+
+2. Clear Service Status
+   - Query enabled services for user
+   - Verify synchronization complete
+
+3. User Onboarding System
+   - Trigger wizard for new users
+   - Track completion status
+   - Skip if credentials exist
+
+DEPLOYMENT:
+- Embedded in Byte UI as guided workflow
+- Accessible from user profile settings
+- Auto-trigger on first login
+
+METRICS TO TRACK:
+- Time to complete setup
+- First-attempt success rate
+- Support tickets reduced`
+            },
+            disclosure: {
+                name: 'Disclosure Status Tracker',
+                tags: ['Monitoring', 'Compliance', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent monitors IDS packages and Closing Disclosures across the loan pipeline, tracking signing status, alerting on delays, and providing compliance dashboards to prevent missed deadlines.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Disclosure Status Tracker
+TYPE: Real-time Monitoring / Compliance
+
+OBJECTIVE:
+Create an agent that monitors all disclosure packages in the pipeline, tracks signing progress, and alerts the team when documents are unsigned or deadlines approach.
+
+MONITORING TARGETS:
+1. IDS Packages
+   - Initial disclosure packages
+   - Re-disclosure packages
+   - Signing status (sent, viewed, signed)
+
+2. Closing Disclosures (CD)
+   - CD sent status
+   - Borrower acknowledgment
+   - 3-day waiting period tracking
+
+ALERT TRIGGERS:
+1. UNSIGNED WARNING (Yellow)
+   - IDS sent > 24 hours without signature
+   - CD sent > 12 hours without acknowledgment
+
+2. DEADLINE APPROACHING (Orange)
+   - IDS 48 hours from compliance deadline
+   - CD 24 hours from closing with no signature
+
+3. CRITICAL (Red)
+   - Compliance deadline passed
+   - Closing scheduled with unsigned CD
+
+STATUS TRACKING DATA:
+{
+  "loanNumber": "2026-001234",
+  "disclosureType": "IDS" | "CD",
+  "packageId": "PKG-789",
+  "status": "sent" | "viewed" | "partially_signed" | "signed",
+  "sentDate": "2026-01-25T14:00:00Z",
+  "viewedDate": null,
+  "signedDate": null,
+  "unsignedDocuments": [
+    { "name": "LE", "signer": "Borrower" },
+    { "name": "LE", "signer": "Co-Borrower" }
+  ],
+  "complianceDeadline": "2026-01-28T23:59:59Z",
+  "closingDate": "2026-02-01"
+}
+
+DASHBOARD METRICS:
+- Total packages in flight
+- Unsigned > 24 hours count
+- Average time to signature
+- Compliance risk score
+
+NOTIFICATION CHANNELS:
+- Email digest (daily 8am)
+- Immediate alerts (critical only)
+- Dashboard badge counts
+- Team Slack/Teams integration`,
+                integration: `INTEGRATION POINTS:
+1. Byte Disclosure History API
+   - Poll disclosure status every 15 minutes
+   - Webhook subscription for status changes
+   - Retrieve unsigned document details
+
+2. Loan Pipeline Database
+   - Link disclosures to loan records
+   - Pull closing dates for deadline calc
+   - Aggregate by LO, branch, team
+
+3. Notification Services
+   - Email: SendGrid/internal SMTP
+   - Slack/Teams: Webhook integration
+   - Dashboard: Real-time WebSocket updates
+
+4. Compliance Calendar
+   - Calculate business days
+   - Account for holidays
+   - Regional timing variations
+
+REPORTING:
+- Weekly compliance summary
+- Individual LO performance
+- Trend analysis over time`
+            },
+            restructure: {
+                name: 'Restructure Assistant',
+                tags: ['Workflow', 'Status Management', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent assists with the loan restructure process by managing status changes between Byte and Clear, guiding parameter updates, and ensuring proper system synchronization throughout the workflow.`,
+                prompt: `You are building a Workflow Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Restructure Assistant
+TYPE: Workflow Automation / Status Management
+
+OBJECTIVE:
+Create an agent that manages the loan restructure workflow, ensuring proper status changes, guiding parameter updates, and coordinating Clear/Byte system states.
+
+RESTRUCTURE WORKFLOW:
+1. INITIATE
+   - Detect restructure request
+   - Validate loan is eligible
+   - Set status to "Restructure" in Byte
+
+2. LOCK CLEAR
+   - Confirm Clear editing is disabled
+   - Notify relevant parties
+   - Log timestamp
+
+3. GUIDE UPDATES
+   - Present common restructure changes
+   - Validate parameter updates
+   - Calculate impact of changes
+
+4. COMPLETE
+   - Verify all changes saved
+   - Update status post-restructure
+   - Unlock Clear editing
+   - Generate change log
+
+PARAMETER CHANGE TEMPLATES:
+{
+  "commonChanges": [
+    {
+      "name": "Loan Amount Adjustment",
+      "fields": ["loanAmount", "ltv", "dti"],
+      "validation": "recalculate all dependent fields"
+    },
+    {
+      "name": "Rate Change",
+      "fields": ["interestRate", "apr", "monthlyPayment"],
+      "validation": "must re-disclose if rate increases"
+    },
+    {
+      "name": "Product Switch",
+      "fields": ["productType", "term", "mi"],
+      "validation": "check eligibility for new product"
+    }
+  ]
+}
+
+STATUS MANAGEMENT:
+Pre-Restructure Status -> "Restructure" -> Post-Restructure Status
+
+Clear Access:
+- Before: Enabled
+- During Restructure: DISABLED (Byte only)
+- After: Re-enabled
+
+CHANGE LOG OUTPUT:
+{
+  "loanNumber": "2026-001234",
+  "restructureId": "RST-456",
+  "initiatedBy": "LO-789",
+  "initiatedAt": "2026-01-27T09:00:00Z",
+  "completedAt": "2026-01-27T09:45:00Z",
+  "changes": [
+    {
+      "field": "loanAmount",
+      "oldValue": 400000,
+      "newValue": 385000,
+      "changedBy": "LO-789"
+    }
+  ],
+  "clearLockDuration": "45 minutes"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Status API
+   - Read/write loan status
+   - Query eligible statuses
+   - Trigger status change events
+
+2. Clear Integration Layer
+   - Lock/unlock editing permissions
+   - Sync status between systems
+   - Handle conflict resolution
+
+3. Audit Trail System
+   - Log all status changes
+   - Record parameter modifications
+   - Timestamp all actions
+
+4. Notification Service
+   - Alert team of restructure start
+   - Notify when complete
+   - Warn of extended lock duration
+
+SAFEGUARDS:
+- Auto-unlock after 4 hours if not completed
+- Admin override capability
+- Rollback support for failed changes`
+            },
+            piggyback: {
+                name: 'Piggyback Sync Agent',
+                tags: ['Data Sync', 'Loan Creation', 'High Complexity', 'Medium Priority'],
+                purpose: `This agent automates the creation of synchronized second liens in Byte when DPA, Bond, or CMG Piggyback products are needed, extracting data from the 1st lien in Clear and maintaining synchronization.`,
+                prompt: `You are building a Data Sync Agent for CMG Financial's Byte and Clear systems.
+
+AGENT NAME: Piggyback Sync Agent
+TYPE: Data Synchronization / Loan Creation
+
+OBJECTIVE:
+Create an agent that automatically creates synchronized second liens in Byte when DPA/Bond or CMG Piggyback products are selected, pulling data from the 1st lien created in Clear.
+
+TRIGGER CONDITIONS:
+1. Product selection includes DPA/Bond second
+2. Product selection includes CMG Piggyback 2nd
+3. HELOC requested with 1st lien
+4. Manual trigger from loan officer
+
+DATA EXTRACTION FROM 1ST LIEN:
+{
+  "borrowerInfo": {
+    "names": "extract all borrowers",
+    "ssn": "encrypted transfer",
+    "dob": "required",
+    "citizenship": "required"
+  },
+  "propertyInfo": {
+    "address": "full address",
+    "type": "property type",
+    "occupancy": "occupancy type",
+    "value": "appraised value"
+  },
+  "loanInfo": {
+    "firstLienAmount": "loan amount",
+    "firstLienRate": "interest rate",
+    "combinedLTV": "calculate total"
+  }
+}
+
+SECOND LIEN CREATION:
+1. Extract 1st lien data from Clear
+2. Navigate to Byte loan creation
+3. Select appropriate 2nd lien product:
+   - DPA/Bond programs
+   - CMG Piggyback 2nd
+   - HELOC
+4. Auto-populate shared fields
+5. Calculate 2nd lien specifics:
+   - Subordinate loan amount
+   - Combined LTV
+   - MI requirements
+6. Link to 1st lien for sync
+7. Confirm visibility in Clear
+
+PRODUCT-SPECIFIC RULES:
+DPA/Bond:
+- Fixed amounts based on program
+- Specific investor requirements
+- Subsidy documentation
+
+CMG Piggyback:
+- Flexible amounts up to CLTV limit
+- Standard CMG underwriting
+- In-house servicing
+
+HELOC:
+- Line amount calculation
+- Draw period terms
+- Rate index selection
+
+SYNC REQUIREMENTS:
+- Status sync: Keep both liens aligned
+- Document sync: Share disclosures
+- Timeline sync: Coordinate closings`,
+                integration: `INTEGRATION POINTS:
+1. Clear Loan Data API
+   - Read 1st lien details
+   - Subscribe to status changes
+   - Query product eligibility
+
+2. Byte Loan Creation API
+   - Create new 2nd lien
+   - Set product parameters
+   - Establish loan link
+
+3. Product Catalog
+   - DPA/Bond program rules
+   - CMG Piggyback guidelines
+   - HELOC parameters
+
+4. Synchronization Service
+   - Real-time status updates
+   - Change propagation
+   - Conflict detection
+
+VALIDATION CHECKS:
+- Combined LTV within limits
+- Borrower eligibility for 2nd
+- Property eligible for product
+- No duplicate 2nd liens
+
+ERROR HANDLING:
+- 1st lien data incomplete: Queue for manual review
+- Product ineligible: Alert with alternatives
+- Sync failure: Retry with notification`
+            }
+        };
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>

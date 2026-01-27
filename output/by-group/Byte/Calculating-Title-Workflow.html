@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculating Owner and Lender Title - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* MI Comparison Cards */
+        .mi-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .mi-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .mi-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .mi-card-header h4 { font-size: 1.05rem; }
+        .mi-card-body { padding: 22px; }
+        .mi-card ul { list-style: none; padding: 0; }
+        .mi-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .mi-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Calculator Display */
+        .calculator-display {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .calculator-display h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        .calc-row:last-child {
+            border-bottom: none;
+        }
+
+        .calc-row.highlight {
+            background: rgba(59, 130, 246, 0.1);
+            margin: 0 -10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .calc-row .label { flex: 1; }
+        .calc-row .operator { width: 40px; text-align: center; color: var(--text-muted); }
+        .calc-row .value { width: 100px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal Specific */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Calculating Owner and Lender Title</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Title Insurance</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active">
+                <span class="nav-number">0</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-1" class="nav-item">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Open Loan File</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Complete CD Process</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Flat Fee Title</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Simultaneous Issue</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Seller Contribution</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Document Upload</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Calculating Owner and Lender Title</h1>
+                <p class="subtitle">TRID-Compliant Title Insurance Disclosure Process</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte</span>
+                    <span class="meta-item">Role: Disclosure Specialist</span>
+                    <span class="meta-item">Updated: Jan 27, 2026</span>
+                    <span class="meta-item">Typical Duration: 10-20 min</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 0: Overview -->
+            <section id="section-0" class="section">
+                <div class="section-header">
+                    <div class="section-number">0</div>
+                    <div class="section-title"><h2>Title Insurance Overview</h2><span>Understanding CFPB compliance requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>CFPB Compliance Requirement</h4>
+                        <p>Per the CFPB, Lenders are required to disclose the <strong>full Lender amount</strong> of title insurance regardless of simultaneous issue on the Loan Estimate. At Closing Disclosure, the figures can be updated using the TRID Rule Title Insurance Calculator. This process is required for compliance.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Lender's Title</h4>
+                            <div class="value">REQ</div>
+                            <div class="label">Required for all loans</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Owner's Title</h4>
+                            <div class="value">OPT</div>
+                            <div class="label">Optional for borrower</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Simultaneous Issue</h4>
+                            <div class="value">$$$</div>
+                            <div class="label">Reduced premium available</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Title Insurance Types</h3>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Lender's Title Insurance</span>
+                            <p>Required purchase as part of closing costs. Protects the lender's interest in the property.</p>
+                        </div>
+                        <div class="tree-node">
+                            <span class="tree-label">Owner's Title Policy</span>
+                            <p>Optional coverage that protects the borrower's equity interest in the property.</p>
+                        </div>
+                        <div class="tree-node">
+                            <span class="tree-label">Simultaneous Issue</span>
+                            <p>When both policies are purchased together, some states offer a reduced combined premium.</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Always use the Rate Calculator Links document when title is not responsive. Access via: <code>https://www.dropbox.com/s/o2ve3784co8mniz/Rate%20Calculator%20Links.pdf</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Open Loan File -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Open Loan File in Byte</h2><span>Access the loan for title insurance updates</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Login to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Search Loan by File Name</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Open Loan File</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Search Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">File Name</strong></td>
+                                <td>Unique loan identifier</td>
+                                <td>REA0000007962</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">First Name / Last Name</strong></td>
+                                <td>Borrower name search</td>
+                                <td>Suzie Buyer</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Property</strong></td>
+                                <td>Property address</td>
+                                <td>16 Glenmoor Road</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Loan Status</strong></td>
+                                <td>Filter by status</td>
+                                <td>Disclosed, Prospect</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Navigation Tips</h4>
+                        <p>Use the <strong>All Live Loans</strong> tab for active files. You can also filter by Loan Officer using the dropdown selector.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Complete CD Process -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Complete CD Process</h2><span>Request title insurance information</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Complete CD Process as Normal</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Contact Title Company</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Title Responsive?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Use Provided Amount</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Use Rate Calculator</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Request Methods</h4>
+                        <p><strong>Ask via email or verbally</strong> the Lender Title Insurance amount from the title company. Document all communications for the loan file.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Title Not Responsive</h4>
+                        <p>If title company does not respond, use the Rate Calculator Links to calculate the full premium yourself:</p>
+                        <p style="margin-top: 10px;"><code>https://www.dropbox.com/s/o2ve3784co8mniz/Rate%20Calculator%20Links.pdf</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Flat Fee Title Insurance -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Flat Fee Lender's Title Insurance</h2><span>Process when title charges a flat fee</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">Is it Flat Fee Title?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Confirm Fees Match Fee Sheet</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Update Conversation Log</div>
+                        </div>
+                    </div>
+
+                    <div class="mi-comparison">
+                        <div class="mi-card">
+                            <div class="mi-card-header">
+                                <h4>Step 1: Verify Fees</h4>
+                            </div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Compare fees to title fee sheet</li>
+                                    <li><span class="check-icon">*</span> Confirm flat fee amount</li>
+                                    <li><span class="check-icon">*</span> Document any discrepancies</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mi-card">
+                            <div class="mi-card-header">
+                                <h4>Step 2: Update Conversation Log</h4>
+                            </div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Talked To: <strong>Title Insurance Fee</strong></li>
+                                    <li><span class="check-icon">*</span> Append Notes: <strong>Flat Fee Title Insurance</strong></li>
+                                    <li><span class="check-icon">*</span> Include confirmation details</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Conversation Log Entry</h4>
+                        <p><strong>Date/Time:</strong> [Current Date/Time]<br>
+                        <strong>Talked To:</strong> Title Insurance Fee<br>
+                        <strong>Append Notes:</strong> Flat Fee Title Insurance - Confirmed with title</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Simultaneous Title Insurance -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Simultaneous Title Insurance</h2><span>TRID calculator for combined policies</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="exception-box">
+                        <h4>Critical Rule</h4>
+                        <p><strong>We cannot charge the discounted rate on the Closing Disclosure.</strong> You must use the TRID Rule Title Insurance Calculator to determine the proper disclosure amounts.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Simultaneous Issue Process Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">Ask Title for Full Lender Amount</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Complete TRID Title Calculator</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Update CD Fees per Calculator</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Update Conversation Log</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node output">Upload Calculator to Documents</div>
+                        </div>
+                    </div>
+
+                    <div class="calculator-display">
+                        <h4>TRID Rule Lender's and Owner's Title Insurance Calculator</h4>
+                        <div class="calc-row">
+                            <span class="label">Full Owner's Policy (Actual Premium)</span>
+                            <span class="operator">+</span>
+                            <span class="value">$400.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">Simultaneous Lender's Policy (Discounted Rate)</span>
+                            <span class="operator">+</span>
+                            <span class="value">$500.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">Stand-Alone Lender's Policy (Full/Undiscounted Rate)</span>
+                            <span class="operator">-</span>
+                            <span class="value">$800.00</span>
+                        </div>
+                        <div class="calc-row highlight">
+                            <span class="label">TRID Rule Owner's Policy Disclosed Amount</span>
+                            <span class="operator">=</span>
+                            <span class="value">$100.00</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Disclose on LE/CD</h4>
+                        <p><strong>Title - Lender's Title Insurance:</strong> $800.00 (Full undiscounted amount)<br>
+                        <strong>Title - Owner's Title Policy (optional):</strong> $100.00 (TRID calculated amount)</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Conversation Log Entry</h4>
+                        <p><strong>Talked To:</strong> Title Insurance Fee<br>
+                        <strong>Append Notes:</strong> Confirmed full premium for Lender's policy is "XXX", see uploaded Title Calculator.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Seller Contribution -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Seller Contribution Scenarios</h2><span>When seller pays full or partial title</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Seller Paid Title Process</h3>
+                        <div class="flow-row">
+                            <div class="flow-node decision">Seller Paying Title?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">Full Title</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Calculate Full Premium</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Partial Title</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Calculate Adjustment</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Simultaneous Issue with Seller Paid</h4>
+                        <p>We <strong>cannot</strong> charge the discounted rate on the Closing Disclosure even when the seller is paying. Follow the standard TRID calculator process.</p>
+                    </div>
+
+                    <div class="mi-comparison">
+                        <div class="mi-card">
+                            <div class="mi-card-header">
+                                <h4>CD Fee Updates Required</h4>
+                            </div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Update <strong>full amount</strong> of Lender's Title Insurance per calculator</li>
+                                    <li><span class="check-icon">*</span> Update <strong>discounted amount</strong> for Owner's Title Policy per calculator</li>
+                                    <li><span class="check-icon">*</span> Update seller credit or adjustment on <strong>CD Page 3 Section L</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mi-card">
+                            <div class="mi-card-header">
+                                <h4>Section L Entry</h4>
+                            </div>
+                            <div class="mi-card-body">
+                                <ul>
+                                    <li><span class="check-icon">*</span> Navigate to CD Page 3</li>
+                                    <li><span class="check-icon">*</span> Locate <strong>Adjustments</strong> section</li>
+                                    <li><span class="check-icon">*</span> Enter as: <strong>Title Premium Adjustment</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calculator-display">
+                        <h4>Example CD Fee Structure with Seller Credit</h4>
+                        <div class="calc-row">
+                            <span class="label">C. Services Borrower Did Shop For</span>
+                            <span class="operator"></span>
+                            <span class="value">$1,157.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">  04 Title - Lender's Title Insurance</span>
+                            <span class="operator"></span>
+                            <span class="value">$797.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">H. Other - Owner's Title Policy (optional)</span>
+                            <span class="operator"></span>
+                            <span class="value">$41.00</span>
+                        </div>
+                        <div class="calc-row highlight">
+                            <span class="label">Adjustments - 08 Title Premium Adjustment</span>
+                            <span class="operator"></span>
+                            <span class="value">$447.00</span>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Conversation Log Entry</h4>
+                        <p><strong>Talked To:</strong> Title Insurance Fee<br>
+                        <strong>Append Notes:</strong> Simultaneous Issue Title Insurance, see uploaded Title Calculator.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Document Upload -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Upload Calculator to Documents</h2><span>Complete documentation requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Upload TRID Calculator</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Category: Title Insurance Policy</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Description: Rate Calculator</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Mark Approved</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Document Category</strong></td>
+                                <td>Title Insurance Policy</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Description</strong></td>
+                                <td>Rate Calculator</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Document Status</strong></td>
+                                <td>Approved</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Documentation Best Practice</h4>
+                        <p>Always upload the completed TRID Rule Title Insurance Calculator to Stored Documents. This provides an audit trail for compliance review and supports the disclosed amounts on the CD.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+TITLE INSURANCE PROCESS SUMMARY
+================================
+
+CFPB RULE: Disclose FULL Lender amount on LE regardless of simultaneous issue
+
+FLAT FEE TITLE:
+  1. Confirm fees match title fee sheet
+  2. Update Conversation Log: "Flat Fee Title Insurance"
+
+SIMULTANEOUS ISSUE:
+  1. Get full Lender amount (if no Owner's purchased)
+  2. Complete TRID Rule Title Insurance Calculator:
+     - Full Owner's Premium + Simultaneous Lender's (discounted)
+     - MINUS Stand-Alone Lender's (full rate)
+     - EQUALS Owner's Policy Disclosed Amount
+  3. Update CD with calculated amounts
+  4. Upload calculator as "Title Insurance Policy" / "Rate Calculator"
+  5. Mark document Approved
+
+SELLER CONTRIBUTION:
+  1. Follow simultaneous issue process
+  2. Add adjustment on CD Page 3 Section L
+  3. Entry: "Title Premium Adjustment"
+
+CONVERSATION LOG ENTRIES:
+  - Talked To: Title Insurance Fee
+  - Notes: [Flat Fee / Simultaneous Issue / Full Premium Amount]
+
+RATE CALCULATOR LINK:
+https://www.dropbox.com/s/o2ve3784co8mniz/Rate%20Calculator%20Links.pdf
+
+QUESTIONS? EMAIL: TRAINING@CMGFI.COM
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Title Insurance Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">6 Process Steps Analyzed</span>
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 50% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">50%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">90%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-calculator')" title="Click to view agent details">
+                        <div class="heat-score">95</div>
+                        <div class="heat-name">TRID Calculator Automation</div>
+                        <div class="heat-desc">Auto-calculate title insurance disclosures</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>4</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-title-request')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Title Request Bot</div>
+                        <div class="heat-desc">Auto-request fees from title companies</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>2</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-conversation-log')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Conversation Log Writer</div>
+                        <div class="heat-desc">Auto-generate compliant log entries</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>3,4,5</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-document-upload')" title="Click to view agent details">
+                        <div class="heat-score">62</div>
+                        <div class="heat-name">Document Auto-Classifier</div>
+                        <div class="heat-desc">Auto-categorize and approve uploads</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: TRID Calculator Automation -->
+                <div class="agent-card" id="agent-calculator">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">C</div>
+                        <div class="agent-info">
+                            <div class="agent-name">TRID Calculator Automation Agent</div>
+                            <div class="agent-type">Calculation Engine Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically calculates TRID-compliant title insurance disclosure amounts based on loan data and title fee inputs. Eliminates manual calculation errors and ensures compliance with CFPB regulations.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Extract Loan Data</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Get Title Fees</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Calculate TRID</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Update CD</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('calculator')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Title Request Bot -->
+                <div class="agent-card" id="agent-title-request">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">T</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Title Request Bot</div>
+                            <div class="agent-type">Communication Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically sends standardized requests to title companies for Lender's Title Insurance amounts. Tracks responses, sends follow-ups, and escalates non-responsive vendors.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Identify Title Co</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Send Request</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Track Response</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Update Loan</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">10min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Availability</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('titleRequest')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Conversation Log Writer -->
+                <div class="agent-card" id="agent-conversation-log">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">L</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Conversation Log Writer</div>
+                            <div class="agent-type">Documentation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically generates compliant conversation log entries based on the title insurance scenario type. Ensures consistent formatting and complete documentation for audit purposes.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Detect Scenario</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Generate Entry</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate Format</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Insert Log</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Compliance</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('conversationLog')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Document Auto-Classifier -->
+                <div class="agent-card" id="agent-document-upload">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">D</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Document Auto-Classifier</div>
+                            <div class="agent-type">Document Processing Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically classifies uploaded title documents, assigns correct categories and descriptions, and marks documents as Approved based on content recognition and validation rules.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Receive Upload</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Classify Doc</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate Content</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Auto-Approve</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">3min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('documentUpload')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Calculating Owner and Lender Title - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Calculating Owner and Lender Title Insurance
+
+## Overview
+Borrowers are required to purchase Lender's Title Insurance as part of their closing costs. There is an optional Owner's Title Policy that can also be purchased. In some states when these are purchased together, this is called simultaneous issue, which could result in a reduced title insurance premium.
+
+## CFPB Compliance Requirement
+Per the CFPB, Lenders are required to disclose the full Lender amount of title insurance regardless of simultaneous issue on the Loan Estimate. At Closing Disclosure, the figures can be updated using the TRID Rule Title Insurance Calculator. This process is required for compliance.
+
+## Process Steps
+
+### Step 1: Open Loan File in Byte
+- Login to Byte system
+- Search for loan by File Name, Borrower Name, or Property Address
+- Open the loan file
+
+### Step 2: Complete CD Process
+- Complete the CD process as normal
+- Ask via email or verbally for the Lender Title Insurance amount
+- If title is not responsive, use Rate Calculator Links
+
+### Step 3: Flat Fee Title Insurance
+If Flat Fee Lender's Title Insurance:
+1. Confirm the fees match the fee sheet from title
+2. Update the Conversation Log:
+   - Talked To: Title Insurance Fee
+   - Append Notes: Flat Fee Title Insurance
+
+### Step 4: Simultaneous Title Insurance
+**IMPORTANT: We cannot charge the discounted rate on the Closing Disclosure.**
+
+1. Ask Title for the amount charged for Lender's title if Borrower did not purchase Owner's Title Policy
+2. If title is not responsive, use Rate Calculator Links
+3. Complete the TRID Rule Title Insurance Calculator:
+   - Full Owner's Policy (Actual Premium)
+   - + Simultaneous Lender's Policy (Discounted Rate)
+   - - Stand-Alone Lender's Policy (Full/Undiscounted Rate)
+   - = TRID Rule Owner's Policy Disclosed Amount
+4. Update the CD fees according to the Title Calculator
+5. Update Conversation Log:
+   - Talked To: Title Insurance Fee
+   - Append Notes: Confirmed full premium for Lender's policy is "XXX", see uploaded Title Calculator
+
+### Step 5: Seller Contribution
+If Seller is paying full title or a portion:
+1. Follow simultaneous issue process
+2. Update full amount of Lender's Title Insurance per calculator
+3. Update discounted amount for Owner's Title Policy per calculator
+4. Update seller credit or adjustment on CD Page 3 Section L as "Title Premium Adjustment"
+5. Update Conversation Log with simultaneous issue note
+
+### Step 6: Upload Documentation
+Upload TRID Rule Title Insurance Calculator:
+- Document Type: Title Insurance Policy
+- Description: Rate Calculator
+- Status: Mark Approved
+
+## Rate Calculator Link
+https://www.dropbox.com/s/o2ve3784co8mniz/Rate%20Calculator%20Links.pdf
+
+## Questions?
+Email: TRAINING@CMGFI.COM</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll spy with click debounce
+        let isScrolling = false;
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Add click handlers with debounce
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                isScrolling = true;
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Agent Prompt System
+        const agentPrompts = {
+            calculator: {
+                name: 'TRID Calculator Automation Agent',
+                tags: ['Calculation Engine', 'CFPB Compliance', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically calculates TRID-compliant title insurance disclosure amounts using the official TRID Rule formula. It eliminates manual calculation errors and ensures all loans have proper title insurance disclosures for compliance with CFPB regulations.`,
+                prompt: `You are building a Calculation Engine Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: TRID Calculator Automation Agent
+TYPE: Calculation Engine / Compliance Automation
+
+OBJECTIVE:
+Create an agent that automatically calculates TRID-compliant title insurance disclosure amounts when processing Closing Disclosures for loans with simultaneous title insurance.
+
+INPUT PARAMETERS:
+1. From Loan File:
+   - Loan Amount
+   - Property Value/Purchase Price
+   - State (for state-specific rate tables)
+   - Title Company Name
+
+2. From Title Company (or Rate Calculator):
+   - Full Owner's Policy Premium (Actual)
+   - Simultaneous Lender's Policy Premium (Discounted)
+   - Stand-Alone Lender's Policy Premium (Full/Undiscounted)
+
+TRID CALCULATION FORMULA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Full Owner's Policy (Actual Premium)         +$XXX
+Simultaneous Lender's Policy (Discounted)    +$XXX
+Stand-Alone Lender's Policy (Undiscounted)   -$XXX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TRID Owner's Policy Disclosed Amount         =$XXX
+
+DISCLOSURE OUTPUT:
+{
+  "lendersTitleInsurance": {
+    "amount": 800.00,
+    "description": "Title - Lender's Title Insurance",
+    "note": "Full undiscounted amount per CFPB requirement"
+  },
+  "ownersTitlePolicy": {
+    "amount": 100.00,
+    "description": "Title - Owner's Title Policy (optional)",
+    "note": "TRID calculated amount"
+  },
+  "calculatorUsed": true,
+  "calculationDate": "2026-01-27T14:30:00Z",
+  "complianceVerified": true
+}
+
+VALIDATION RULES:
+- Owner's disclosed amount must be >= $0
+- Lender's amount must equal stand-alone rate
+- All three input values required for calculation
+- Flag if any calculated value seems unreasonable (>2x expected)
+
+ERROR HANDLING:
+- If title fees missing: Prompt to use Rate Calculator Links
+- If calculation yields negative: Flag for manual review
+- If state not in rate table: Use manual entry mode`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS System
+   - Hook into CD preparation workflow
+   - Auto-populate fee fields on CD screen
+   - Trigger when Title Insurance section accessed
+
+2. Title Company Fee Database
+   - Maintain rate tables by state/county
+   - API connection to title company portals
+   - Fallback to Rate Calculator Links PDF
+
+3. Compliance Engine
+   - Log all calculations for audit trail
+   - Generate calculator document for upload
+   - Verify amounts against CFPB thresholds
+
+4. Document Generation
+   - Auto-create completed TRID Calculator PDF
+   - Pre-fill document metadata fields
+   - Queue for Stored Documents upload
+
+DEPLOYMENT:
+- Byte plugin/extension
+- Accessible from CD preparation screen
+- One-click calculation with auto-fill`
+            },
+            titleRequest: {
+                name: 'Title Request Bot',
+                tags: ['Communication', 'Vendor Management', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent automatically sends standardized requests to title companies for Lender's Title Insurance amounts. It tracks responses, sends follow-up reminders, and escalates when vendors are non-responsive, ensuring timely receipt of title fees for CD preparation.`,
+                prompt: `You are building a Communication Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Title Request Bot
+TYPE: Vendor Communication / Response Tracking
+
+OBJECTIVE:
+Create an agent that automates the process of requesting title insurance fee information from title companies, tracks responses, and ensures timely receipt of required data for Closing Disclosure preparation.
+
+TRIGGER CONDITIONS:
+1. CD preparation initiated for loan
+2. Title insurance fees not yet received
+3. Manual request by disclosure specialist
+4. X days before scheduled closing
+
+REQUEST TEMPLATE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Subject: Title Fee Request - [File Number] - [Borrower Name]
+
+Dear [Title Company Contact],
+
+We are preparing the Closing Disclosure for the following loan and require title insurance fee information:
+
+Loan File: [File Number]
+Borrower: [Borrower Name]
+Property: [Property Address]
+Closing Date: [Scheduled Closing]
+
+Please provide:
+1. Lender's Title Insurance (Full/Undiscounted Rate)
+2. Owner's Title Policy Premium (if applicable)
+3. Simultaneous Issue Lender's Rate (if applicable)
+
+Please respond by [Date - 3 business days] to ensure timely CD delivery.
+
+Thank you,
+[Disclosure Team / Auto-generated]
+CMG Financial
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RESPONSE TRACKING:
+{
+  "requestId": "TR-2026-001234",
+  "loanFile": "REA0000007962",
+  "titleCompany": "Buy Sige Birmingham Title Agency",
+  "sentDate": "2026-01-25T09:00:00Z",
+  "responseDeadline": "2026-01-28T17:00:00Z",
+  "status": "pending" | "received" | "escalated",
+  "followUpsSent": 0,
+  "responseData": null
+}
+
+FOLLOW-UP LOGIC:
+Day 0: Initial request sent
+Day 2: First reminder if no response
+Day 3: Second reminder + escalate to supervisor
+Day 4: Flag loan as "Title Non-Responsive" in Byte
+
+RESPONSE PARSING:
+- Extract fee amounts from email body
+- Recognize common formats ($XXX, XXX.00, etc.)
+- Flag ambiguous responses for human review`,
+                integration: `INTEGRATION POINTS:
+1. Email System
+   - Send via CMG email domain
+   - Track delivery/open/response
+   - Parse incoming replies
+
+2. Byte LOS
+   - Read loan data for request population
+   - Update loan status on response
+   - Create conversation log entries
+
+3. Title Company Database
+   - Maintain contact information
+   - Track response times by vendor
+   - Identify reliable vs slow vendors
+
+4. Escalation System
+   - Notify disclosure supervisor
+   - Create task for manual follow-up
+   - Update loan timeline alerts
+
+REPORTING:
+- Average response time by title company
+- Non-responsive vendor report
+- SLA compliance metrics`
+            },
+            conversationLog: {
+                name: 'Conversation Log Writer',
+                tags: ['Documentation', 'Compliance', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically generates properly formatted conversation log entries based on the title insurance scenario type (Flat Fee, Simultaneous Issue, Seller Paid). It ensures consistent documentation and complete audit trails for compliance review.`,
+                prompt: `You are building a Documentation Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Conversation Log Writer Agent
+TYPE: Documentation Automation / Compliance
+
+OBJECTIVE:
+Create an agent that automatically generates conversation log entries for title insurance scenarios, ensuring consistent formatting and complete documentation for regulatory compliance and audit purposes.
+
+SCENARIO DETECTION:
+Analyze loan data to determine which template to use:
+
+1. FLAT FEE SCENARIO
+   Trigger: Title fees match flat fee structure
+   Entry Template:
+   {
+     "dateTime": "[Current DateTime]",
+     "talkedTo": "Title Insurance Fee",
+     "followUpFlag": false,
+     "alert": false,
+     "appendNotes": "Flat Fee Title Insurance - Confirmed with [Title Company Name]"
+   }
+
+2. SIMULTANEOUS ISSUE SCENARIO
+   Trigger: Both Owner's and Lender's policies present
+   Entry Template:
+   {
+     "dateTime": "[Current DateTime]",
+     "talkedTo": "Title Insurance Fee",
+     "followUpFlag": false,
+     "alert": false,
+     "appendNotes": "Confirmed full premium for Lender's policy is $[Amount], see uploaded Title Calculator. Simultaneous Issue Title Insurance."
+   }
+
+3. SELLER CONTRIBUTION SCENARIO
+   Trigger: Seller credits applied to title
+   Entry Template:
+   {
+     "dateTime": "[Current DateTime]",
+     "talkedTo": "Title Insurance Fee",
+     "followUpFlag": false,
+     "alert": false,
+     "appendNotes": "Simultaneous Issue Title Insurance. Seller contributing $[Amount] toward title. Title Premium Adjustment entered on CD Page 3 Section L. See uploaded Title Calculator."
+   }
+
+VALIDATION RULES:
+- DateTime must be current timestamp
+- "Talked To" must be "Title Insurance Fee"
+- Notes must include specific dollar amounts where applicable
+- Must reference uploaded calculator when simultaneous issue
+
+OUTPUT FORMAT:
+{
+  "conversationLogEntry": {
+    "dateTime": "2026-01-27 2:14 PM",
+    "talkedTo": "Title Insurance Fee",
+    "followUpFlag": false,
+    "alert": false,
+    "appendNotes": "string with scenario-specific content"
+  },
+  "scenarioType": "flat_fee" | "simultaneous" | "seller_contribution",
+  "autoGeneratedFlag": true,
+  "reviewRequired": false
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Conversation Log
+   - Direct integration with Edit Conversation dialog
+   - Auto-populate all fields
+   - One-click entry creation
+
+2. Loan Data Reader
+   - Pull title insurance fee data
+   - Detect scenario type automatically
+   - Read TRID calculator results
+
+3. Audit Trail
+   - Log all auto-generated entries
+   - Flag for QC review if needed
+   - Maintain compliance documentation
+
+4. User Interface
+   - Show preview before insertion
+   - Allow manual edits if needed
+   - Confirm successful entry
+
+COMPLIANCE FEATURES:
+- All entries timestamped
+- User attribution maintained
+- Edit history preserved
+- Exportable for audits`
+            },
+            documentUpload: {
+                name: 'Document Auto-Classifier',
+                tags: ['Document Processing', 'ML Classification', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent automatically classifies uploaded title insurance documents, assigns the correct document category and description, and marks documents as Approved based on content recognition and business rules validation.`,
+                prompt: `You are building a Document Processing Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Document Auto-Classifier Agent
+TYPE: Document Classification / ML Processing
+
+OBJECTIVE:
+Create an agent that automatically processes uploaded title insurance documents, classifies them correctly, and applies appropriate metadata and approval status.
+
+DOCUMENT CLASSIFICATION RULES:
+
+1. TRID TITLE INSURANCE CALCULATOR
+   Detection: Contains "TRID Rule" + "Title Insurance Calculator"
+   Classification:
+   {
+     "documentType": "Title Insurance Policy",
+     "description": "Rate Calculator",
+     "status": "Approved",
+     "autoApproved": true
+   }
+
+2. TITLE COMMITMENT
+   Detection: Contains "Commitment for Title Insurance"
+   Classification:
+   {
+     "documentType": "Title",
+     "description": "Title Commitment",
+     "status": "Reviewed",
+     "autoApproved": false
+   }
+
+3. TITLE POLICY
+   Detection: Contains "Owner's Policy" OR "Lender's Policy"
+   Classification:
+   {
+     "documentType": "Title Insurance Policy",
+     "description": "Title Policy",
+     "status": "Reviewed",
+     "autoApproved": false
+   }
+
+CONTENT VALIDATION:
+- OCR scan for key terms
+- Verify loan number matches file
+- Check borrower name consistency
+- Validate property address
+
+CLASSIFICATION OUTPUT:
+{
+  "uploadId": "DOC-2026-001234",
+  "originalFilename": "Title_Calculator.pdf",
+  "classificationResult": {
+    "documentType": "Title Insurance Policy",
+    "description": "Rate Calculator",
+    "confidence": 0.95,
+    "detectedTerms": ["TRID Rule", "Lender's Policy", "Owner's Policy"]
+  },
+  "validationResult": {
+    "loanNumberMatch": true,
+    "borrowerNameMatch": true,
+    "propertyAddressMatch": true
+  },
+  "recommendedStatus": "Approved",
+  "autoApproveEligible": true
+}
+
+AUTO-APPROVE CRITERIA:
+- Document type = "Rate Calculator"
+- Confidence >= 0.90
+- All validation checks pass
+- Loan file in appropriate status`,
+                integration: `INTEGRATION POINTS:
+1. Byte Document Upload
+   - Intercept upload events
+   - Process before storage
+   - Auto-fill metadata fields
+
+2. OCR Engine
+   - Extract text from PDF/images
+   - Identify key document terms
+   - Extract relevant data fields
+
+3. Stored Documents System
+   - Apply classification
+   - Set document status
+   - Update document list
+
+4. Validation Database
+   - Cross-reference loan data
+   - Verify document authenticity
+   - Flag mismatches
+
+MACHINE LEARNING:
+- Train on historical document uploads
+- Improve classification over time
+- Learn from user corrections
+
+REPORTING:
+- Classification accuracy metrics
+- Auto-approve rate
+- Documents requiring manual review`
+            }
+        };
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
