@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LoanSafe Training Portal - CMG Financial</title>
+    <title>LoanSafe - System Documentation | CMG Training Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,15 +15,18 @@
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             --accent-green: #22c55e;
-            --accent-purple: #8b5cf6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --border-subtle: rgba(255,255,255,0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -39,6 +42,9 @@
             align-items: center;
             gap: 12px;
             font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -59,68 +65,83 @@
             border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
-        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+        .breadcrumb .separator {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
 
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
-            padding: 60px 40px;
-            text-align: center;
+        .breadcrumb .current {
+            color: var(--accent-amber);
+            font-weight: 600;
+            padding: 8px 16px;
+        }
+
+        /* Header */
+        .system-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 50px 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .hero::before {
+        .system-header::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background:
-                radial-gradient(ellipse at 30% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
             pointer-events: none;
         }
 
-        .hero-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            display: inline-block;
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
             position: relative;
+            z-index: 1;
         }
 
-        .hero h1 {
+        .system-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .system-title {
             font-size: 2.8rem;
             font-weight: 800;
-            margin-bottom: 15px;
-            position: relative;
+            margin-bottom: 12px;
             background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .hero .subtitle {
+        .system-description {
+            font-size: 1.15rem;
             color: var(--text-secondary);
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            position: relative;
+            max-width: 650px;
         }
 
-        .hero-stats {
+        .header-stats {
             display: flex;
-            justify-content: center;
-            gap: 40px;
+            gap: 25px;
+            margin-top: 30px;
             flex-wrap: wrap;
-            position: relative;
         }
 
-        .hero-stat {
-            text-align: center;
+        .header-stat {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 18px 28px;
+            border-radius: 12px;
         }
 
-        .hero-stat-value {
-            font-size: 2.5rem;
+        .header-stat-value {
+            font-size: 2rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             -webkit-background-clip: text;
@@ -128,441 +149,422 @@
             background-clip: text;
         }
 
-        .hero-stat-label {
-            color: var(--text-muted);
+        .header-stat-label {
             font-size: 0.9rem;
-            margin-top: 5px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         /* Main Content */
         .main-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 40px 30px;
         }
 
-        /* Section Title */
-        .section-title {
+        /* Category Section */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .section-title h2 {
-            font-size: 1.6rem;
+        .category-icon {
+            font-size: 1.8rem;
+        }
+
+        .category-title {
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        .section-title-line {
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-blue), transparent);
-            border-radius: 1px;
+        .category-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: auto;
         }
 
-        /* Workflow Cards Grid */
-        .workflow-grid {
+        /* Module Grid */
+        .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
 
-        .workflow-card {
+        .module-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
         }
 
-        .workflow-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(59, 130, 246, 0.2);
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
             border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .workflow-card-header {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
+        .module-card.complete {
+            border-color: rgba(34, 197, 94, 0.3);
         }
 
-        .workflow-card-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
+        .module-card.complete::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-teal) 100%);
         }
 
-        .workflow-card-title {
-            flex: 1;
-        }
-
-        .workflow-card-title h3 {
-            font-size: 1.25rem;
+        .module-name {
+            font-size: 1.1rem;
             font-weight: 700;
-            color: white;
-            margin-bottom: 5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
         }
 
-        .workflow-card-title span {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
+        .module-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            line-height: 1.5;
         }
 
-        .workflow-card-body {
-            padding: 25px;
-        }
-
-        .workflow-card-body p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .workflow-card-meta {
+        .module-status {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 18px;
         }
 
-        .meta-tag {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent-blue);
-            padding: 6px 12px;
+        .status-badge {
+            padding: 5px 12px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.complete {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-badge.pending {
+            background: rgba(100, 116, 139, 0.15);
+            color: var(--text-muted);
+        }
+
+        .module-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
-        .meta-tag.role {
-            background: rgba(20, 184, 166, 0.1);
-            color: var(--accent-teal);
+        .module-link:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
         }
 
-        .meta-tag.time {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent-amber);
+        .module-link.primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border: none;
+            color: white;
         }
 
-        /* System Overview */
-        .overview-section {
+        .module-link.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .module-link.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .module-link.disabled:hover {
+            background: rgba(0,0,0,0.3);
+            border-color: var(--border-subtle);
+            color: var(--text-muted);
+            transform: none;
+        }
+
+        /* Info Section */
+        .info-section {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 35px;
+            border-radius: 14px;
+            padding: 28px;
             margin-bottom: 40px;
         }
 
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-        }
-
-        .overview-card {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 25px;
-        }
-
-        .overview-card h4 {
+        .info-section h3 {
             color: var(--accent-blue);
-            font-size: 1rem;
-            margin-bottom: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .overview-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
-        .overview-card ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .overview-card li {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-subtle);
+        .info-item {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
         }
 
-        .overview-card li:last-child {
-            border-bottom: none;
+        .info-item .icon {
+            font-size: 1.2rem;
         }
 
-        .check-icon {
-            color: var(--accent-green);
-            font-weight: bold;
+        .info-item span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
         /* Quick Links */
         .quick-links {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 14px;
+            padding: 24px;
             margin-bottom: 40px;
         }
 
         .quick-links h3 {
             color: var(--text-primary);
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1rem;
+            margin-bottom: 15px;
         }
 
         .quick-links-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .quick-link {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 8px;
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .quick-link:hover {
             background: var(--accent-blue);
             color: white;
             border-color: var(--accent-blue);
-            transform: translateY(-2px);
         }
 
         /* Footer */
         .footer {
             text-align: center;
             padding: 30px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
             border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .main-content { padding: 20px; }
-            .workflow-grid { grid-template-columns: 1fr; }
-            .hero-stats { gap: 20px; }
+            .system-title { font-size: 2rem; }
+            .header-stats { gap: 15px; }
+            .header-stat { padding: 12px 18px; }
+            .module-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-        <a href="../../index.html">Portal Home</a>
-        <span class="separator">></span>
-        <span class="current">LoanSafe</span>
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <span class="current">🛡️ LoanSafe</span>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-icon">🛡️</div>
-        <h1>LoanSafe Fraud Manager</h1>
-        <p class="subtitle">CoreLogic's comprehensive fraud detection and mitigation solution for identifying mortgage fraud risk through loan data analysis, fraud scoring, and regulatory compliance screening.</p>
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="hero-stat-value">3</div>
-                <div class="hero-stat-label">Workflow Guides</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">12+</div>
-                <div class="hero-stat-label">Party Types Screened</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">8</div>
-                <div class="hero-stat-label">Compliance Databases</div>
+    <!-- Header -->
+    <header class="system-header">
+        <div class="header-content">
+            <div class="system-icon">🛡️</div>
+            <h1 class="system-title">LoanSafe</h1>
+            <p class="system-description">CoreLogic's fraud detection and identity verification platform — comprehensive screening against regulatory databases, fraud scoring, and compliance validation for mortgage origination.</p>
+
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">4</div>
+                    <div class="header-stat-label">Total Modules</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">4</div>
+                    <div class="header-stat-label">Documented</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">0</div>
+                    <div class="header-stat-label">In Progress</div>
+                </div>
             </div>
         </div>
-    </section>
+    </header>
 
     <!-- Main Content -->
     <main class="main-content">
 
-        <!-- System Overview -->
-        <div class="overview-section">
-            <div class="section-title">
-                <h2>System Overview</h2>
-                <div class="section-title-line"></div>
-            </div>
-            <div class="overview-grid">
-                <div class="overview-card">
-                    <h4>What is LoanSafe?</h4>
-                    <p>LoanSafe is CoreLogic's fraud detection and mitigation solution that analyzes loan data to identify mortgage fraud risk. It provides fraud risk scores, alerts, and recommendations to minimize potential fraud throughout the loan lifecycle.</p>
-                </div>
-                <div class="overview-card">
-                    <h4>Key Databases Searched</h4>
-                    <ul>
-                        <li><span class="check-icon">&#10003;</span> SSN Validation</li>
-                        <li><span class="check-icon">&#10003;</span> MERS (Mortgage Registry)</li>
-                        <li><span class="check-icon">&#10003;</span> NMLS/ASC (Licensing)</li>
-                        <li><span class="check-icon">&#10003;</span> OFAC Sanctions List</li>
-                        <li><span class="check-icon">&#10003;</span> SAM.gov Exclusions</li>
-                        <li><span class="check-icon">&#10003;</span> HUD/LDP & FHFA SCP</li>
-                        <li><span class="check-icon">&#10003;</span> Freddie Mac Exclusionary</li>
-                    </ul>
-                </div>
-                <div class="overview-card">
-                    <h4>When is LoanSafe Run?</h4>
-                    <ul>
-                        <li><span class="check-icon">1</span> Initial: File Received Status</li>
-                        <li><span class="check-icon">2</span> Prior to UW Submission</li>
-                        <li><span class="check-icon">3</span> Final: CTC Requested</li>
-                    </ul>
-                    <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted);">Report auto-runs when status changes to "File Received" (Submitted to Processing)</p>
-                </div>
-                <div class="overview-card">
-                    <h4>Role Responsibilities</h4>
-                    <ul>
-                        <li><span style="color: var(--accent-teal);">Processor</span> - Clear LOW alerts</li>
-                        <li><span style="color: var(--accent-amber);">Underwriter</span> - Clear MED/HIGH alerts</li>
-                        <li><span style="color: var(--accent-rose);">Underwriter</span> - Fraud Scores > 900</li>
-                        <li><span style="color: var(--accent-blue);">All</span> - Add required parties</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
         <!-- Quick Links -->
         <div class="quick-links">
-            <h3>Quick Reference Links</h3>
+            <h3>🔗 External Compliance Databases</h3>
             <div class="quick-links-grid">
-                <a href="https://www.asc.gov/appraiser/advanced#" target="_blank" class="quick-link">ASC Appraiser Search</a>
                 <a href="https://ofac.treasury.gov/sanctions-list-search" target="_blank" class="quick-link">OFAC Sanctions Search</a>
                 <a href="https://www.sam.gov" target="_blank" class="quick-link">SAM.gov Exclusions</a>
                 <a href="https://www.hud.gov/program_offices/general_counsel/LDPList" target="_blank" class="quick-link">HUD LDP List</a>
                 <a href="https://www.fhfa.gov/SupervisionRegulation/LegalDocuments/Pages/Suspended-Counterparty-Program.aspx" target="_blank" class="quick-link">FHFA SCP List</a>
+                <a href="https://www.asc.gov/appraiser/advanced#" target="_blank" class="quick-link">ASC Appraiser Search</a>
             </div>
         </div>
 
-        <!-- Workflow Guides -->
-        <div class="section-title">
-            <h2>Workflow Guides</h2>
-            <div class="section-title-line"></div>
-        </div>
-
-        <div class="workflow-grid">
-            <!-- Fraud Manager Workflow -->
-            <a href="./LoanSafe-Fraud-Manager-Workflow.html" class="workflow-card">
-                <div class="workflow-card-header">
-                    <div class="workflow-card-icon">📊</div>
-                    <div class="workflow-card-title">
-                        <h3>LoanSafe Fraud Manager</h3>
-                        <span>Complete fraud detection workflow</span>
-                    </div>
-                </div>
-                <div class="workflow-card-body">
-                    <p>Master the end-to-end LoanSafe Fraud Manager process including running reports, reviewing alerts, clearing findings, and managing parties through the Byte interface.</p>
-                    <div class="workflow-card-meta">
-                        <span class="meta-tag">Processing</span>
-                        <span class="meta-tag">Underwriting</span>
-                        <span class="meta-tag role">All Roles</span>
-                        <span class="meta-tag time">15-30 min</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Correspondent Parties Workflow -->
-            <a href="./Correspondent-Parties-Workflow.html" class="workflow-card">
-                <div class="workflow-card-header">
-                    <div class="workflow-card-icon">👥</div>
-                    <div class="workflow-card-title">
-                        <h3>Correspondent Parties Check</h3>
-                        <span>FHLMC & FHFA SCP screening</span>
-                    </div>
-                </div>
-                <div class="workflow-card-body">
-                    <p>Learn the correspondent-specific workflow for completing the FHLMC Exclusionary and FHFA SCP Parties form, adding parties to the Byte Parties screen, and running LoanSafe for correspondent loans.</p>
-                    <div class="workflow-card-meta">
-                        <span class="meta-tag">Correspondent</span>
-                        <span class="meta-tag role">Credit Auditor</span>
-                        <span class="meta-tag time">10-20 min</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Operations Flow -->
-            <a href="./LoanSafe-Operations-Flow.html" class="workflow-card">
-                <div class="workflow-card-header">
-                    <div class="workflow-card-icon">🔄</div>
-                    <div class="workflow-card-title">
-                        <h3>LoanSafe Operations Flow</h3>
-                        <span>Processing & Underwriting handoffs</span>
-                    </div>
-                </div>
-                <div class="workflow-card-body">
-                    <p>Understand the operational workflow showing how LoanSafe integrates with loan processing stages, from initial file receipt through underwriting decision and final CTC.</p>
-                    <div class="workflow-card-meta">
-                        <span class="meta-tag">Operations</span>
-                        <span class="meta-tag role">Processor</span>
-                        <span class="meta-tag role">Underwriter</span>
-                        <span class="meta-tag time">5-10 min</span>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Alert Severity Guide -->
-        <div class="overview-section">
-            <div class="section-title">
-                <h2>Alert Severity Guide</h2>
-                <div class="section-title-line"></div>
+        <!-- Fraud Detection -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔍</span>
+                <h2 class="category-title">Fraud Detection & Screening</h2>
+                <span class="category-count">2 of 2</span>
             </div>
-            <div class="overview-grid">
-                <div class="overview-card" style="border-left: 4px solid var(--accent-green);">
-                    <h4 style="color: var(--accent-green);">LOW Alerts</h4>
-                    <p><strong>Cleared by:</strong> Processor/Account Manager</p>
-                    <p style="margin-top: 10px;">Minor discrepancies or informational flags that require acknowledgment but typically don't indicate fraud risk.</p>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">LoanSafe Fraud Manager</h3>
+                    <p class="module-description">Complete fraud detection workflow including running reports, reviewing alerts, clearing findings, and managing parties through the Byte interface.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./LoanSafe-Fraud-Manager-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
                 </div>
-                <div class="overview-card" style="border-left: 4px solid var(--accent-amber);">
-                    <h4 style="color: var(--accent-amber);">MEDIUM Alerts</h4>
-                    <p><strong>Cleared by:</strong> Underwriter</p>
-                    <p style="margin-top: 10px;">Moderate risk indicators requiring documentation review and potential additional verification.</p>
+                <div class="module-card complete">
+                    <h3 class="module-name">Correspondent Parties Check</h3>
+                    <p class="module-description">FHLMC Exclusionary and FHFA SCP Parties form completion, party management in Byte, and running LoanSafe for correspondent loans.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./Correspondent-Parties-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
                 </div>
-                <div class="overview-card" style="border-left: 4px solid var(--accent-rose);">
-                    <h4 style="color: var(--accent-rose);">HIGH Alerts</h4>
-                    <p><strong>Cleared by:</strong> Underwriter</p>
-                    <p style="margin-top: 10px;">Significant fraud indicators requiring thorough investigation, documentation, and potential escalation.</p>
+            </div>
+        </section>
+
+        <!-- Operations -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">⚙️</span>
+                <h2 class="category-title">Operations & Workflow</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">LoanSafe Operations Flow</h3>
+                    <p class="module-description">End-to-end operational workflow showing LoanSafe integration with loan processing stages, from file receipt through CTC.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./LoanSafe-Operations-Flow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
                 </div>
-                <div class="overview-card" style="border-left: 4px solid var(--accent-purple);">
-                    <h4 style="color: var(--accent-purple);">Fraud Score > 900</h4>
-                    <p><strong>Action:</strong> Risk Fraud Manager Policy</p>
-                    <p style="margin-top: 10px;">High-risk loans requiring comprehensive review per Risk Fraud Manager Policy and potential escalation to management.</p>
+                <div class="module-card complete">
+                    <h3 class="module-name">Alert Clearing Guide</h3>
+                    <p class="module-description">Role-based guide for clearing LOW, MEDIUM, and HIGH alerts. Includes escalation procedures for fraud scores above 900.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./LoanSafe-Fraud-Manager-Workflow.html#review-alerts" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h3>📋 Key Databases Searched</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>SSN Validation</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>MERS (Mortgage Registry)</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>NMLS/ASC Licensing</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>OFAC Sanctions List</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>SAM.gov Exclusions</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>HUD/LDP List</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>FHFA SCP List</span>
+                </div>
+                <div class="info-item">
+                    <span class="icon">✓</span>
+                    <span>Freddie Mac Exclusionary</span>
                 </div>
             </div>
         </div>
@@ -571,7 +573,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>CMG Financial Training Portal | LoanSafe Documentation | Last Updated: January 2026</p>
+        <p>CMG Training Documentation Portal — Last Updated: January 2026</p>
     </footer>
 </body>
 </html>

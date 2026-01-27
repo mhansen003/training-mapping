@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMLS - Training Portal</title>
+    <title>NMLS - System Documentation | CMG Training Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,21 +15,23 @@
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             --accent-green: #22c55e;
-            --accent-purple: #8b5cf6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --border-subtle: rgba(255,255,255,0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 0;
         }
 
         /* Breadcrumb */
@@ -40,6 +42,9 @@
             align-items: center;
             gap: 12px;
             font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -60,73 +65,83 @@
             border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
-        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
-            padding: 60px 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 1px solid var(--border-subtle);
+        .breadcrumb .separator {
+            color: var(--text-muted);
+            font-size: 1.2rem;
         }
 
-        .hero::before {
+        .breadcrumb .current {
+            color: var(--accent-amber);
+            font-weight: 600;
+            padding: 8px 16px;
+        }
+
+        /* Header */
+        .system-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 50px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-header::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background:
-                radial-gradient(ellipse at 30% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
             pointer-events: none;
         }
 
-        .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-
-        .hero-icon {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 25px;
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 800;
+        .system-icon {
+            font-size: 4rem;
             margin-bottom: 15px;
+        }
+
+        .system-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
             background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .hero .subtitle {
-            font-size: 1.3rem;
+        .system-description {
+            font-size: 1.15rem;
             color: var(--text-secondary);
-            margin-bottom: 30px;
+            max-width: 650px;
         }
 
-        .hero-stats {
+        .header-stats {
             display: flex;
-            justify-content: center;
-            gap: 40px;
+            gap: 25px;
+            margin-top: 30px;
             flex-wrap: wrap;
         }
 
-        .stat-item {
-            text-align: center;
+        .header-stat {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 18px 28px;
+            border-radius: 12px;
         }
 
-        .stat-value {
-            font-size: 2.5rem;
+        .header-stat-value {
+            font-size: 2rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             -webkit-background-clip: text;
@@ -134,238 +149,221 @@
             background-clip: text;
         }
 
-        .stat-label {
+        .header-stat-label {
             font-size: 0.9rem;
             color: var(--text-muted);
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         /* Main Content */
         .main-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px;
+            padding: 40px 30px;
         }
 
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 25px;
+        /* Category Section */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
             display: flex;
             align-items: center;
             gap: 15px;
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-blue), transparent);
-        }
-
-        /* Workflow Cards */
-        .workflow-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-
-        .workflow-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .workflow-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 60px rgba(59, 130, 246, 0.2);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .card-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .category-icon {
             font-size: 1.8rem;
         }
 
-        .card-title {
-            flex: 1;
-        }
-
-        .card-title h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 5px;
-        }
-
-        .card-title span {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        .card-description {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .card-meta {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .meta-tag {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: var(--accent-blue);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .card-footer {
-            padding: 0 25px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .step-count {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .view-btn {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .workflow-card:hover .view-btn {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
-        }
-
-        /* Quick Start Section */
-        .quick-start {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 35px;
-            margin-bottom: 50px;
-        }
-
-        .quick-start h2 {
-            color: var(--accent-blue);
-            margin-bottom: 20px;
+        .category-title {
             font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .quick-steps {
+        .category-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        /* Module Grid */
+        .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
         }
 
-        .quick-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .step-number {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 1rem;
-            color: white;
-            flex-shrink: 0;
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .step-content h4 {
+        .module-card.complete {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .module-card.complete::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-teal) 100%);
+        }
+
+        .module-name {
+            font-size: 1.1rem;
+            font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 5px;
-            font-size: 1rem;
+            margin-bottom: 8px;
         }
 
-        .step-content p {
+        .module-description {
+            font-size: 0.9rem;
             color: var(--text-muted);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .module-status {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.complete {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-badge.pending {
+            background: rgba(100, 116, 139, 0.15);
+            color: var(--text-muted);
+        }
+
+        .module-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
             font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .module-link:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        .module-link.primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border: none;
+            color: white;
+        }
+
+        .module-link.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .module-link.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .module-link.disabled:hover {
+            background: rgba(0,0,0,0.3);
+            border-color: var(--border-subtle);
+            color: var(--text-muted);
+            transform: none;
         }
 
         /* Contact Section */
         .contact-section {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 35px;
-            text-align: center;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 40px;
         }
 
-        .contact-section h2 {
+        .contact-section h3 {
             color: var(--text-primary);
-            margin-bottom: 15px;
-        }
-
-        .contact-section p {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-
-        .contact-info {
+            font-size: 1.1rem;
+            margin-bottom: 18px;
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-grid {
+            display: flex;
             flex-wrap: wrap;
+            gap: 20px;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--accent-blue);
-            font-weight: 600;
+            padding: 12px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+        }
+
+        .contact-item .label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
 
         .contact-item a {
             color: var(--accent-blue);
+            font-weight: 600;
             text-decoration: none;
         }
 
@@ -374,223 +372,165 @@
         }
 
         /* Footer */
-        footer {
+        .footer {
             text-align: center;
             padding: 30px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
             border-top: 1px solid var(--border-subtle);
-            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .hero-stats { gap: 25px; }
-            .main-content { padding: 20px; }
-            .workflow-grid { grid-template-columns: 1fr; }
+            .system-title { font-size: 2rem; }
+            .header-stats { gap: 15px; }
+            .header-stat { padding: 12px 18px; }
+            .module-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-        <a href="../../index.html">Portal Home</a>
-        <span class="separator">></span>
-        <span class="current">NMLS</span>
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <span class="current">🆔 NMLS</span>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-icon">NMLS</div>
-            <h1>NMLS Training Portal</h1>
-            <p class="subtitle">Nationwide Multistate Licensing System - Complete training documentation for mortgage loan originators</p>
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <div class="stat-value">4</div>
-                    <div class="stat-label">Workflow Guides</div>
+    <!-- Header -->
+    <header class="system-header">
+        <div class="header-content">
+            <div class="system-icon">🆔</div>
+            <h1 class="system-title">NMLS</h1>
+            <p class="system-description">Nationwide Multistate Licensing System — complete training documentation for mortgage loan originator registration, licensing, and compliance requirements.</p>
+
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">5</div>
+                    <div class="header-stat-label">Total Modules</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value">25+</div>
-                    <div class="stat-label">Step-by-Step Instructions</div>
+                <div class="header-stat">
+                    <div class="header-stat-value">5</div>
+                    <div class="header-stat-label">Documented</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Compliance Coverage</div>
+                <div class="header-stat">
+                    <div class="header-stat-value">0</div>
+                    <div class="header-stat-label">In Progress</div>
                 </div>
             </div>
         </div>
-    </section>
+    </header>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Quick Start -->
-        <div class="quick-start">
-            <h2>New to NMLS? Start Here</h2>
-            <div class="quick-steps">
-                <div class="quick-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Log Into NMLS</h4>
-                        <p>Access your individual NMLS account using your credentials</p>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Grant CMG Access</h4>
-                        <p>Provide CMG Mortgage access to view and manage your record</p>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Check CBC Status</h4>
-                        <p>Verify your fingerprint expiration and background check status</p>
-                    </div>
-                </div>
-                <div class="quick-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4>Complete Attestation</h4>
-                        <p>Review and attest to filings created by CMG on your behalf</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Workflow Cards -->
-        <h2 class="section-title">Available Workflows</h2>
-        <div class="workflow-grid">
-            <!-- Login Workflow -->
-            <a href="./NMLS-Login-Workflow.html" class="workflow-card">
-                <div class="card-header">
-                    <div class="card-icon">LOGIN</div>
-                    <div class="card-title">
-                        <h3>Logging into NMLS</h3>
-                        <span>Account Access & Password Recovery</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="card-description">
-                        Step-by-step guide for accessing the NMLS website, entering credentials,
-                        recovering forgotten usernames/passwords, and ensuring you're logged into
-                        the correct (State) side of the system.
-                    </p>
-                    <div class="card-meta">
-                        <span class="meta-tag">Beginner</span>
-                        <span class="meta-tag">Essential</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span class="step-count">4 Steps</span>
-                    <span class="view-btn">View Workflow</span>
-                </div>
-            </a>
-
-            <!-- CMG Access Workflow -->
-            <a href="./CMG-Access-Workflow.html" class="workflow-card">
-                <div class="card-header">
-                    <div class="card-icon">KEY</div>
-                    <div class="card-title">
-                        <h3>Providing CMG Access</h3>
-                        <span>Company Access Permissions</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="card-description">
-                        Grant CMG Mortgage, Inc. (NMLS ID: 1820) access to your NMLS record.
-                        This allows the Licensing Team to view your record, create sponsorships,
-                        and assist with license applications.
-                    </p>
-                    <div class="card-meta">
-                        <span class="meta-tag">Required</span>
-                        <span class="meta-tag">One-Time Setup</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span class="step-count">8 Steps</span>
-                    <span class="view-btn">View Workflow</span>
-                </div>
-            </a>
-
-            <!-- CBC Status Workflow -->
-            <a href="./CBC-Status-Workflow.html" class="workflow-card">
-                <div class="card-header">
-                    <div class="card-icon">CBC</div>
-                    <div class="card-title">
-                        <h3>Criminal Background Check</h3>
-                        <span>Fingerprints & CBC Status</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="card-description">
-                        Check your fingerprint expiration date, request a new Criminal Background
-                        Check, and schedule fingerprint appointments through Fieldprint.
-                        Current fingerprints are required for license applications.
-                    </p>
-                    <div class="card-meta">
-                        <span class="meta-tag">Compliance</span>
-                        <span class="meta-tag">Renewal</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span class="step-count">12 Steps</span>
-                    <span class="view-btn">View Workflow</span>
-                </div>
-            </a>
-
-            <!-- Attestation Workflow -->
-            <a href="./Attestation-Workflow.html" class="workflow-card">
-                <div class="card-header">
-                    <div class="card-icon">DOC</div>
-                    <div class="card-title">
-                        <h3>Attestation</h3>
-                        <span>MU4 Filing Confirmation</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="card-description">
-                        When CMG initiates an Individual (MU4) Form filing on your behalf,
-                        you must log into NMLS to review and attest that your information
-                        is true and accurate before submission.
-                    </p>
-                    <div class="card-meta">
-                        <span class="meta-tag">Action Required</span>
-                        <span class="meta-tag">Time-Sensitive</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span class="step-count">6 Steps</span>
-                    <span class="view-btn">View Workflow</span>
-                </div>
-            </a>
-        </div>
 
         <!-- Contact Section -->
         <div class="contact-section">
-            <h2>Need Assistance?</h2>
-            <p>The CMG Licensing Team is here to help with all NMLS-related questions.</p>
-            <div class="contact-info">
+            <h3>📞 Need Assistance?</h3>
+            <div class="contact-grid">
                 <div class="contact-item">
-                    <span>Phone:</span>
+                    <span class="label">CMG Licensing:</span>
                     <a href="tel:1-925-983-3099">1-925-983-3099</a>
                 </div>
                 <div class="contact-item">
-                    <span>Email:</span>
+                    <span class="label">Email:</span>
                     <a href="mailto:licensing@cmgfi.com">licensing@cmgfi.com</a>
                 </div>
                 <div class="contact-item">
-                    <span>NMLS Call Center:</span>
+                    <span class="label">NMLS Call Center:</span>
                     <a href="tel:1-855-665-7123">1-855-NMLS-123</a>
                 </div>
             </div>
         </div>
+
+        <!-- Account Access -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔐</span>
+                <h2 class="category-title">Account Access</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Logging into NMLS</h3>
+                    <p class="module-description">Step-by-step guide for accessing the NMLS website, entering credentials, recovering passwords, and navigating to the State side of the system.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./NMLS-Login-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Providing CMG Access</h3>
+                    <p class="module-description">Grant CMG Mortgage, Inc. (NMLS ID: 1820) access to your record for sponsorships, license applications, and record management.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./CMG-Access-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compliance & Background -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h2 class="category-title">Compliance & Background Check</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Criminal Background Check (CBC)</h3>
+                    <p class="module-description">Check fingerprint expiration dates, request new CBC, and schedule fingerprint appointments through Fieldprint for license compliance.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./CBC-Status-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Attestation (MU4 Filing)</h3>
+                    <p class="module-description">Review and attest to Individual (MU4) Form filings initiated by CMG on your behalf before submission to NMLS.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./Attestation-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Modules -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📚</span>
+                <h2 class="category-title">Additional Resources</h2>
+                <span class="category-count">1 of 1</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">NMLS Quick Reference</h3>
+                    <p class="module-description">Essential information including CMG's NMLS ID (1820), common workflows, and frequently asked questions for loan originators.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./NMLS-Login-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Footer -->
-    <footer>
-        <p>CMG Financial Training Portal | NMLS Documentation | Last Updated: January 2026</p>
+    <footer class="footer">
+        <p>CMG Training Documentation Portal — Last Updated: January 2026</p>
     </footer>
 </body>
 </html>
