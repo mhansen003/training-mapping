@@ -15,7 +15,6 @@
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             --accent-green: #22c55e;
-            --accent-purple: #8b5cf6;
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
@@ -23,6 +22,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -30,7 +30,6 @@
             min-height: 100vh;
         }
 
-        /* Breadcrumb */
         .breadcrumb {
             background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
             padding: 14px 25px;
@@ -64,7 +63,6 @@
         .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
         .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
 
-        /* Header */
         .system-header {
             background: var(--bg-card);
             border-bottom: 1px solid var(--border-subtle);
@@ -83,13 +81,7 @@
             pointer-events: none;
         }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
+        .header-content { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
         .system-icon { font-size: 4rem; margin-bottom: 15px; }
 
         .system-title {
@@ -102,18 +94,9 @@
             background-clip: text;
         }
 
-        .system-description {
-            font-size: 1.15rem;
-            color: var(--text-secondary);
-            max-width: 650px;
-        }
+        .system-description { font-size: 1.15rem; color: var(--text-secondary); max-width: 650px; }
 
-        .header-stats {
-            display: flex;
-            gap: 25px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
+        .header-stats { display: flex; gap: 25px; margin-top: 30px; flex-wrap: wrap; }
 
         .header-stat {
             background: rgba(0,0,0,0.3);
@@ -131,20 +114,10 @@
             background-clip: text;
         }
 
-        .header-stat-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
+        .header-stat-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
 
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 30px;
-        }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 30px; }
 
-        /* Category Section */
         .category-section { margin-bottom: 40px; }
 
         .category-header {
@@ -169,7 +142,6 @@
             margin-left: auto;
         }
 
-        /* Module Grid */
         .module-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -179,105 +151,91 @@
         .module-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 25px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .module-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .module-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 15px;
+        .module-card.complete { border-color: rgba(34, 197, 94, 0.3); }
+
+        .module-card.complete::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-teal) 100%);
         }
 
-        .module-icon {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
+        .module-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .module-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
 
-        .module-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
-        .module-subtitle { font-size: 0.85rem; color: var(--text-muted); }
+        .module-status { display: flex; gap: 10px; margin-bottom: 18px; }
 
-        .module-description {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 18px;
-        }
-
-        .module-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-
-        .module-tag {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-subtle);
-            padding: 4px 12px;
+        .status-badge {
+            padding: 5px 12px;
             border-radius: 6px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .module-tag.agents {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: rgba(139, 92, 246, 0.3);
-            color: var(--accent-purple);
-        }
+        .status-badge.complete { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
 
-        .module-btn {
-            display: flex;
+        .module-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .module-link {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
         }
 
-        .module-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        .module-link:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
         }
 
-        /* Footer */
-        .page-footer {
-            max-width: 1200px;
-            margin: 0 auto;
+        .module-link.primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border: none;
+            color: white;
+        }
+
+        .module-link.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .footer {
+            text-align: center;
             padding: 30px;
             border-top: 1px solid var(--border-subtle);
-            text-align: center;
             color: var(--text-muted);
             font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
             .system-title { font-size: 2rem; }
-            .header-stats { flex-direction: column; }
+            .header-stats { gap: 15px; }
+            .header-stat { padding: 12px 18px; }
             .module-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -286,211 +244,281 @@
     <nav class="breadcrumb">
         <a href="../../index.html">🏠 Portal Home</a>
         <span class="separator">›</span>
-        <span class="current">🏦 Byte</span>
+        <span class="current">🖥️ Byte</span>
     </nav>
 
     <header class="system-header">
         <div class="header-content">
             <div class="system-icon">🖥️</div>
             <h1 class="system-title">Byte</h1>
-            <p class="system-description">
-                Byte is CMG Financial's Loan Origination System (LOS) used by the Retail division for loan processing,
-                underwriting, closing, and funding. This documentation covers field locations, workflows, and best practices.
-            </p>
+            <p class="system-description">CMG Financial's Loan Origination System (LOS) for the Retail division — comprehensive documentation covering loan processing, underwriting, closing, funding, and all operational workflows.</p>
+
             <div class="header-stats">
                 <div class="header-stat">
-                    <div class="header-stat-value">10</div>
-                    <div class="header-stat-label">Workflow Modules</div>
+                    <div class="header-stat-value">50</div>
+                    <div class="header-stat-label">Total Modules</div>
                 </div>
                 <div class="header-stat">
-                    <div class="header-stat-value">25+</div>
+                    <div class="header-stat-value">50</div>
+                    <div class="header-stat-label">Documented</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">150+</div>
                     <div class="header-stat-label">AI Agent Opportunities</div>
-                </div>
-                <div class="header-stat">
-                    <div class="header-stat-value">Retail</div>
-                    <div class="header-stat-label">Division</div>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="main-content">
+
         <!-- Reference Guides -->
         <section class="category-section">
             <div class="category-header">
                 <span class="category-icon">📚</span>
                 <h2 class="category-title">Reference Guides</h2>
-                <span class="category-count">1 module</span>
+                <span class="category-count">2 of 2</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">📖</div>
-                        <div>
-                            <div class="module-title">Field Guide (Retail)</div>
-                            <div class="module-subtitle">Field Location Reference</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Comprehensive lookup guide for 55+ data fields across Byte screens. Find exactly where any field is located with searchable reference tables.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">55+ Fields</span>
-                        <span class="module-tag">15+ Screens</span>
-                        <span class="module-tag agents">3 AI Agents</span>
-                    </div>
-                    <a href="./Byte-Field-Guide-Retail-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Field Guide (Retail)</h3>
+                    <p class="module-description">Comprehensive lookup guide for 55+ data fields across Byte screens with searchable reference tables.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Field-Guide-Retail-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Retail Status Explanations</h3>
+                    <p class="module-description">Complete guide to all 25+ loan statuses from Lead through Post Closing Complete.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Retail-Status-Explanations-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
 
-        <!-- Loan Management -->
+        <!-- Loan Setup & Management -->
         <section class="category-section">
             <div class="category-header">
                 <span class="category-icon">🔄</span>
-                <h2 class="category-title">Loan Management</h2>
-                <span class="category-count">1 module</span>
+                <h2 class="category-title">Loan Setup & Management</h2>
+                <span class="category-count">5 of 5</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">🔧</div>
-                        <div>
-                            <div class="module-title">Loan Restructure</div>
-                            <div class="module-subtitle">Job Aid for Sales</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Complete guide for making substantive loan changes after release to Operations. Covers URLA entry, income, assets, liabilities, REO, and AUS submission.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">14 Pages</span>
-                        <span class="module-tag">Full URLA</span>
-                        <span class="module-tag agents">3 AI Agents</span>
-                    </div>
-                    <a href="./Loan-Restructure-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Borrower Management</h3>
+                    <p class="module-description">Managing borrower information including personal details, employment, and co-borrower setup.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Borrower-Management-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Loan Restructure</h3>
+                    <p class="module-description">Complete guide for making substantive loan changes after release to Operations.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Loan-Restructure-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Create Second Mortgage</h3>
+                    <p class="module-description">Synchronized seconds for DPA, Bond, and Piggyback loan products.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Create-Second-Mortgage-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">ARM Loans - Qualifying Rate</h3>
+                    <p class="module-description">ARM loan qualifying rates and Fannie Mae plan codes for SOFR products.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./ARM-Loans-Qualifying-Rate-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Finding a Test Loan</h3>
+                    <p class="module-description">Access test loans in BytePro Enterprise for training and testing.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Finding-Test-Loan-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
 
-        <!-- Data Entry & Management -->
+        <!-- Data Entry & Pricing -->
         <section class="category-section">
             <div class="category-header">
                 <span class="category-icon">📝</span>
-                <h2 class="category-title">Data Entry & Management</h2>
-                <span class="category-count">3 modules</span>
+                <h2 class="category-title">Data Entry & Pricing</h2>
+                <span class="category-count">7 of 7</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">👥</div>
-                        <div>
-                            <div class="module-title">Borrower Management</div>
-                            <div class="module-subtitle">Borrower Information Entry</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Complete guide to managing borrower information in Byte including personal details, employment, and co-borrower setup.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">URLA Entry</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./Borrower-Management-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Aggregate Escrow</h3>
+                    <p class="module-description">Setting up and calculating aggregate escrow accounts for taxes and insurance.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Aggregate-Escrow-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
-
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">💰</div>
-                        <div>
-                            <div class="module-title">Aggregate Escrow</div>
-                            <div class="module-subtitle">Escrow Calculations</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        How to set up and calculate aggregate escrow accounts in Byte for taxes and insurance.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Escrow</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./Aggregate-Escrow-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Applying APR Credits</h3>
+                    <p class="module-description">Credits not tied to interest rate chosen (NFIRC field).</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Applying-APR-Credits-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
-
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">💵</div>
-                        <div>
-                            <div class="module-title">Applying APR Credits</div>
-                            <div class="module-subtitle">Credits Not for Interest Rate</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Process for applying APR credits that are not tied to the interest rate chosen on the loan.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Pricing</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./Applying-APR-Credits-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Ops Lender Credit NFIRC</h3>
+                    <p class="module-description">BorrowSmart, HomeFundIt, RefiNow/Possible, and Energy Plus credits.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Ops-Lender-Credit-NFIRC-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Details of Transaction</h3>
+                    <p class="module-description">Updating DOT when AUS shows borrower short on funds.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Details-of-Transaction-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">REO & Mortgage Liability</h3>
+                    <p class="module-description">Real Estate Owned and mortgage lien liability entry in Byte.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./REO-Mortgage-Liability-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Rental Income</h3>
+                    <p class="module-description">Four rental income scenarios with Schedule E and REO entry.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Rental-Income-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Specific Entry for Sales</h3>
+                    <p class="module-description">Byte-specific tasks for Sales including credit credentials and disclosures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Specific-Entry-Sales-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
 
-        <!-- Loan Products -->
+        <!-- Mortgage Insurance -->
         <section class="category-section">
             <div class="category-header">
-                <span class="category-icon">🏠</span>
-                <h2 class="category-title">Loan Products</h2>
-                <span class="category-count">1 module</span>
+                <span class="category-icon">🛡️</span>
+                <h2 class="category-title">Mortgage Insurance</h2>
+                <span class="category-count">3 of 3</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">📈</div>
-                        <div>
-                            <div class="module-title">ARM Loans - Qualifying Rate</div>
-                            <div class="module-subtitle">Plan Codes & Rate Setup</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Understanding ARM loan qualifying rates and plan codes in Byte for adjustable-rate mortgage products.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">ARM Products</span>
-                        <span class="module-tag">Plan Codes</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./ARM-Loans-Qualifying-Rate-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Conventional PMI Quote</h3>
+                    <p class="module-description">Ordering PMI quotes through Byte and BESTX MI in Optimal Blue.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Conventional-PMI-Quote-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">PMI Coverage Chart</h3>
+                    <p class="module-description">Required MI coverage percentages by LTV and loan type.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./PMI-Coverage-Chart-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Mortgage Insurance Manual</h3>
+                    <p class="module-description">Complete MI guide: types, ordering, delegation, and certificate entry.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Mortgage-Insurance-Manual-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
 
-        <!-- Appraisal -->
+        <!-- Appraisal & Property -->
         <section class="category-section">
             <div class="category-header">
                 <span class="category-icon">🏡</span>
-                <h2 class="category-title">Appraisal Management</h2>
-                <span class="category-count">1 module</span>
+                <h2 class="category-title">Appraisal & Property</h2>
+                <span class="category-count">4 of 4</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">📅</div>
-                        <div>
-                            <div class="module-title">Appraisal Key Dates</div>
-                            <div class="module-subtitle">Operations Date Tracking</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Key appraisal dates that Operations needs to track including ordered, received, and delivery dates.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Operations</span>
-                        <span class="module-tag">Dates</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./Appraisal-Key-Dates-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Appraisal Key Dates</h3>
+                    <p class="module-description">Key appraisal dates for Operations including delivery and VA tracking.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Appraisal-Key-Dates-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">ValueLink Ordering</h3>
+                    <p class="module-description">Appraisal ordering through ValueLink in BytePro.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./ValueLink-Ordering-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Disaster Protection</h3>
+                    <p class="module-description">FEMA disaster area notifications, attestation, and hard stops.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Disaster-Protection-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">HMDA Geocoding</h3>
+                    <p class="module-description">HMDA geocoding using FFIEC, appraisal, and map research.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./HMDA-Geocoding-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Disclosures & Compliance -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h2 class="category-title">Disclosures & Compliance</h2>
+                <span class="category-count">4 of 4</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Initial Disclosures Checklist</h3>
+                    <p class="module-description">Pre-disclosure verification checklist for Loan Estimate accuracy.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Initial-Disclosures-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Disclosure History Tool</h3>
+                    <p class="module-description">LE/CD tracking and TRID compliance monitoring.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Disclosure-History-Tool-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Disclosure 1004D/COC</h3>
+                    <p class="module-description">Appraisal reinspection fees and Change of Circumstance process.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Disclosure-1004D-COC-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Supplemental Consumer Info</h3>
+                    <p class="module-description">SCIF form for homeownership education and language preference.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Supplemental-Consumer-Info-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conditions & Underwriting -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">✅</span>
+                <h2 class="category-title">Conditions & Underwriting</h2>
+                <span class="category-count">4 of 4</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Condition Definitions</h3>
+                    <p class="module-description">Condition stages: Suspense, PTD, PTF, PTP, Post Funding lifecycle.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Condition-Definitions-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Conditions for Operations</h3>
+                    <p class="module-description">Submission notes, CLA distribution, and UW resubmission workflow.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Conditions-Operations-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Credit Audit Workflow</h3>
+                    <p class="module-description">Correspondent credit audit: UCD, ULDD, conditions, and status.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Credit-Audit-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processing Hold</h3>
+                    <p class="module-description">Placing files on hold and 2-day UW submission requirement.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processing-Hold-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
@@ -500,79 +528,197 @@
             <div class="category-header">
                 <span class="category-icon">📄</span>
                 <h2 class="category-title">Document Management</h2>
-                <span class="category-count">2 modules</span>
+                <span class="category-count">6 of 6</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">✍️</div>
-                        <div>
-                            <div class="module-title">Adding Signature - Pre-Qual Letter</div>
-                            <div class="module-subtitle">Signature Process</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        How to add your signature to pre-qualification letters in Byte for borrower delivery.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Signatures</span>
-                        <span class="module-tag">Pre-Qual</span>
-                    </div>
-                    <a href="./Adding-Signature-Pre-Qual-Letter-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Stored Documents Manual</h3>
+                    <p class="module-description">Complete guide to upload, search, annotate, split, and merge documents.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Stored-Documents-Manual-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
-
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">📁</div>
-                        <div>
-                            <div class="module-title">Adding Signature - Stored Docs</div>
-                            <div class="module-subtitle">Document Signatures</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Process for adding signatures to documents stored in Byte's document management system.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Signatures</span>
-                        <span class="module-tag">Stored Docs</span>
-                    </div>
-                    <a href="./Adding-Signature-Stored-Docs-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Labeling Stored Documents</h3>
+                    <p class="module-description">Document type, category, description, and expiration tracking.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Labeling-Stored-Documents-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Adding Signature - Pre-Qual</h3>
+                    <p class="module-description">Adding signatures to pre-qualification letters.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Adding-Signature-Pre-Qual-Letter-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Adding Signature - Stored Docs</h3>
+                    <p class="module-description">Adding signatures to documents in Byte's document system.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Adding-Signature-Stored-Docs-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Signature to Store</h3>
+                    <p class="module-description">Process for storing your signature in Byte for document signing.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Signature-to-Store-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Printing from Byte</h3>
+                    <p class="module-description">Print, preview, email, PDF, and store document options.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Printing-from-Byte-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
 
-        <!-- Disclosure Tools -->
+        <!-- Title & Closing -->
         <section class="category-section">
             <div class="category-header">
-                <span class="category-icon">📋</span>
-                <h2 class="category-title">Disclosure Tools</h2>
-                <span class="category-count">1 module</span>
+                <span class="category-icon">🏠</span>
+                <h2 class="category-title">Title & Closing</h2>
+                <span class="category-count">4 of 4</span>
             </div>
             <div class="module-grid">
-                <div class="module-card">
-                    <div class="module-card-header">
-                        <div class="module-icon">🔍</div>
-                        <div>
-                            <div class="module-title">Disclosure History Tool</div>
-                            <div class="module-subtitle">LE/CD Tracking</div>
-                        </div>
-                    </div>
-                    <p class="module-description">
-                        Using Byte's Disclosure History tool to track Loan Estimate and Closing Disclosure timelines and compliance.
-                    </p>
-                    <div class="module-tags">
-                        <span class="module-tag">Compliance</span>
-                        <span class="module-tag">TRID</span>
-                        <span class="module-tag agents">AI Agents</span>
-                    </div>
-                    <a href="./Disclosure-History-Tool-Workflow.html" class="module-btn">📊 View Workflow</a>
+                <div class="module-card complete">
+                    <h3 class="module-name">Calculating Title</h3>
+                    <p class="module-description">Owner's and Lender's title insurance with TRID calculator.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Calculating-Title-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Closer Pipeline</h3>
+                    <p class="module-description">Four closer pipelines: CD Requested, Revised CD, Fee Reconciliation.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Closer-Pipeline-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Hybrid e-Close Notifications</h3>
+                    <p class="module-description">Eligibility, request, and cancellation notification workflow.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Hybrid-eClose-Notifications-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Taxes Due at Closing</h3>
+                    <p class="module-description">60-day rule, Section F entry, and escrow setup for taxes.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Taxes-Due-Closing-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
                 </div>
             </div>
         </section>
+
+        <!-- Funding -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💰</span>
+                <h2 class="category-title">Funding</h2>
+                <span class="category-count">3 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Funding Manual</h3>
+                    <p class="module-description">Complete funding workflow: pre-closing, post-closing, conditions, shipping.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Funding-Manual-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Funding Assistant Manual</h3>
+                    <p class="module-description">Funding assistant guide: warehouse, document review, UCD process.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Funding-Assistant-Manual-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">UCD Process</h3>
+                    <p class="module-description">Uniform Closing Dataset submission to Fannie Mae and Freddie Mac.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./UCD-Process-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rate Lock -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔒</span>
+                <h2 class="category-title">Rate Lock</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Lock Extension</h3>
+                    <p class="module-description">Requesting lock extensions through Byte and Optimal Blue.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Lock-Extension-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Relocking a Loan</h3>
+                    <p class="module-description">Relock process when lock expires or rate changes needed.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Relocking-Loan-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Verifications -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">✔️</span>
+                <h2 class="category-title">Verifications</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">VVOE (Employed)</h3>
+                    <p class="module-description">Verbal Verification of Employment for W-2 employees.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./VVOE-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">VVOE (Self-Employed)</h3>
+                    <p class="module-description">VVOE for self-employed: CPA, business license, and phone verification.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./VVOE-Self-Employed-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Configuration -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">⚙️</span>
+                <h2 class="category-title">System Configuration</h2>
+                <span class="category-count">4 of 4</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Credit Credentials</h3>
+                    <p class="module-description">Entering credit credentials for vendor services (Credit, DU, LP, Flood).</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Credit-Credentials-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Export Fannie Mae File</h3>
+                    <p class="module-description">Exporting 3.4 XML for USDA, brokered, and State Agency loans.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Export-Fannie-Mae-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Important Dates Screen</h3>
+                    <p class="module-description">TRID dates, expiration tracking, and warning/hard stop fields.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Important-Dates-Screen-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Updating Log Entries</h3>
+                    <p class="module-description">Manual Byte updates for wet-signed disclosures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Updating-Log-Entries-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <footer class="page-footer">
-        <p>CMG Training Portal • Byte System Documentation • Last Updated: January 2026</p>
+    <footer class="footer">
+        <p>CMG Training Documentation Portal — Last Updated: January 2026</p>
     </footer>
 </body>
 </html>
