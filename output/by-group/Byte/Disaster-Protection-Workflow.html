@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Disaster Protection - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.auto-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Status Cards */
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 22px 0; }
+
+        .status-card {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .status-card .status-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+        .status-card.highlight { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); }
+
+        /* Recipients Grid */
+        .recipients-grid { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+        .recipient-badge {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal Styles */
+        .prompt-modal .modal {
+            max-width: 800px;
+        }
+
+        .prompt-modal .modal-header {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+        }
+
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .prompt-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Disaster Protection</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Disaster Protection</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active">
+                <span class="nav-number">0</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-1" class="nav-item">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Email Notifications</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Disaster Attestation</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">PROP 609 Condition</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Hard Stop Process</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Disaster Protection in Byte</h1>
+                <p class="subtitle">Multi-Layer Protection System for Disaster Area Properties</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Roles: Processor, UW, Closer, Funder</span>
+                    <span class="meta-item">Updated: Nov 3, 2021</span>
+                    <span class="meta-item">Doc: RET-11.03.2021</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception/Hard Stop</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 0: Overview -->
+            <section id="section-0" class="section">
+                <div class="section-header">
+                    <div class="section-number">0</div>
+                    <div class="section-title"><h2>Disaster Protection Overview</h2><span>Understanding the multi-layer protection system</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Purpose</h4>
+                        <p>CMG has implemented additional checks throughout the loan process to identify and review properties in a Disaster Area. Through <strong>email notifications</strong>, <strong>conditions</strong>, and <strong>system checks</strong>, the goal is to eliminate unknown disaster area loans moving forward without missing additional documentation.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Protection Layers</h4>
+                            <div class="value">3</div>
+                            <div class="label">Email, Attestation, Condition</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Email Recipients</h4>
+                            <div class="value">6</div>
+                            <div class="label">Key team members notified</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Hard Stop</h4>
+                            <div class="value">1</div>
+                            <div class="label">At Funds Ordered status</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Disaster Protection Flow Overview</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Property in Disaster Area Declared</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">System Detects Disaster Declaration</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">Layer 1</span>
+                                <div class="flow-node output">Email Notification Sent</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Layer 2</span>
+                                <div class="flow-node action">Disaster Area Fields Populated</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Layer 3</span>
+                                <div class="flow-node action">PROP 609 Condition Added</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Policy Reference</h4>
+                        <p>Additional details on acceptable documentation for disaster properties can be found in the <strong>Disaster Area Corporate Policy</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Email Notifications -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Email Notifications</h2><span>Automated alerts for disaster-flagged loans</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Trigger Condition</h4>
+                        <p>Email notification is sent when a loan is <strong>declared to be in a disaster area</strong> and the loan is in specific qualifying statuses.</p>
+                    </div>
+
+                    <h4 style="color: var(--text-primary); margin: 20px 0 15px;">Email Recipients</h4>
+                    <div class="recipients-grid">
+                        <span class="recipient-badge">LO (Loan Officer)</span>
+                        <span class="recipient-badge">Production Assistant</span>
+                        <span class="recipient-badge">Processor</span>
+                        <span class="recipient-badge">Underwriter</span>
+                        <span class="recipient-badge">Closer</span>
+                        <span class="recipient-badge">Funder</span>
+                    </div>
+
+                    <h4 style="color: var(--text-primary); margin: 25px 0 15px;">Qualifying Loan Statuses for Email Trigger</h4>
+                    <div class="status-grid">
+                        <div class="status-card highlight"><span class="status-label">CTC</span></div>
+                        <div class="status-card highlight"><span class="status-label">Docs Ordered</span></div>
+                        <div class="status-card highlight"><span class="status-label">Docs Out</span></div>
+                        <div class="status-card highlight"><span class="status-label">Docs Back</span></div>
+                        <div class="status-card highlight"><span class="status-label">CORR - Ready for Purchase</span></div>
+                        <div class="status-card highlight"><span class="status-label">Funds Ordered</span></div>
+                        <div class="status-card highlight"><span class="status-label">Funds Sent</span></div>
+                    </div>
+
+                    <div class="workflow-diagram" style="margin-top: 25px;">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Email Notification Sample</h3>
+                        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 20px;">
+                            <div style="color: var(--accent-rose); font-weight: 700; margin-bottom: 10px;">Subject: Property in Emergency Disaster Area! Loan REA*******</div>
+                            <div style="color: var(--text-secondary); line-height: 1.8;">
+                                <p>This file has been flagged to be in a current emergency disaster area.</p>
+                                <p>Please review the file with the Underwriter to determine additional information needed to ensure the property has not been affected.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Disaster Attestation -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Disaster Attestation</h2><span>Appraisal Info Screen disaster area fields</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Location in Byte</h4>
+                        <p>A <strong>Disaster Area</strong> section has been added to the header of the <strong>Appraisal Info Screen</strong> within Byte.</p>
+                    </div>
+
+                    <h4 style="color: var(--text-primary); margin: 20px 0 15px;">Disaster Area Fields</h4>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Disaster Incident Begin Date</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>Start date of the disaster incident</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Disaster Incident End Date</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>End date of the disaster incident (if applicable)</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Disaster Declaration Date</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>Official FEMA declaration date</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Declaration Title</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>Name of the disaster (e.g., WILDFIRES)</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">State</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>State of the disaster area</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Designated Area</strong></td>
+                                <td><span class="badge auto-badge">Read Only</span></td>
+                                <td>County or specific designated area</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Acknowledgment Checkbox</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                                <td>"I acknowledge I have received and reviewed the Disaster Report/Requirements"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Processor Responsibility</h4>
+                        <p>Processors are responsible to <strong>complete the attestation</strong> in the Appraisal Info Screen by checking the acknowledgment checkbox after reviewing the Disaster Report/Requirements.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: PROP 609 Condition -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>PROP 609 Condition</h2><span>Automated underwriting condition for disaster properties</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>PROP 609 Trigger Logic</h3>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Condition Trigger</span>
+                        </div>
+                        <div class="tree-node">
+                            <strong style="color: var(--text-primary);">IF</strong> Disaster Incident Begin Date <strong style="color: var(--accent-amber);">is AFTER</strong> Appraisal Completed Date
+                        </div>
+                        <div class="tree-node">
+                            <strong style="color: var(--text-primary);">AND</strong> Loan is <strong style="color: var(--accent-amber);">NOT yet CTC</strong>
+                        </div>
+                        <div class="tree-node">
+                            <strong style="color: var(--accent-green);">THEN</strong> Condition PROP 609 is automatically inserted
+                        </div>
+                    </div>
+
+                    <h4 style="color: var(--text-primary); margin: 25px 0 15px;">Condition Details</h4>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Condition Class</strong></td>
+                                <td>UW</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Type and No</strong></td>
+                                <td>PROP - 609</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Description Type</strong></td>
+                                <td>Not Editable</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Description</strong></td>
+                                <td>If subject property is located in a designated FEMA disaster area underwriter to review location and determine if additional collateral verification is needed to support no damage to the property.</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Default Stage</strong></td>
+                                <td>PTD</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Internal</strong></td>
+                                <td>Yes (Checked)</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Standard</strong></td>
+                                <td>Yes (Checked)</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Responsibility</strong></td>
+                                <td><span class="badge required-badge">Underwriter</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="color: var(--text-primary); margin: 25px 0 15px;">Auto-Insert Loan Statuses</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Condition is automatically added when loan is in any of the following statuses:</p>
+                    <div class="status-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                        <div class="status-card"><span class="status-label">Registered</span></div>
+                        <div class="status-card"><span class="status-label">Prospect</span></div>
+                        <div class="status-card"><span class="status-label">LE Pending</span></div>
+                        <div class="status-card"><span class="status-label">Credit Only</span></div>
+                        <div class="status-card"><span class="status-label">Disclosed</span></div>
+                        <div class="status-card"><span class="status-label">File Received</span></div>
+                        <div class="status-card"><span class="status-label">UW Received</span></div>
+                        <div class="status-card"><span class="status-label">Pre Approved</span></div>
+                        <div class="status-card"><span class="status-label">Approved</span></div>
+                        <div class="status-card"><span class="status-label">CORR - Credit Audit in Process</span></div>
+                        <div class="status-card"><span class="status-label">CORR - Audit Complete - Conditions Pending</span></div>
+                        <div class="status-card"><span class="status-label">Conditions for Review</span></div>
+                        <div class="status-card"><span class="status-label">Loan Re-Structure</span></div>
+                        <div class="status-card"><span class="status-label">Changes to UW</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Hard Stop Process -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Hard Stop Process</h2><span>Funds Ordered attestation requirement</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="exception-box">
+                        <h4>Critical Hard Stop</h4>
+                        <p>If the disaster attestation checkbox is <strong>NOT checked</strong>, the loan <strong>cannot move to the next status</strong> if in <strong>Funds Ordered</strong>. A hard stop will prevent progression.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Hard Stop Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node input">Loan at Funds Ordered Status</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node decision">Attestation Checkbox Checked?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node start">Proceed to Next Status</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node exception">HARD STOP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 10px; padding: 20px; margin-top: 20px;">
+                        <h4 style="color: var(--accent-rose); margin-bottom: 12px;">Hard Stop Error Message</h4>
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--text-secondary);">
+                            "This file has been flagged to be in a current emergency disaster area. The "I acknowledge I have received and reviewed the Disaster Report/Requirements" checkbox is a required field. Please review/complete to continue"
+                        </div>
+                    </div>
+
+                    <div class="tip-box" style="margin-top: 20px;">
+                        <h4>Resolution Steps</h4>
+                        <p>To resolve the hard stop:</p>
+                        <ol style="margin-top: 10px; padding-left: 20px; color: var(--text-secondary);">
+                            <li>Navigate to the Appraisal Info Screen</li>
+                            <li>Review the Disaster Report/Requirements</li>
+                            <li>Check the acknowledgment checkbox</li>
+                            <li>Return to move the loan to the next status</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+DISASTER PROTECTION IN BYTE - QUICK REFERENCE
+==============================================
+
+LAYER 1: EMAIL NOTIFICATION
+---------------------------
+Trigger: Loan declared in disaster area
+Statuses: CTC, Docs Ordered/Out/Back, CORR-Ready for Purchase, Funds Ordered/Sent
+Recipients: LO, Production Asst, Processor, UW, Closer, Funder
+
+LAYER 2: DISASTER ATTESTATION
+-----------------------------
+Location: Appraisal Info Screen > Disaster Area section
+Fields: Incident Begin/End Date, Declaration Date, Title, State, Designated Area
+Action Required: Processor must check acknowledgment checkbox
+
+LAYER 3: PROP 609 CONDITION
+---------------------------
+Trigger: Disaster Begin Date > Appraisal Completed Date AND loan not CTC
+Responsibility: Underwriter to clear
+Stage: PTD
+
+HARD STOP: FUNDS ORDERED
+------------------------
+Requirement: Attestation checkbox MUST be checked to proceed
+Error: System blocks progression until checkbox is completed
+
+POLICY REFERENCE: Disaster Area Corporate Policy
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Disaster Protection Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">5 Process Steps Analyzed</span>
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 50% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">50%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">90%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-fema')" title="Click to view agent details">
+                        <div class="heat-score">95</div>
+                        <div class="heat-name">FEMA Data Integration</div>
+                        <div class="heat-desc">Real-time disaster declaration monitoring</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>0</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-attestation')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Smart Attestation Assistant</div>
+                        <div class="heat-desc">Guide processors through disaster review</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>2</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-reinspection')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Re-inspection Coordinator</div>
+                        <div class="heat-desc">Auto-order property inspections</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>3</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-compliance')" title="Click to view agent details">
+                        <div class="heat-score">62</div>
+                        <div class="heat-name">Compliance Tracker</div>
+                        <div class="heat-desc">Monitor disaster loan compliance</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>4</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: FEMA Data Integration -->
+                <div class="agent-card" id="agent-fema">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">E</div>
+                        <div class="agent-info">
+                            <div class="agent-name">FEMA Data Integration Agent</div>
+                            <div class="agent-type">Data Integration Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors FEMA disaster declarations in real-time and automatically cross-references with active loan pipeline properties. Proactively flags affected loans before they progress to later stages.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">FEMA API</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Parse Declarations</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Match Properties</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Flag in Byte</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Coverage</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('fema')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Smart Attestation Assistant -->
+                <div class="agent-card" id="agent-attestation">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">A</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Smart Attestation Assistant</div>
+                            <div class="agent-type">Guided Workflow Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Guides processors through the disaster attestation process with a checklist. Pulls relevant policy requirements, suggests documentation needed, and validates completeness before allowing checkbox selection.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Detect Flag</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Load Checklist</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Guide User</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">99%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('attestation')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Re-inspection Coordinator -->
+                <div class="agent-card" id="agent-reinspection">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">R</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Re-inspection Coordinator</div>
+                            <div class="agent-type">Task Automation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">When PROP 609 condition is added, automatically determines if re-inspection is needed based on disaster type, property proximity, and timeline. Orders inspections through integrated AMC systems.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">PROP 609 Added</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Assess Need</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Order Inspection</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Track Status</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2hrs</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Auto</div><div class="agent-stat-label">Ordering</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('reinspection')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Compliance Tracker -->
+                <div class="agent-card" id="agent-compliance">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">C</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Disaster Compliance Tracker</div>
+                            <div class="agent-type">Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors all disaster-flagged loans across the pipeline. Provides dashboard visibility, tracks attestation completion rates, and alerts management to aging items or compliance gaps.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Pipeline</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Track Status</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Generate Reports</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Alert Mgmt</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">Daily</div><div class="agent-stat-label">Reports</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Visibility</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('compliance')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Disaster Protection - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent">Loading documentation...</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll spy state
+        let isScrolling = false;
+        let scrollTimeout = null;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Nav item click handler
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                isScrolling = true;
+
+                // Clear any existing timeout
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // Update active state immediately
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Scroll to section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Reset isScrolling after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Scroll to agent from heat map
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) {
+                agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                agent.classList.add('highlight');
+                setTimeout(() => agent.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Documentation Modal
+        const docMarkdown = `# Disaster Protection in Byte
+
+## Overview
+CMG has implemented additional checks throughout the loan process to identify and review properties in a Disaster Area.
+
+Through email notifications, conditions, and system checks, the goal is to eliminate unknown disaster area loans moving forward without missing additional documentation.
+
+## Layer 1: Email Notifications
+
+**Trigger:** Loan declared to be in a disaster area
+
+**Qualifying Statuses:**
+- CTC
+- Docs Ordered
+- Docs Out
+- Docs Back
+- CORR - Ready for Purchase
+- Funds Ordered
+- Funds Sent
+
+**Recipients:** LO, Production Asst, Processor, UW, Closer, Funder
+
+## Layer 2: Disaster Attestation
+
+**Location:** Appraisal Info Screen > Disaster Area section
+
+**Fields:**
+- Disaster Incident Begin Date (Read Only)
+- Disaster Incident End Date (Read Only)
+- Disaster Declaration Date (Read Only)
+- Declaration Title (Read Only)
+- State (Read Only)
+- Designated Area (Read Only)
+- Acknowledgment Checkbox (REQUIRED)
+
+**Responsibility:** Processors must complete the attestation
+
+## Layer 3: PROP 609 Condition
+
+**Trigger Logic:**
+- IF Disaster Incident Begin Date > Appraisal Completed Date
+- AND Loan is NOT yet CTC
+- THEN Condition PROP 609 is auto-inserted
+
+**Condition Details:**
+- Class: UW
+- Type: PROP - 609
+- Responsibility: Underwriter
+- Stage: PTD
+
+## Hard Stop at Funds Ordered
+
+If attestation checkbox is NOT checked, loan cannot progress from Funds Ordered status.
+
+**Error Message:**
+"This file has been flagged to be in a current emergency disaster area. The 'I acknowledge I have received and reviewed the Disaster Report/Requirements' checkbox is a required field. Please review/complete to continue"
+
+## Policy Reference
+Disaster Area Corporate Policy`;
+
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.getElementById('docContent').textContent = docMarkdown;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(docMarkdown);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        // Agent Prompts
+        const agentPrompts = {
+            fema: {
+                name: 'FEMA Data Integration Agent',
+                tags: ['Data Integration', 'FEMA API', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent monitors FEMA disaster declarations in real-time and automatically cross-references with the active loan pipeline in Byte, proactively flagging affected properties before they progress to later loan stages.`,
+                prompt: `You are building a Data Integration Agent for CMG Financial's Byte LOS disaster protection system.
+
+AGENT NAME: FEMA Data Integration Agent
+TYPE: Data Integration / Real-time Monitoring
+
+OBJECTIVE:
+Create an agent that continuously monitors FEMA disaster declarations and automatically identifies loans in the pipeline with properties in newly declared disaster areas.
+
+INPUT DATA SOURCES:
+1. FEMA Disaster Declarations API
+   - Endpoint: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
+   - Poll frequency: Every 15 minutes
+   - Filter: declarationType = "DR" (Major Disaster)
+
+2. Byte Loan Pipeline
+   - Active loans with property addresses
+   - State and County from property data
+   - Current loan status
+
+MATCHING LOGIC:
+1. Parse new FEMA declarations for:
+   - Incident Begin Date
+   - Declaration Date
+   - Designated Area (County/State)
+   - Disaster Type
+
+2. Cross-reference with pipeline:
+   - Match State + County to property location
+   - Check if Incident Begin Date > Appraisal Date
+   - Identify loans in pre-CTC statuses
+
+OUTPUT ACTIONS:
+{
+  "matchedLoans": [
+    {
+      "loanNumber": "string",
+      "propertyAddress": "string",
+      "currentStatus": "string",
+      "disasterTitle": "string",
+      "incidentBeginDate": "date",
+      "declarationDate": "date",
+      "action": "FLAG_FOR_REVIEW" | "ADD_CONDITION"
+    }
+  ],
+  "totalAffected": number,
+  "processingTimestamp": "datetime"
+}
+
+ERROR HANDLING:
+- FEMA API timeout: Retry 3x with exponential backoff
+- No matches found: Log and continue monitoring
+- Byte API failure: Queue actions for retry`,
+                integration: `INTEGRATION POINTS:
+
+1. FEMA Open Data API
+   - Authentication: None (public API)
+   - Rate limits: 1000 requests/hour
+   - Data format: JSON
+
+2. Byte LOS Database
+   - Read: Property addresses, loan status
+   - Write: Disaster area flags, condition insertion
+   - Trigger: Webhook on new declaration match
+
+3. Notification System
+   - Send email alerts to affected loan team
+   - Update Byte dashboard with disaster indicators
+
+DEPLOYMENT:
+- Azure Function with timer trigger (15 min)
+- Or: AWS Lambda with CloudWatch Events
+- Database: Cache recent declarations (7 days)`
+            },
+            attestation: {
+                name: 'Smart Attestation Assistant',
+                tags: ['Guided Workflow', 'Compliance', 'Low Complexity', 'High Priority'],
+                purpose: `This agent guides processors through the disaster attestation process by providing a dynamic checklist, pulling relevant policy requirements, and validating documentation completeness before allowing the attestation checkbox to be selected.`,
+                prompt: `You are building a Guided Workflow Agent for CMG Financial's Byte LOS disaster protection system.
+
+AGENT NAME: Smart Attestation Assistant
+TYPE: Guided Workflow / Compliance Helper
+
+OBJECTIVE:
+Create an agent that assists processors in completing the disaster attestation by providing step-by-step guidance, policy references, and validation of required documentation.
+
+TRIGGER CONDITIONS:
+- User opens Appraisal Info Screen
+- Disaster Area section is populated
+- Attestation checkbox is unchecked
+
+WORKFLOW STEPS:
+
+STEP 1: Display Disaster Summary
+- Show all read-only disaster fields
+- Highlight key dates and affected area
+- Link to FEMA disaster page for details
+
+STEP 2: Policy Requirements Checklist
+Based on disaster type, display required items:
+
+[ ] Review Disaster Area Corporate Policy
+[ ] Verify appraisal date vs incident date
+[ ] Check if re-inspection is required
+[ ] Confirm property damage assessment
+[ ] Document insurance coverage status
+[ ] Obtain borrower attestation (if required)
+
+STEP 3: Documentation Validation
+- Scan loan file for required documents
+- Flag missing items with clear descriptions
+- Provide upload prompts for missing docs
+
+STEP 4: Enable Attestation
+- Only enable checkbox when checklist complete
+- Log completion timestamp and user
+- Generate audit trail entry
+
+OUTPUT FORMAT:
+{
+  "checklistItems": [
+    { "item": "string", "status": "complete|pending|missing", "notes": "string" }
+  ],
+  "readyForAttestation": boolean,
+  "missingDocuments": ["string"],
+  "policyVersion": "string",
+  "completedBy": "userId",
+  "completedAt": "datetime"
+}`,
+                integration: `INTEGRATION POINTS:
+
+1. Byte Appraisal Info Screen
+   - Inject checklist panel adjacent to Disaster Area section
+   - Real-time validation on field changes
+   - Enable/disable checkbox based on completion
+
+2. Document Management System
+   - Query for required document types
+   - Validate document dates vs disaster dates
+   - Provide quick-upload functionality
+
+3. Policy Repository
+   - Fetch current Disaster Area Corporate Policy
+   - Display relevant sections inline
+   - Track policy version for compliance
+
+DEPLOYMENT:
+- Browser extension or embedded iframe
+- Backend API for checklist logic
+- Audit logging to compliance database`
+            },
+            reinspection: {
+                name: 'Re-inspection Coordinator Agent',
+                tags: ['Task Automation', 'AMC Integration', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent automatically assesses whether a property re-inspection is needed when PROP 609 condition is added, and if so, coordinates the ordering process through integrated AMC systems.`,
+                prompt: `You are building a Task Automation Agent for CMG Financial's Byte LOS disaster protection system.
+
+AGENT NAME: Re-inspection Coordinator Agent
+TYPE: Task Automation / Vendor Integration
+
+OBJECTIVE:
+Create an agent that automatically evaluates re-inspection requirements for disaster-flagged properties and coordinates inspection orders through AMC integrations.
+
+TRIGGER:
+- PROP 609 condition added to loan
+- OR manual trigger by underwriter
+
+ASSESSMENT LOGIC:
+
+1. Evaluate Re-inspection Need:
+   - Disaster Type Impact Matrix:
+     * Wildfire: High impact (always inspect)
+     * Hurricane: High impact (always inspect)
+     * Tornado: High impact (always inspect)
+     * Flood: Medium impact (inspect if in flood zone)
+     * Earthquake: High impact (always inspect)
+
+   - Property Proximity Check:
+     * Distance from disaster epicenter
+     * Affected county vs adjacent county
+
+   - Timeline Analysis:
+     * Days since incident begin date
+     * Days since original appraisal
+
+2. Decision Matrix:
+   IF (disasterType in HIGH_IMPACT)
+      AND (propertyInDesignatedArea OR distanceFromEpicenter < 10mi)
+      AND (daysSinceIncident > 7)
+   THEN orderReinspection = TRUE
+
+3. Order Automation:
+   - Select appropriate inspection type:
+     * Exterior-only (drive-by)
+     * Full interior/exterior
+     * Damage assessment
+   - Submit to AMC via API
+   - Track order status
+
+OUTPUT:
+{
+  "loanNumber": "string",
+  "assessmentResult": {
+    "reinspectionRequired": boolean,
+    "reason": "string",
+    "inspectionType": "exterior|full|damage",
+    "urgency": "standard|rush"
+  },
+  "orderStatus": "pending|ordered|scheduled|complete",
+  "amcOrderId": "string",
+  "estimatedCompletionDate": "date"
+}`,
+                integration: `INTEGRATION POINTS:
+
+1. Byte LOS Conditions Screen
+   - Monitor for PROP 609 condition creation
+   - Read property and disaster details
+   - Update condition notes with inspection status
+
+2. AMC Integration (Mercury, Reggora, etc.)
+   - API authentication and order submission
+   - Order type and priority mapping
+   - Status webhook for completion tracking
+
+3. Underwriter Notification
+   - Alert when inspection ordered
+   - Alert when inspection complete
+   - Provide inspection report link
+
+DEPLOYMENT:
+- Event-driven architecture (condition creation trigger)
+- Queue-based order processing for reliability
+- Dashboard for tracking all pending inspections`
+            },
+            compliance: {
+                name: 'Disaster Compliance Tracker',
+                tags: ['Monitoring', 'Reporting', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent provides comprehensive visibility into all disaster-flagged loans across the pipeline, tracks attestation completion rates, and alerts management to aging items or compliance gaps.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Byte LOS disaster protection system.
+
+AGENT NAME: Disaster Compliance Tracker
+TYPE: Monitoring / Reporting Agent
+
+OBJECTIVE:
+Create an agent that maintains real-time visibility into disaster-affected loans, tracks compliance metrics, and proactively alerts stakeholders to potential issues.
+
+MONITORING SCOPE:
+- All loans with Disaster Area flags
+- PROP 609 condition status
+- Attestation completion status
+- Re-inspection order status
+
+DASHBOARD METRICS:
+
+1. Pipeline Overview:
+   - Total disaster-flagged loans
+   - By status (Active, Pending Attestation, Cleared)
+   - By disaster event
+   - By branch/region
+
+2. Compliance Health:
+   - Attestation completion rate (target: 100%)
+   - Average time to attestation
+   - Overdue attestations (>48 hours)
+   - PROP 609 clearance rate
+
+3. Risk Indicators:
+   - Loans approaching funding without attestation
+   - Stale conditions (>5 days uncleared)
+   - Re-inspections pending
+
+ALERT RULES:
+
+CRITICAL (Immediate):
+- Loan at Funds Ordered without attestation
+- Hard stop triggered
+
+HIGH (Within 4 hours):
+- Attestation pending >48 hours
+- PROP 609 uncleared >5 days
+
+MEDIUM (Daily digest):
+- New disaster declaration affecting pipeline
+- Completion rate below 90%
+
+REPORT OUTPUT:
+{
+  "reportDate": "date",
+  "totalFlagged": number,
+  "byStatus": { "pending": n, "attested": n, "cleared": n },
+  "complianceRate": percentage,
+  "overdueItems": [{ loan, daysPending, assignedTo }],
+  "alerts": [{ severity, message, loanNumber }]
+}`,
+                integration: `INTEGRATION POINTS:
+
+1. Byte LOS Database
+   - Query disaster flags, conditions, attestations
+   - Real-time status monitoring
+   - Historical trend analysis
+
+2. Reporting Dashboard
+   - Executive summary view
+   - Drill-down by disaster/branch/status
+   - Export to PDF/Excel
+
+3. Alert Distribution
+   - Email digests to management
+   - Slack/Teams notifications for critical
+   - Escalation matrix for overdue items
+
+DEPLOYMENT:
+- Scheduled jobs: Every 15 min for monitoring
+- Daily report generation at 6 AM
+- Real-time alerts via webhook triggers`
+            }
+        };
+
+        let currentPromptKey = '';
+
+        function showAgentPrompt(key) {
+            const prompt = agentPrompts[key];
+            if (!prompt) return;
+
+            currentPromptKey = key;
+            document.getElementById('promptModalTitle').textContent = prompt.name;
+            document.getElementById('promptTags').innerHTML = prompt.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = prompt.purpose;
+            document.getElementById('promptContent').textContent = prompt.prompt;
+            document.getElementById('promptIntegration').textContent = prompt.integration;
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const prompt = agentPrompts[currentPromptKey];
+            if (!prompt) return;
+
+            const fullText = `${prompt.name}\n\n${prompt.purpose}\n\n${prompt.prompt}\n\n${prompt.integration}`;
+            try {
+                await navigator.clipboard.writeText(fullText);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDocModal();
+                closePromptModal();
+            }
+        });
+
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+    </script>
+</body>
+</html>
