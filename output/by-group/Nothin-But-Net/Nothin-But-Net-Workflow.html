@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nothin' But Net Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb - FIXED positioning */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(20, 184, 166, 0.15);
+            color: var(--accent-teal);
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-teal); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar - FIXED positioning */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-teal); border-bottom-color: var(--accent-teal); background: rgba(20, 184, 166, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+        .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 12px 20px 8px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(20, 184, 166, 0.1); border-left-color: var(--accent-teal); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-teal); color: white; }
+        .nav-label { font-size: 0.9rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(20, 184, 166, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-teal); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-teal); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(20, 184, 166, 0.15);
+            color: var(--accent-teal);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+        .field-table code { background: rgba(20, 184, 166, 0.15); padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--accent-teal); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Summary */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            scroll-margin-top: 75px;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-purple); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .prompt-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏀 Nothin' But Net</a>
+        <span class="separator">›</span>
+        <span class="current">Netted Payoff Workflow</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🏀 Nothin' But Net</h2>
+            <p>Netted Escrow Payoff Process</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <div class="nav-section-title">Workflow Steps</div>
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Verify Eligibility</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Complete Request</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Receive Payoff</span>
+            </a>
+            <div class="nav-section-title">Reference</div>
+            <a href="#important-info" class="nav-item">
+                <span class="nav-number">⚠️</span>
+                <span class="nav-label">Important Info</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">⚡</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">📊</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">🔥</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">🤖</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="./index.html" class="doc-btn">
+                ← Back to Index
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>🏀 Nothin' But Net™ Workflow</h1>
+                <p class="subtitle">Order netted payoffs for refinances where the borrower's existing mortgage is serviced by CMG Financial</p>
+                <div class="meta">
+                    <span class="meta-item">🏢 System: Byte LOS</span>
+                    <span class="meta-item">👤 Roles: Processor, Closer</span>
+                    <span class="meta-item">📅 Updated: July 2024</span>
+                    <span class="meta-item">🔗 Servicer: Cenlar</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #14b8a6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Verify Eligibility -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Verify Eligibility</h2>
+                        <span>Confirm the existing loan is CMG-serviced</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start Refi</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Open Previous Loan</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Go to Servicing Screen</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node decision">CMG Serviced?</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>🏀 What is Nothin' But Net?</h4>
+                        <p>Nothin' But Net™ allows the borrower's <strong>current escrow balance to be netted from the payoff</strong> on a refinance. This means less cash needed at closing!</p>
+                        <p style="margin-top: 10px;"><strong>Eligibility:</strong> The borrower's existing mortgage must be currently serviced by CMG Financial.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Servicing Screen Field</th>
+                                <th>Required Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>Servicing Option</code></td>
+                                <td>Servicing Retained</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Servicer</code></td>
+                                <td>Cenlar</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Servicer Loan Number</code></td>
+                                <td>10-digit CMG loan number</td>
+                                <td><span class="badge required">Copy This</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>✅ FHA to FHA Exception</h4>
+                        <p>FHA to FHA refinances do <strong>not</strong> need to follow this process. Netted escrow payoffs can be requested <strong>directly from Cenlar</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Complete Request -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Complete the Request</h2>
+                        <span>Fill out the Nothin' But Net section in Byte</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open NEW Loan</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Processing Log - Additional</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node input">Complete NBN Section</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Request Submitted</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>📍 Location in Byte</h4>
+                        <p>On the <strong>NEW loan</strong>, navigate to: <code>Processing Log → Additional</code> screen and locate the <strong>Nothin' But Net</strong> section.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>Nothin' But Net</code></td>
+                                <td>Checkbox - must be checked to initiate request</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Existing CMG Loan Number</code></td>
+                                <td>10-digit CMG loan number from the previous loan's Servicing screen</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Date Requested</code></td>
+                                <td>Submit <strong>minimum 5 days prior</strong> to CD release date</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Payoff Good Through Date</code></td>
+                                <td>Up to <strong>30 calendar days</strong> from request date</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Requestor Email</code></td>
+                                <td>Email address of the person requesting the payoff</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>Updated PO Request</code></td>
+                                <td>Only check if requesting an UPDATED netted payoff</td>
+                                <td><span class="badge optional">Optional</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>New Good Thru Date</code></td>
+                                <td>Only complete if requesting updated payoff</td>
+                                <td><span class="badge optional">Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>⚠️ Timing is Critical</h4>
+                        <p>Requests must be submitted a <strong>minimum of 5 days prior</strong> to the CD release date. Late requests may delay closing.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Receive Payoff -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Receive the Payoff</h2>
+                        <span>CMG Servicing processes and delivers the netted payoff</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Concierge Reviews</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node decision">Info Complete?</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Order from Cenlar</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Payoff Received</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>📬 Delivery Process</h4>
+                        <p>The <strong>CMG Servicing Concierge Team</strong> will review your request and reach out to the Requestor Email if any additional information is required.</p>
+                        <p style="margin-top: 10px;">Once received from Cenlar, the netted payoff will be:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px; color: var(--text-secondary);">
+                            <li>Uploaded to the Byte file</li>
+                            <li>Emailed to the Requestor Email address</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>⏱️ Expected Turnaround</h4>
+                        <p>Please allow <strong>2-5 business days</strong> for payoff receipt after submitting your request.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Important Information -->
+            <section id="important-info" class="section">
+                <div class="section-header">
+                    <div class="section-number">⚠️</div>
+                    <div class="section-title">
+                        <h2>Important Information</h2>
+                        <span>Critical scenarios and exceptions</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="exception-box">
+                        <h4>🚨 Loan Doesn't Close or Rescinds</h4>
+                        <p>If a loan does <strong>not close or rescinds</strong>, you must notify <strong>servicinghelp@cmgfi.com immediately</strong> to avoid potential escrow issues on the existing loan.</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>💰 Low Escrow Balance Scenarios</h4>
+                        <p>The CMG Servicing Concierge Team will reach out to you if:</p>
+                        <ul style="margin-left: 20px; margin-top: 8px; color: var(--text-secondary);">
+                            <li>There is an <strong>escrow shortage</strong></li>
+                            <li>There are <strong>upcoming disbursements</strong></li>
+                            <li>The current escrow balance is <strong>under $500</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>✅ FHA to FHA Refinances</h4>
+                        <p>These do NOT need to follow the Nothin' But Net process. Netted escrow payoffs can be requested <strong>directly from Cenlar</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>⚡ Quick Reference Card</h3>
+                <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│  🏀 NOTHIN' BUT NET - QUICK REFERENCE                           │
+├─────────────────────────────────────────────────────────────────┤
+│  ELIGIBILITY:                                                   │
+│  • Existing loan must be CMG-serviced (Cenlar)                  │
+│  • Servicing screen shows "Servicing Retained"                  │
+│  • FHA→FHA refis: Request directly from Cenlar                  │
+├─────────────────────────────────────────────────────────────────┤
+│  LOCATION IN BYTE:                                              │
+│  NEW Loan → Processing Log → Additional → Nothin' But Net       │
+├─────────────────────────────────────────────────────────────────┤
+│  REQUIRED FIELDS:                                               │
+│  ☑ Nothin' But Net checkbox                                     │
+│  • Existing CMG Loan Number (10-digit)                          │
+│  • Date Requested (5+ days before CD release)                   │
+│  • Payoff Good Through Date (up to 30 days out)                 │
+│  • Requestor Email                                              │
+├─────────────────────────────────────────────────────────────────┤
+│  TURNAROUND: 2-5 business days                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  SUPPORT: servicinghelp@cmgfi.com                               │
+├─────────────────────────────────────────────────────────────────┤
+│  ⚠️ IF LOAN RESCINDS: Notify servicinghelp@cmgfi.com IMMEDIATELY │
+└─────────────────────────────────────────────────────────────────┘
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Nothin' But Net Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">🤖 4 Agent Candidates Identified</span>
+                    <span class="meta-item">⏱️ Est. 70% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">1</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">70%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">80%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">🔥 Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-eligibility')">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Eligibility Checker</div>
+                        <div class="heat-desc">Auto-verify CMG servicing status before request</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-autofill')">
+                        <div class="heat-score">72</div>
+                        <div class="heat-name">Request Auto-Populate</div>
+                        <div class="heat-desc">Pull loan number from servicing screen automatically</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-timeline')">
+                        <div class="heat-score">68</div>
+                        <div class="heat-name">Timeline Monitor</div>
+                        <div class="heat-desc">Alert if request is too close to CD release</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item low" onclick="scrollToAgent('agent-rescission')">
+                        <div class="heat-score">55</div>
+                        <div class="heat-name">Rescission Alert</div>
+                        <div class="heat-desc">Auto-notify servicing if loan status changes</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Cards -->
+            <h2 style="margin-bottom: 25px; color: var(--text-primary);" id="agent-details">🤖 Agent Details</h2>
+            <div class="agent-grid">
+                <!-- Agent 1: Eligibility Checker -->
+                <div class="agent-card" id="agent-eligibility">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">✅</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Eligibility Checker</div>
+                            <div class="agent-type">Pre-Validation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically verifies if the borrower's existing loan is CMG-serviced before allowing a Nothin' But Net request. Prevents errors and saves time by checking servicing status upfront.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Detect Refi</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Query Servicing</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Validate</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Enable/Block</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">85</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">5min</div>
+                                <div class="agent-stat-label">Saved/Loan</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">100%</div>
+                                <div class="agent-stat-label">Error Prevention</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('eligibility')">
+                            ✨ View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Request Auto-Populate -->
+                <div class="agent-card" id="agent-autofill">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📝</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Request Auto-Populate</div>
+                            <div class="agent-type">Data Integration Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically pulls the existing CMG loan number from the servicing screen and populates the Nothin' But Net request fields, reducing manual data entry and copy/paste errors.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Open NBN Form</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Find Prior Loan</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Extract Data</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Auto-Fill</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">72</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">3min</div>
+                                <div class="agent-stat-label">Saved/Request</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">Low</div>
+                                <div class="agent-stat-label">Complexity</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('autofill')">
+                            ✨ View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Timeline Monitor -->
+                <div class="agent-card" id="agent-timeline">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">⏰</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Timeline Monitor</div>
+                            <div class="agent-type">Compliance Alert Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors loan timelines and alerts when a Nothin' But Net request is submitted less than 5 days before the CD release date, preventing delays and compliance issues.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Check CD Date</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Calculate Gap</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">< 5 Days?</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Alert User</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">68</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">95%</div>
+                                <div class="agent-stat-label">Delay Prevention</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">Med</div>
+                                <div class="agent-stat-label">Complexity</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('timeline')">
+                            ✨ View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Rescission Alert -->
+                <div class="agent-card" id="agent-rescission">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🚨</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Rescission Alert</div>
+                            <div class="agent-type">Status Change Agent</div>
+                        </div>
+                        <span class="agent-priority low">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors loan status and automatically notifies servicinghelp@cmgfi.com when a loan with an active Nothin' But Net request is cancelled or rescinded, preventing escrow issues.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Monitor Status</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Detect Cancel</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Check NBN Flag</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">Email Servicing</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">55</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">100%</div>
+                                <div class="agent-stat-label">Issue Prevention</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">Med</div>
+                                <div class="agent-stat-label">Complexity</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('rescission')">
+                            ✨ View Build Prompt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Prompt Modal -->
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closeModal()">✕ Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>🎯 Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>📝 Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptFull"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>🔗 Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">✓ Copied to clipboard!</div>
+
+    <script>
+        // Agent Prompt Data
+        const agentPrompts = {
+            eligibility: {
+                title: "Eligibility Checker",
+                tags: ["Pre-Validation", "Byte Integration", "Servicing"],
+                purpose: "Automatically verifies if the borrower's existing loan is CMG-serviced (Cenlar) before allowing a Nothin' But Net request, preventing invalid requests and reducing errors.",
+                fullPrompt: `You are an Eligibility Checker Agent for CMG Financial's Nothin' But Net process.
+
+AGENT NAME: NBN Eligibility Checker
+TYPE: Pre-Validation / Data Verification
+
+OBJECTIVE:
+Automatically check if a borrower's existing loan is serviced by CMG (via Cenlar) before enabling the Nothin' But Net request option. Block requests for non-eligible loans.
+
+INPUT DATA SOURCES:
+1. Current Loan (NEW Refi)
+   - Borrower SSN or property address
+   - Loan type (must be refinance)
+
+2. Previous Loan Servicing Data
+   - Servicing Option field
+   - Servicer field
+   - Servicer Loan Number
+
+VALIDATION LOGIC:
+| Field | Required Value | Action if Mismatch |
+|-------|---------------|-------------------|
+| Servicing Option | "Servicing Retained" | Block NBN, show message |
+| Servicer | "Cenlar" | Block NBN, show message |
+| Loan Type | FHA→FHA | Skip NBN (direct Cenlar request) |
+
+OUTPUT FORMAT:
+{
+  "eligible": true | false,
+  "reason": "string",
+  "existing_loan_number": "string" | null,
+  "servicer": "string",
+  "servicing_option": "string",
+  "recommendation": "string"
+}
+
+ERROR HANDLING:
+- Previous loan not found: "Unable to locate existing CMG loan"
+- Not CMG serviced: "Existing loan is not serviced by CMG"
+- FHA to FHA: "Use direct Cenlar request for FHA refis"`,
+                integration: `INTEGRATION POINTS:
+• Byte Servicing Screen API
+• Loan origination pipeline trigger
+• NBN form enable/disable control
+
+TRIGGER POINTS:
+• Refinance loan created
+• NBN checkbox clicked
+• Property address matched to existing loan`
+            },
+            autofill: {
+                title: "Request Auto-Populate",
+                tags: ["Data Integration", "Auto-Fill", "Byte"],
+                purpose: "Automatically pulls the existing CMG loan number and pre-populates Nothin' But Net request fields, eliminating manual data entry and copy/paste errors.",
+                fullPrompt: `You are a Request Auto-Populate Agent for CMG Financial's Nothin' But Net process.
+
+AGENT NAME: NBN Auto-Populate
+TYPE: Data Integration / Form Automation
+
+OBJECTIVE:
+When a user opens the Nothin' But Net section on a new refinance loan, automatically locate the borrower's existing CMG-serviced loan and populate the request fields.
+
+INPUT DATA SOURCES:
+1. Current Loan (NEW)
+   - Borrower info for matching
+   - CD release date (for calculating Date Requested)
+
+2. Previous Loan
+   - 10-digit CMG loan number
+   - Servicing screen data
+
+FIELD MAPPING:
+| NBN Field | Source | Auto-Calculate |
+|-----------|--------|----------------|
+| Existing CMG Loan Number | Previous loan servicing screen | Direct copy |
+| Date Requested | Current date | Today's date |
+| Payoff Good Through Date | CD release date | CD date + buffer |
+| Requestor Email | Current user | From session |
+
+OUTPUT FORMAT:
+{
+  "auto_populated": true,
+  "fields": {
+    "existing_cmg_loan_number": "0123456789",
+    "date_requested": "2024-01-15",
+    "good_through_date": "2024-02-14",
+    "requestor_email": "user@cmgfi.com"
+  },
+  "previous_loan_found": true
+}
+
+ERROR HANDLING:
+- No previous loan: Prompt user for manual entry
+- Multiple loans found: Show selection list`,
+                integration: `INTEGRATION POINTS:
+• Byte loan database
+• Processing Log - Additional screen
+• User session for email
+
+TRIGGER POINTS:
+• NBN section opened
+• NBN checkbox checked
+• Form focus event`
+            },
+            timeline: {
+                title: "Timeline Monitor",
+                tags: ["Compliance", "Alerts", "Scheduling"],
+                purpose: "Monitors loan timelines and alerts users when a Nothin' But Net request is submitted less than 5 days before the CD release date, preventing delays.",
+                fullPrompt: `You are a Timeline Monitor Agent for CMG Financial's Nothin' But Net process.
+
+AGENT NAME: NBN Timeline Monitor
+TYPE: Compliance Alert / Scheduling
+
+OBJECTIVE:
+Monitor the gap between NBN request submission and CD release date. Alert users when requests are submitted with less than 5 business days lead time.
+
+INPUT DATA SOURCES:
+1. NBN Request
+   - Date Requested
+   - Loan number
+
+2. Loan Timeline
+   - CD Release Date
+   - Closing Date
+
+ALERT LOGIC:
+| Days Before CD | Alert Level | Message |
+|---------------|-------------|---------|
+| >= 5 days | None | Request submitted on time |
+| 3-4 days | Warning | Request may cause delays |
+| 1-2 days | Critical | High risk of closing delay |
+| 0 or past | Block | Cannot process in time |
+
+OUTPUT FORMAT:
+{
+  "alert_triggered": true | false,
+  "alert_level": "none" | "warning" | "critical" | "blocked",
+  "days_until_cd": number,
+  "message": "string",
+  "recommendation": "string"
+}
+
+ERROR HANDLING:
+- CD date not set: Warn user to set date first
+- Past CD date: Block submission entirely`,
+                integration: `INTEGRATION POINTS:
+• Byte loan milestones
+• NBN request form validation
+• Email/notification system
+
+TRIGGER POINTS:
+• NBN form submission
+• CD date change on loan with pending NBN
+• Daily pipeline scan`
+            },
+            rescission: {
+                title: "Rescission Alert",
+                tags: ["Status Monitor", "Auto-Email", "Servicing"],
+                purpose: "Automatically notifies servicinghelp@cmgfi.com when a loan with an active Nothin' But Net request is cancelled or rescinded, preventing escrow issues on the existing loan.",
+                fullPrompt: `You are a Rescission Alert Agent for CMG Financial's Nothin' But Net process.
+
+AGENT NAME: NBN Rescission Alert
+TYPE: Status Change Monitor / Auto-Notification
+
+OBJECTIVE:
+Monitor loan status changes and automatically send an alert to servicinghelp@cmgfi.com when a loan with an active Nothin' But Net request is cancelled, denied, or rescinded.
+
+INPUT DATA SOURCES:
+1. Loan Status
+   - Current status
+   - Status change timestamp
+   - Previous status
+
+2. NBN Request
+   - NBN checkbox status
+   - Existing loan number
+   - Requestor email
+
+TRIGGER CONDITIONS:
+| New Status | NBN Active | Action |
+|------------|-----------|--------|
+| Cancelled | Yes | Send alert immediately |
+| Denied | Yes | Send alert immediately |
+| Rescinded | Yes | Send alert immediately |
+| Withdrawn | Yes | Send alert immediately |
+| Any other | Yes | No action |
+| Any | No | No action |
+
+EMAIL TEMPLATE:
+To: servicinghelp@cmgfi.com
+Subject: NBN Request Cancellation - Loan #{loan_number}
+
+A Nothin' But Net request has been cancelled due to loan status change.
+
+Existing CMG Loan: {existing_loan_number}
+New Loan Status: {new_status}
+Original Requestor: {requestor_email}
+Status Change Date: {timestamp}
+
+Please take appropriate action to prevent escrow issues.
+
+OUTPUT FORMAT:
+{
+  "alert_sent": true,
+  "loan_number": "string",
+  "existing_loan_number": "string",
+  "new_status": "string",
+  "email_sent_to": "servicinghelp@cmgfi.com",
+  "timestamp": "ISO8601"
+}
+
+ERROR HANDLING:
+- Email send failure: Retry 3x, then alert IT
+- Status ambiguous: Flag for manual review`,
+                integration: `INTEGRATION POINTS:
+• Byte loan status webhook
+• SMTP email service
+• NBN request flag database
+
+TRIGGER POINTS:
+• Loan status change event
+• Nightly batch check for status changes
+• Manual trigger by user`
+            }
+        };
+
+        let currentPrompt = '';
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:first-child').classList.add('active');
+            } else {
+                document.querySelector('.sidebar-tab:last-child').classList.add('active');
+            }
+
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab + '-panel').classList.add('active');
+
+            document.getElementById('workflow-nav').style.display = tab === 'workflow' ? 'block' : 'none';
+            document.getElementById('agents-nav').style.display = tab === 'agents' ? 'block' : 'none';
+        }
+
+        // Scroll to Agent
+        function scrollToAgent(agentId) {
+            const card = document.getElementById(agentId);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('highlight');
+                setTimeout(() => card.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Modal Functions
+        function openPromptModal(agentKey) {
+            const agent = agentPrompts[agentKey];
+            document.getElementById('modalTitle').textContent = '✨ ' + agent.title + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptFull').textContent = agent.fullPrompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+            currentPrompt = agent.fullPrompt;
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPrompt() {
+            try {
+                await navigator.clipboard.writeText(currentPrompt);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => success.style.display = 'none', 2000);
+            } catch (e) {
+                alert('Failed to copy to clipboard');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Navigation highlighting
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.getAttribute('href') && this.getAttribute('href').startsWith('#')) {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
