@@ -1,9 +1,42 @@
+<!--
+=============================================================================
+CMG TRAINING PORTAL - WORKFLOW HTML TEMPLATE
+=============================================================================
+This template file should be used by the /CreateCMGAgentWorkflow skill to
+generate consistent workflow HTML pages with the correct Scenario Pricing
+template structure.
+
+KEY TEMPLATE FEATURES:
+1. Fixed positioning (not sticky) for breadcrumb and sidebar
+2. Tab switching between Workflow and AI Agents panels
+3. Heat map with onclick handlers that scroll to agent cards
+4. Agent cards with icon, name, type, priority badge, description, flow diagram, stats grid
+5. Modal system with Purpose, Full Prompt, and Integration Points sections
+6. Highlight animation for agent cards when clicked from heat map
+
+PLACEHOLDERS TO REPLACE:
+- {{WORKFLOW_TITLE}} - e.g., "Ordering Credit"
+- {{WORKFLOW_ICON}} - e.g., "📋"
+- {{WORKFLOW_SUBTITLE}} - e.g., "Complete workflow for ordering credit reports"
+- {{WORKFLOW_DURATION}} - e.g., "3-5 min"
+- {{WORKFLOW_SECTIONS}} - The numbered workflow sections
+- {{QUICK_REF_CONTENT}} - Quick reference card content
+- {{AGENT_COUNT}} - Number of agent candidates
+- {{CRITICAL_COUNT}} - Number of critical priority agents
+- {{TIME_SAVINGS}} - Estimated time savings percentage
+- {{AUTOMATION_POTENTIAL}} - Automation potential percentage
+- {{HEAT_MAP_ITEMS}} - Heat map tiles
+- {{AGENT_CARDS}} - Agent card HTML
+- {{AGENT_PROMPTS_JS}} - JavaScript object with agent prompt data
+- {{NAV_ITEMS}} - Sidebar navigation items for workflow sections
+=============================================================================
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordering Credit - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <title>{{WORKFLOW_TITLE}} - CLEAR 2.0 Workflow | CMG Training Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +65,7 @@
             min-height: 100vh;
         }
 
-        /* Breadcrumb - Fixed */
+        /* Breadcrumb - FIXED positioning */
         .breadcrumb {
             background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
             padding: 14px 25px;
@@ -68,7 +101,7 @@
         .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
         .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
 
-        /* Sidebar - Fixed */
+        /* Sidebar - FIXED positioning */
         .sidebar {
             position: fixed;
             top: 54px;
@@ -757,13 +790,13 @@
         <span class="separator">›</span>
         <a href="./index.html">🏦 CLEAR 2.0</a>
         <span class="separator">›</span>
-        <span class="current">📋 Ordering Credit</span>
+        <span class="current">{{WORKFLOW_ICON}} {{WORKFLOW_TITLE}}</span>
     </nav>
 
     <!-- Fixed Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h2>📋 Ordering Credit</h2>
+            <h2>{{WORKFLOW_ICON}} {{WORKFLOW_TITLE}}</h2>
             <p>Interactive Workflow Guide</p>
         </div>
 
@@ -775,26 +808,7 @@
 
         <!-- Workflow Navigation -->
         <nav class="sidebar-nav" id="workflow-nav">
-            <a href="#section-0" class="nav-item active">
-                <span class="nav-number">0</span>
-                <span class="nav-label">Overview</span>
-            </a>
-            <a href="#section-1" class="nav-item">
-                <span class="nav-number">1</span>
-                <span class="nav-label">Authorization</span>
-            </a>
-            <a href="#section-2" class="nav-item">
-                <span class="nav-number">2</span>
-                <span class="nav-label">Order Credit</span>
-            </a>
-            <a href="#section-3" class="nav-item">
-                <span class="nav-number">3</span>
-                <span class="nav-label">Import Liabilities</span>
-            </a>
-            <a href="#quick-ref" class="nav-item">
-                <span class="nav-number">⚡</span>
-                <span class="nav-label">Quick Reference</span>
-            </a>
+            {{NAV_ITEMS}}
         </nav>
 
         <!-- Agent Navigation -->
@@ -827,13 +841,13 @@
         <div id="workflow-panel" class="tab-panel active">
             <!-- Header -->
             <div class="header">
-                <h1>📋 Ordering Credit in CLEAR 2.0</h1>
-                <p class="subtitle">Complete workflow for ordering credit reports and importing liabilities</p>
+                <h1>{{WORKFLOW_ICON}} {{WORKFLOW_TITLE}} in CLEAR 2.0</h1>
+                <p class="subtitle">{{WORKFLOW_SUBTITLE}}</p>
                 <div class="meta">
                     <span class="meta-item">🏢 System: CLEAR 2.0</span>
                     <span class="meta-item">👤 Role: Loan Officer</span>
                     <span class="meta-item">📅 Updated: Jan 2026</span>
-                    <span class="meta-item">⏱️ Duration: 3-5 min</span>
+                    <span class="meta-item">⏱️ Duration: {{WORKFLOW_DURATION}}</span>
                 </div>
             </div>
 
@@ -846,170 +860,13 @@
                 <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
             </div>
 
-            <!-- Section 0: Overview -->
-            <section id="section-0" class="section">
-                <div class="section-header">
-                    <div class="section-number">0</div>
-                    <div class="section-title"><h2>Process Overview</h2><span>Credit ordering fundamentals</span></div>
-                </div>
-                <div class="section-content">
-                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
-                        The Credit section in CLEAR 2.0 allows Loan Officers to order credit reports, view credit scores, and import liabilities directly into the loan file. Borrower authorization must be obtained before ordering credit.
-                    </p>
-                    <div class="workflow-diagram">
-                        <div class="flow-row">
-                            <div class="flow-node start">🚀 Start</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node input">Get Authorization</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Order Credit</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Review Report</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node output">Import Liabilities</div>
-                        </div>
-                    </div>
-                    <div class="tip-box">
-                        <h4>💡 Pro Tip</h4>
-                        <p>Always obtain verbal or written authorization before pulling credit. This protects both the borrower and CMG from compliance issues.</p>
-                    </div>
-                    <table class="field-table">
-                        <thead>
-                            <tr><th>Requirement</th><th>Details</th><th>Status</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong style="color: var(--text-primary);">Borrower Authorization</strong></td><td>Verbal or written consent to pull credit report</td><td><span class="badge required-badge">Required</span></td></tr>
-                            <tr><td><strong style="color: var(--text-primary);">SSN Verified</strong></td><td>Social Security Number entered and validated in URLA</td><td><span class="badge required-badge">Required</span></td></tr>
-                            <tr><td><strong style="color: var(--text-primary);">Date of Birth</strong></td><td>Borrower DOB required for credit bureau matching</td><td><span class="badge required-badge">Required</span></td></tr>
-                            <tr><td><strong style="color: var(--text-primary);">Current Address</strong></td><td>Full current address for identity verification</td><td><span class="badge required-badge">Required</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Section 1: Authorization -->
-            <section id="section-1" class="section">
-                <div class="section-header">
-                    <div class="section-number">1</div>
-                    <div class="section-title"><h2>Obtain Authorization</h2><span>Confirm borrower consent before ordering</span></div>
-                </div>
-                <div class="section-content">
-                    <div class="workflow-diagram">
-                        <div class="flow-row">
-                            <div class="flow-node start">Start</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Confirm Consent</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Mark Authorization</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node output">Ready to Order</div>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <h4>📋 Authorization Steps</h4>
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li style="margin-bottom: 8px;"><strong>Confirm Borrower Consent:</strong> Obtain borrower authorization either verbally (with documentation in notes) or in writing.</li>
-                            <li><strong>Check Credit Authorization Box:</strong> In CLEAR, navigate to the Credit section and ensure the authorization checkbox is marked.</li>
-                        </ul>
-                    </div>
-                    <div class="exception-box">
-                        <h4>⚠️ Compliance Warning</h4>
-                        <p>Never order credit without documented authorization. This is a federal compliance requirement under FCRA.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 2: Order Credit -->
-            <section id="section-2" class="section">
-                <div class="section-header">
-                    <div class="section-number">2</div>
-                    <div class="section-title"><h2>Order Credit Report</h2><span>Execute the credit pull</span></div>
-                </div>
-                <div class="section-content">
-                    <div class="workflow-diagram">
-                        <div class="flow-row">
-                            <div class="flow-node action">Navigate to Credit Tab</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node decision">Select Report Type</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node input">Select Borrowers</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node output">Click Order Credit</div>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <h4>📊 Credit Report Types</h4>
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li style="margin-bottom: 8px;"><strong>Soft Pull:</strong> No impact on credit score, used for prequalification scenarios</li>
-                            <li style="margin-bottom: 8px;"><strong>Hard Pull:</strong> Full tri-merge report, required for formal loan application</li>
-                            <li><strong>Joint vs Individual:</strong> Joint for shared applications, Individual for privacy-preferred borrowers</li>
-                        </ul>
-                    </div>
-                    <div class="tip-box">
-                        <h4>💡 Report Selection Tips</h4>
-                        <p>For joint applications with shared financials, select both borrowers for a joint report. The system will submit the request and return results within seconds.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 3: Import Liabilities -->
-            <section id="section-3" class="section">
-                <div class="section-header">
-                    <div class="section-number">3</div>
-                    <div class="section-title"><h2>Import Liabilities</h2><span>Transfer credit data to URLA</span></div>
-                </div>
-                <div class="section-content">
-                    <div class="workflow-diagram">
-                        <div class="flow-row">
-                            <div class="flow-node action">Review Credit Report</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Click Import Liabilities</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node action">Match to REO</div>
-                            <span class="flow-arrow">→</span>
-                            <div class="flow-node output">Verify Accuracy</div>
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <h4>📥 Import Process</h4>
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li style="margin-bottom: 8px;"><strong>Review Credit Report:</strong> Check the score and liabilities displayed in the Credit section.</li>
-                            <li style="margin-bottom: 8px;"><strong>Click Import Liabilities:</strong> Automatically populate the URLA liabilities section with credit report data.</li>
-                            <li style="margin-bottom: 8px;"><strong>Review & Match REO:</strong> For mortgage accounts, link them to the appropriate Real Estate Owned entries.</li>
-                            <li><strong>Verify Accuracy:</strong> Confirm all liability information is accurate and make corrections as needed.</li>
-                        </ul>
-                    </div>
-                    <div class="tip-box">
-                        <h4>💡 Best Practice</h4>
-                        <p>Always compare imported liabilities against borrower-provided documentation for accuracy. Discrepancies may indicate undisclosed debts or outdated credit information.</p>
-                    </div>
-                </div>
-            </section>
+            <!-- Workflow Sections -->
+            {{WORKFLOW_SECTIONS}}
 
             <!-- Quick Reference -->
             <section id="quick-ref" class="quick-ref">
                 <h3>⚡ Quick Reference Card</h3>
-                <pre>
-ACCESS: Loan File → Credit Tab
-
-REQUIRED BEFORE ORDERING:
-• Borrower Authorization (verbal/written)
-• SSN, DOB, Current Address in URLA
-
-REPORT TYPES:
-• Soft Pull → Prequalification (no credit impact)
-• Hard Pull → Full tri-merge (formal application)
-
-IMPORT STEPS:
-1. Review returned credit report
-2. Click "Import Liabilities"
-3. Match mortgage accounts to REO entries
-4. Verify accuracy against borrower docs
-
-KEY METRICS:
-• Report Validity: 120 Days
-• Score Used: Middle Score (for qualifying)
-                </pre>
+                <pre>{{QUICK_REF_CONTENT}}</pre>
             </section>
         </div>
 
@@ -1018,30 +875,29 @@ KEY METRICS:
             <!-- Header -->
             <div class="agent-header">
                 <h1>🤖 AI Agent Opportunities</h1>
-                <p class="subtitle">Automation Analysis for Credit Ordering Workflow</p>
+                <p class="subtitle">Automation Analysis for {{WORKFLOW_TITLE}} Workflow</p>
                 <div class="meta">
-                    <span class="meta-item">📊 4 Process Steps Analyzed</span>
-                    <span class="meta-item">🤖 3 Agent Candidates Identified</span>
-                    <span class="meta-item">⏱️ Est. 60% Time Savings</span>
+                    <span class="meta-item">🤖 {{AGENT_COUNT}} Agent Candidates Identified</span>
+                    <span class="meta-item">⏱️ Est. {{TIME_SAVINGS}} Time Savings</span>
                 </div>
             </div>
 
             <!-- Summary Stats -->
             <div class="agent-summary" id="agent-summary">
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">3</div>
+                    <div class="agent-summary-value">{{AGENT_COUNT}}</div>
                     <div class="agent-summary-label">Agent Candidates</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">1</div>
+                    <div class="agent-summary-value">{{CRITICAL_COUNT}}</div>
                     <div class="agent-summary-label">Critical Priority</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">60%</div>
+                    <div class="agent-summary-value">{{TIME_SAVINGS}}</div>
                     <div class="agent-summary-label">Time Savings</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">90%</div>
+                    <div class="agent-summary-value">{{AUTOMATION_POTENTIAL}}</div>
                     <div class="agent-summary-label">Automation Potential</div>
                 </div>
             </div>
@@ -1058,140 +914,14 @@ KEY METRICS:
             <div class="heat-map-container">
                 <div class="heat-map-title">🔥 Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
                 <div class="heat-map-grid">
-                    <div class="heat-item critical" onclick="scrollToAgent('agent-autoimport')" title="Click to view agent details">
-                        <div class="heat-score">92</div>
-                        <div class="heat-name">Credit Auto-Import</div>
-                        <div class="heat-desc">Automatically import and categorize liabilities</div>
-                        <div class="heat-metrics">
-                            <div class="heat-metric">Effort: <span>Low</span></div>
-                            <div class="heat-metric">Impact: <span>High</span></div>
-                            <div class="heat-metric">Step: <span>3</span></div>
-                        </div>
-                    </div>
-                    <div class="heat-item high" onclick="scrollToAgent('agent-validator')" title="Click to view agent details">
-                        <div class="heat-score">78</div>
-                        <div class="heat-name">Credit Validator</div>
-                        <div class="heat-desc">Validate data against URLA before AUS</div>
-                        <div class="heat-metrics">
-                            <div class="heat-metric">Effort: <span>Medium</span></div>
-                            <div class="heat-metric">Impact: <span>High</span></div>
-                            <div class="heat-metric">Step: <span>3</span></div>
-                        </div>
-                    </div>
-                    <div class="heat-item high" onclick="scrollToAgent('agent-matcher')" title="Click to view agent details">
-                        <div class="heat-score">75</div>
-                        <div class="heat-name">REO Matcher</div>
-                        <div class="heat-desc">ML-powered liability to REO matching</div>
-                        <div class="heat-metrics">
-                            <div class="heat-metric">Effort: <span>Medium</span></div>
-                            <div class="heat-metric">Impact: <span>High</span></div>
-                            <div class="heat-metric">Step: <span>3</span></div>
-                        </div>
-                    </div>
+                    {{HEAT_MAP_ITEMS}}
                 </div>
             </div>
 
             <!-- Agent Cards -->
             <h2 style="margin-bottom: 25px; color: var(--text-primary);" id="agent-details">🤖 Agent Details</h2>
             <div class="agent-grid">
-                <!-- Agent 1: Auto-Import -->
-                <div class="agent-card" id="agent-autoimport">
-                    <div class="agent-card-header">
-                        <div class="agent-icon">📊</div>
-                        <div class="agent-info">
-                            <div class="agent-name">Credit Auto-Import Agent</div>
-                            <div class="agent-type">Data Integration / Automation</div>
-                        </div>
-                        <span class="agent-priority critical">92</span>
-                    </div>
-                    <div class="agent-card-body">
-                        <p class="agent-description">Automatically imports credit report liabilities into URLA with intelligent categorization and REO matching suggestions.</p>
-                        <div class="agent-flow">
-                            <div class="agent-flow-title">Process Flow</div>
-                            <div class="agent-flow-diagram">
-                                <span class="agent-step">📊 Credit Report</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">🔍 Parse Liabilities</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">🏠 Match REO</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">✓ Import URLA</span>
-                            </div>
-                        </div>
-                        <div class="agent-stats">
-                            <div class="agent-stat"><div class="agent-stat-value">8 min</div><div class="agent-stat-label">Time Saved</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">98%</div><div class="agent-stat-label">Accuracy</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
-                        </div>
-                        <button class="agent-prompt-btn" onclick="openPromptModal('autoimport')">✨ View AI Prompt to Build This Agent</button>
-                    </div>
-                </div>
-
-                <!-- Agent 2: Validator -->
-                <div class="agent-card" id="agent-validator">
-                    <div class="agent-card-header">
-                        <div class="agent-icon">✅</div>
-                        <div class="agent-info">
-                            <div class="agent-name">Credit Report Validator</div>
-                            <div class="agent-type">Quality Assurance / Validation</div>
-                        </div>
-                        <span class="agent-priority high">78</span>
-                    </div>
-                    <div class="agent-card-body">
-                        <p class="agent-description">Validates credit report data against URLA entries and flags discrepancies for review before AUS submission.</p>
-                        <div class="agent-flow">
-                            <div class="agent-flow-title">Process Flow</div>
-                            <div class="agent-flow-diagram">
-                                <span class="agent-step">📋 URLA Data</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">🔄 Compare Credit</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">⚠️ Flag Issues</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">📝 Generate Report</span>
-                            </div>
-                        </div>
-                        <div class="agent-stats">
-                            <div class="agent-stat"><div class="agent-stat-value">5 min</div><div class="agent-stat-label">Time Saved</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Catch Rate</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">Medium</div><div class="agent-stat-label">Complexity</div></div>
-                        </div>
-                        <button class="agent-prompt-btn" onclick="openPromptModal('validator')">✨ View AI Prompt to Build This Agent</button>
-                    </div>
-                </div>
-
-                <!-- Agent 3: Matcher -->
-                <div class="agent-card" id="agent-matcher">
-                    <div class="agent-card-header">
-                        <div class="agent-icon">🏠</div>
-                        <div class="agent-info">
-                            <div class="agent-name">Liability-to-REO Matcher</div>
-                            <div class="agent-type">ML Classification / Matching</div>
-                        </div>
-                        <span class="agent-priority high">75</span>
-                    </div>
-                    <div class="agent-card-body">
-                        <p class="agent-description">Uses ML to intelligently match mortgage liabilities from credit reports to REO entries based on address, balance, and payment patterns.</p>
-                        <div class="agent-flow">
-                            <div class="agent-flow-title">Process Flow</div>
-                            <div class="agent-flow-diagram">
-                                <span class="agent-step">🏠 REO Entries</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">💳 Mortgage Debts</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">🤖 ML Match</span>
-                                <span class="agent-arrow">→</span>
-                                <span class="agent-step">✓ Link Records</span>
-                            </div>
-                        </div>
-                        <div class="agent-stats">
-                            <div class="agent-stat"><div class="agent-stat-value">6 min</div><div class="agent-stat-label">Time Saved</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">92%</div><div class="agent-stat-label">Match Rate</div></div>
-                            <div class="agent-stat"><div class="agent-stat-value">Medium</div><div class="agent-stat-label">Complexity</div></div>
-                        </div>
-                        <button class="agent-prompt-btn" onclick="openPromptModal('matcher')">✨ View AI Prompt to Build This Agent</button>
-                    </div>
-                </div>
+                {{AGENT_CARDS}}
             </div>
         </div>
     </main>
@@ -1229,137 +959,7 @@ KEY METRICS:
     <script>
         // Agent Prompt Data
         const agentPrompts = {
-            autoimport: {
-                title: "Credit Auto-Import Agent",
-                tags: ["Data Integration", "Low Complexity", "Critical Priority"],
-                purpose: "Automatically imports credit report liabilities into URLA with intelligent categorization and REO matching suggestions.",
-                fullPrompt: `You are building a Credit Auto-Import Agent for CMG Financial's CLEAR 2.0 LOS.
-
-AGENT NAME: Credit Auto-Import Agent
-TYPE: Data Integration / Automation
-
-OBJECTIVE:
-Automatically parse credit report liability data and import into URLA with proper categorization, while suggesting REO matches for mortgage accounts.
-
-INPUT DATA SOURCES:
-1. Credit Report XML/JSON
-   - Tradelines, balances, payments, account types
-2. Existing URLA Data
-   - Current REO entries, addresses
-3. Borrower Information
-   - Names, SSN matches
-
-LIABILITY CATEGORIZATION:
-| Account Type | URLA Category | Include in DTI |
-|-------------|---------------|----------------|
-| Mortgage | Mortgage Liability | Link to REO |
-| Installment | Installment Debt | Yes |
-| Revolving | Revolving Debt | Yes |
-| Collection | Collections | Review Required |
-| Student Loan | Student Loan | Yes (IBR rules) |
-
-OUTPUT FORMAT:
-{
-  "imported_count": 12,
-  "liabilities": [
-    {
-      "creditor": "ABC Bank",
-      "type": "mortgage",
-      "balance": 245000,
-      "payment": 1450,
-      "suggested_reo_match": "123 Main St",
-      "confidence": 0.95
-    }
-  ],
-  "requires_review": ["Collection account XYZ"]
-}
-
-ERROR HANDLING:
-- Duplicate detection: Skip if liability already exists
-- Invalid data: Log and continue with valid records`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: Credit bureau response, URLA REO section
-- Output: URLA Liabilities section
-- Trigger: Credit report received
-- API: POST /api/v1/credit/auto-import`
-            },
-            validator: {
-                title: "Credit Report Validator",
-                tags: ["Quality Assurance", "Medium Complexity", "High Priority"],
-                purpose: "Validates credit report data against URLA entries and flags discrepancies before AUS submission.",
-                fullPrompt: `You are building a Credit Report Validator Agent for CMG Financial's CLEAR 2.0 LOS.
-
-AGENT NAME: Credit Report Validator
-TYPE: Quality Assurance / Validation
-
-OBJECTIVE:
-Compare credit report data against URLA entries to identify discrepancies that could cause AUS findings or underwriting issues.
-
-VALIDATION CHECKS:
-1. Name matching (borrower names vs credit)
-2. SSN verification
-3. Address history alignment
-4. Liability balance discrepancies (>10%)
-5. Missing accounts on credit report
-6. Undisclosed debts detection
-
-OUTPUT FORMAT:
-{
-  "status": "pass" | "review_needed" | "fail",
-  "issues": [
-    {
-      "type": "balance_mismatch",
-      "severity": "warning",
-      "credit_value": 15000,
-      "urla_value": 12000,
-      "recommendation": "Verify current balance with borrower"
-    }
-  ]
-}`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: Credit report, URLA data
-- Output: Validation report, alerts
-- Trigger: Before AUS submission
-- API: POST /api/v1/credit/validate`
-            },
-            matcher: {
-                title: "Liability-to-REO Matcher",
-                tags: ["ML Classification", "Medium Complexity", "High Priority"],
-                purpose: "Uses ML to intelligently match mortgage liabilities to REO entries based on address, balance, and payment patterns.",
-                fullPrompt: `You are building a Liability-to-REO Matcher Agent for CMG Financial's CLEAR 2.0 LOS.
-
-AGENT NAME: Liability-to-REO Matcher
-TYPE: ML Classification / Pattern Matching
-
-OBJECTIVE:
-Match mortgage liabilities from credit reports to Real Estate Owned entries using multiple data points for accurate linking.
-
-MATCHING CRITERIA:
-1. Address similarity (fuzzy match)
-2. Balance within 5% of property value/loan amount
-3. Payment amount alignment
-4. Lien position indicators
-5. Account open date vs purchase date
-
-OUTPUT FORMAT:
-{
-  "matches": [
-    {
-      "liability_id": "L123",
-      "reo_id": "REO456",
-      "confidence": 0.94,
-      "match_factors": ["address_92%", "balance_98%", "payment_match"]
-    }
-  ],
-  "unmatched_liabilities": ["L789"],
-  "unmatched_reo": []
-}`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: Credit liabilities, REO entries
-- Output: Matched pairs, linking recommendations
-- Trigger: After liability import
-- API: POST /api/v1/reo/auto-match`
-            }
+            {{AGENT_PROMPTS_JS}}
         };
 
         let currentPrompt = '';

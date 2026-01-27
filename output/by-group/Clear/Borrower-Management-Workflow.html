@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrower Management - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <title>Borrower Management - CLEAR 2.0 Workflow</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,20 +20,18 @@
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Breadcrumb */
         .breadcrumb {
             background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
             padding: 14px 25px;
@@ -41,9 +39,11 @@
             align-items: center;
             gap: 12px;
             font-size: 0.95rem;
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 1000;
+            left: 0;
+            right: 0;
+            z-index: 1001;
             border-bottom: 1px solid var(--border-subtle);
         }
 
@@ -58,708 +58,267 @@
             border: 1px solid var(--border-subtle);
         }
 
-        .breadcrumb a:hover {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-blue);
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
         .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
         .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
 
-        /* Layout */
-        .page-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Fixed Sidebar */
         .sidebar {
-            width: 280px;
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
             background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
             border-right: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
-            position: sticky;
-            top: 52px;
-            height: calc(100vh - 52px);
-            overflow: hidden;
         }
 
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
+        .sidebar-header { padding: 25px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
 
-        .sidebar-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
 
-        .sidebar-subtitle {
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
             font-size: 0.8rem;
+            font-weight: 700;
             color: var(--text-muted);
-        }
-
-        /* Tab Switcher */
-        .tab-switcher {
-            display: flex;
-            padding: 12px;
-            gap: 8px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
             transition: all 0.2s;
-            background: transparent;
-            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
         }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            color: white;
-        }
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
 
-        .tab-btn:not(.active):hover {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-primary);
-        }
-
-        /* Section Navigation */
-        .section-nav {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-        }
-
-        .nav-group {
-            margin-bottom: 20px;
-        }
-
-        .nav-group-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            padding: 8px 12px;
-        }
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
 
         .nav-item {
-            display: block;
-            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            margin-bottom: 2px;
-            transition: all 0.2s;
             border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        .nav-item:hover {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-primary);
-        }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
 
-        .nav-item.active {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-blue);
-            border-left-color: var(--accent-blue);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-            max-width: 1000px;
-        }
-
-        /* Content Sections */
-        .content-section {
-            margin-bottom: 50px;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .section-icon {
-            font-size: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.6rem;
-            font-weight: 800;
-        }
-
-        /* Flow Diagram */
-        .flow-diagram {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 25px 0;
-            align-items: center;
-        }
-
-        .flow-node {
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-align: center;
-            min-width: 140px;
-        }
-
-        .flow-node.start {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%);
-            color: white;
-            border-radius: 25px;
-        }
-
-        .flow-node.action {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
-            color: white;
-        }
-
-        .flow-node.decision {
-            background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
-            color: white;
-            clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
-            padding: 14px 30px;
-        }
-
-        .flow-node.input {
-            background: var(--bg-card);
-            border: 2px solid var(--accent-blue);
-            color: var(--text-primary);
-        }
-
-        .flow-node.output {
-            background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%);
-            color: white;
-        }
-
-        .flow-node.exception {
-            background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%);
-            color: white;
-        }
-
-        .flow-arrow {
-            color: var(--text-muted);
-            font-size: 1.5rem;
-        }
-
-        /* Info Box */
-        .info-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .info-box.tip {
-            border-left: 4px solid var(--accent-green);
-        }
-
-        .info-box.warning {
-            border-left: 4px solid var(--accent-amber);
-        }
-
-        .info-box.critical {
-            border-left: 4px solid var(--accent-rose);
-        }
-
-        .info-box-title {
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Field Table */
-        .field-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.9rem;
-        }
-
-        .field-table th,
-        .field-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .field-table th {
-            background: var(--bg-card);
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .field-table td {
+        .nav-number {
+            background: rgba(255,255,255,0.1);
             color: var(--text-secondary);
-        }
-
-        .field-table tr:hover td {
-            background: rgba(255,255,255,0.02);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .badge.required {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-        }
-
-        .badge.optional {
-            background: rgba(100, 116, 139, 0.15);
-            color: var(--text-muted);
-        }
-
-        /* Step List */
-        .step-list {
-            counter-reset: step;
-            list-style: none;
-            padding: 0;
-        }
-
-        .step-item {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding: 18px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .step-item::before {
-            counter-increment: step;
-            content: counter(step);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
-            border-radius: 50%;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
         }
 
-        .step-content h4 {
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
 
-        .step-content p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
 
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Heat Map Grid for AI Agents */
-        .heat-map-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .heat-tile {
+        .header {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .heat-tile::before {
+        .header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        .heat-tile.critical::before { background: var(--accent-rose); }
-        .heat-tile.high::before { background: var(--accent-amber); }
-        .heat-tile.medium::before { background: var(--accent-blue); }
-        .heat-tile.low::before { background: var(--accent-green); }
-
-        .heat-tile:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-
-        .heat-tile.highlighted {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-
-        .heat-score {
-            font-size: 1.8rem;
+        .header h1 {
+            font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .heat-tile.critical .heat-score { color: var(--accent-rose); }
-        .heat-tile.high .heat-score { color: var(--accent-amber); }
-        .heat-tile.medium .heat-score { color: var(--accent-blue); }
-        .heat-tile.low .heat-score { color: var(--accent-green); }
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+        .header .meta-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary); }
 
-        .heat-name {
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-        }
-
-        .heat-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Agent Cards */
-        .agent-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .agent-card.highlighted {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
-        }
-
-        .agent-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 18px;
-        }
-
-        .agent-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .agent-type {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .agent-score {
-            text-align: right;
-        }
-
-        .agent-score-value {
-            font-size: 2rem;
-            font-weight: 800;
-        }
-
-        .agent-score-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .agent-flow {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 18px 0;
-            padding: 16px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-        }
-
-        .agent-flow-step {
-            padding: 8px 14px;
-            background: var(--bg-secondary);
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .agent-flow-arrow {
-            color: var(--text-muted);
-        }
-
-        .agent-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 18px 0;
-        }
-
-        .agent-metric {
-            text-align: center;
-            padding: 12px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-        }
-
-        .agent-metric-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent-teal);
-        }
-
-        .agent-metric-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .view-prompt-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .view-prompt-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 15, 26, 0.9);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal {
+        .section {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 16px;
-            width: 100%;
-            max-width: 800px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
         }
 
-        .modal-header {
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
-            color: white;
-            padding: 22px 28px;
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-radius: 16px 16px 0 0;
+            gap: 18px;
         }
 
-        .modal-header h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .modal-header-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .modal-btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .modal-btn.copy {
-            background: white;
-            color: var(--accent-purple);
-        }
-
-        .modal-btn.close {
-            background: rgba(255,255,255,0.2);
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             color: white;
-        }
-
-        .modal-body {
-            padding: 28px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .prompt-section {
-            margin-bottom: 24px;
-        }
-
-        .prompt-section-title {
-            font-weight: 700;
-            color: var(--accent-teal);
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .prompt-content {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-subtle);
-            padding: 18px;
-            border-radius: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            color: var(--text-secondary);
-        }
-
-        .prompt-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .prompt-tag {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .prompt-tag.type {
-            background: rgba(139, 92, 246, 0.15);
-            color: var(--accent-purple);
-        }
-
-        .prompt-tag.complexity {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--accent-blue);
-        }
-
-        .prompt-tag.priority {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-amber);
-        }
-
-        #copySuccess {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--accent-green);
-            color: white;
-            padding: 18px 35px;
-            border-radius: 10px;
-            font-weight: 700;
-            z-index: 3000;
-            display: none;
-        }
-
-        /* Quick Reference */
-        .quick-ref {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%);
-            border: 1px solid var(--border-subtle);
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            padding: 24px;
-            margin: 30px 0;
-        }
-
-        .quick-ref h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
         }
 
-        .quick-ref-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-        }
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
 
-        .quick-ref-item {
-            background: rgba(0,0,0,0.2);
-            padding: 14px;
-            border-radius: 8px;
-        }
+        .workflow-diagram { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; margin-bottom: 22px; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
 
-        .quick-ref-item strong {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
+        .flow-node { padding: 14px 22px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 600; min-width: 150px; border: 1px solid var(--border-subtle); }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
 
-        .quick-ref-item span {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+
+        .tip-box, .info-box, .exception-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; }
+        .tip-box { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p { color: var(--text-secondary); }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p { color: var(--text-secondary); }
+
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .field-table th { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 14px 18px; text-align: left; font-weight: 600; font-size: 0.9rem; }
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+
+        /* Agent Styles */
+        .agent-header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .agent-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .agent-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+
+        .heat-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+
+        .heat-score { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; font-weight: 800; }
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; scroll-margin-top: 80px; }
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        .agent-card.highlight { animation: highlightPulse 2s ease; box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4); }
+        @keyframes highlightPulse { 0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); } 50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); } 100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); } }
+
+        .agent-card-header { padding: 22px; display: flex; align-items: flex-start; gap: 18px; border-bottom: 1px solid var(--border-subtle); }
+        .agent-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-priority { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .agent-step { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .agent-stat { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; text-align: center; }
+        .agent-stat-value { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn { width: 100%; margin-top: 18px; padding: 14px 20px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 10px; color: var(--accent-purple); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
+        .agent-prompt-btn:hover { background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%); border-color: var(--accent-purple); transform: translateY(-2px); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: transform 0.2s; font-size: 0.9rem; }
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-purple); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; }
+        .prompt-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+        .copy-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+
+        @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 75px 20px 30px 20px; } .agent-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
         <a href="../../index.html">🏠 Portal Home</a>
         <span class="separator">›</span>
@@ -768,744 +327,462 @@
         <span class="current">👥 Borrower Management</span>
     </nav>
 
-    <div class="page-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">Borrower Management</div>
-                <div class="sidebar-subtitle">CLEAR 2.0 Module</div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>👥 Borrower Management</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active"><span class="nav-number">1</span><span class="nav-label">Borrower Guidelines</span></a>
+            <a href="#section-2" class="nav-item"><span class="nav-number">2</span><span class="nav-label">Manage Borrowers</span></a>
+            <a href="#section-3" class="nav-item"><span class="nav-number">3</span><span class="nav-label">Switch Positions</span></a>
+            <a href="#section-4" class="nav-item"><span class="nav-number">4</span><span class="nav-label">Split to Application</span></a>
+            <a href="#section-5" class="nav-item"><span class="nav-number">5</span><span class="nav-label">Delete Borrower</span></a>
+            <a href="#section-6" class="nav-item"><span class="nav-number">6</span><span class="nav-label">Surefire Sync</span></a>
+        </nav>
+
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-heatmap" class="nav-item active"><span class="nav-number">🔥</span><span class="nav-label">Heat Map</span></a>
+            <a href="#agent-details" class="nav-item"><span class="nav-number">🤖</span><span class="nav-label">Agent Details</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div id="workflow-panel" class="tab-panel active">
+            <div class="header">
+                <h1>👥 Borrower Management in CLEAR</h1>
+                <p class="subtitle">Managing borrower and co-borrower information throughout the loan lifecycle</p>
+                <div class="meta">
+                    <span class="meta-item">🏢 System: CLEAR 2.0</span>
+                    <span class="meta-item">👤 Role: Loan Officer / Processor</span>
+                    <span class="meta-item">⏱️ Est. Time: 5-10 min</span>
+                </div>
             </div>
 
-            <div class="tab-switcher">
-                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
-                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
-            </div>
-
-            <nav class="section-nav" id="workflowNav">
-                <div class="nav-group">
-                    <div class="nav-group-title">Overview</div>
-                    <a href="#overview" class="nav-item active">Process Overview</a>
-                    <a href="#guidelines" class="nav-item">Borrower Guidelines</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Core Functions</div>
-                    <a href="#manage" class="nav-item">Manage Borrowers</a>
-                    <a href="#switch" class="nav-item">Switch Positions</a>
-                    <a href="#split" class="nav-item">Split to Application</a>
-                    <a href="#delete" class="nav-item">Delete Borrower</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Reference</div>
-                    <a href="#quickref" class="nav-item">Quick Reference</a>
-                </div>
-            </nav>
-
-            <nav class="section-nav" id="agentsNav" style="display: none;">
-                <div class="nav-group">
-                    <div class="nav-group-title">Heat Map</div>
-                    <a href="#heatmap" class="nav-item active">Priority Overview</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Agents</div>
-                    <a href="#agent1" class="nav-item">Privacy Advisor</a>
-                    <a href="#agent2" class="nav-item">Borrower Setup Agent</a>
-                    <a href="#agent3" class="nav-item">Surefire Sync Monitor</a>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Workflow Tab -->
-            <div id="workflowContent" class="tab-content active">
-                <section id="overview" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">👥</span>
-                        <h2 class="section-title">Borrower Management Overview</h2>
-                    </div>
-
-                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
-                        Borrower Management in CLEAR 2.0 enables Loan Officers and Production Assistants to manage borrower and co-borrower relationships, switch positions, split applications, and handle deletions. The structure depends on borrower relationships, occupancy intentions, and privacy preferences.
-                    </p>
-
-                    <div class="flow-diagram">
-                        <div class="flow-node start">Start</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node decision">Privacy Question</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node action">Joint or Separate</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node input">URLA Entry</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node output">Application Ready</div>
-                    </div>
-
-                    <div class="info-box tip">
-                        <div class="info-box-title">💡 Pro Tip</div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Always ask borrowers the privacy question before proceeding: "Do you mind if the other borrower sees your financial information?" This determines whether to set up a joint or separate application structure.</p>
-                    </div>
-                </section>
-
-                <section id="guidelines" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">📋</span>
-                        <h2 class="section-title">Borrower & Co-Borrower Guidelines</h2>
-                    </div>
-
+            <section id="section-1" class="section">
+                <div class="section-header"><div class="section-number">1</div><div class="section-title"><h2>Borrower Guidelines</h2><span>Understanding borrower configurations in CLEAR</span></div></div>
+                <div class="section-content">
                     <table class="field-table">
-                        <thead>
-                            <tr>
-                                <th>Requirement</th>
-                                <th>Details</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Configuration</th><th>Max Borrowers</th><th>Notes</th></tr></thead>
                         <tbody>
-                            <tr>
-                                <td><strong>Credit Report Type</strong></td>
-                                <td>Joint (shared financials visible) or Individual (privacy between borrowers)</td>
-                                <td><span class="badge required">Required</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Marital Status</strong></td>
-                                <td>Borrowers do NOT need to be married to apply jointly</td>
-                                <td><span class="badge optional">Note</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Occupancy Requirement</strong></td>
-                                <td>Both borrowers must have same intended occupancy (primary, second, investment)</td>
-                                <td><span class="badge required">Required</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Financial Transparency</strong></td>
-                                <td>In joint application, all assets and liabilities are visible to both borrowers</td>
-                                <td><span class="badge required">Required</span></td>
-                            </tr>
+                            <tr><td><strong style="color: var(--text-primary);">Single Borrower</strong></td><td>1</td><td>Standard individual application</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Co-Borrowers</strong></td><td>Up to 4</td><td>All borrowers on title and note</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Non-Occupant Co-Borrower</strong></td><td>1-2</td><td>Credit support, not on title</td></tr>
                         </tbody>
                     </table>
-
-                    <div class="info-box warning">
-                        <div class="info-box-title">⚠️ Privacy Decision Logic</div>
-                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 20px;">
-                            <li>Both say "No" (don't mind sharing) → Proceed as <strong>Borrower & Co-Borrower</strong> (Joint)</li>
-                            <li>Either says "Yes" (wants privacy) → Proceed as <strong>Borrower / Borrower</strong> (Separate Applications)</li>
-                        </ul>
+                    <div class="info-box">
+                        <h4>📋 URLA 2020 Standard</h4>
+                        <p>CLEAR supports the updated URLA format which allows up to 4 borrowers on a single application with individual employment and asset sections for each.</p>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section id="manage" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">⚙️</span>
-                        <h2 class="section-title">Manage Borrowers in URLA</h2>
-                    </div>
-
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Access borrower management through the URLA or Loan Summary screen in CLEAR.</p>
-
-                    <ol class="step-list">
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Open Loan in CLEAR</h4>
-                                <p>Navigate to the loan and open it in CLEAR 2.0. Go to the URLA or Loan Summary screen.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Access Borrower Dropdown</h4>
-                                <p>At the top of the screen, click the dropdown where Borrower names are located. This shows all Borrowers on the loan and options to manage them.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Click Manage Borrowers</h4>
-                                <p>Select "Manage Borrowers" to open the management modal. From here you can: Add Borrower, Move/Switch Borrowers, Delete Borrower, or Add New Application.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
-
-                <section id="switch" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">🔄</span>
-                        <h2 class="section-title">Move/Switch Borrower Positions</h2>
-                    </div>
-
-                    <ol class="step-list">
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Open Manage Borrowers</h4>
-                                <p>Click "Manage Borrowers" from the borrower dropdown to access position controls.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Click Make Primary</h4>
-                                <p>To make the Additional Borrower the Primary Borrower, click "Make Primary" next to their name.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Save Changes</h4>
-                                <p>Click Save. The Additional Borrower will now be the Primary Borrower.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
-
-                <section id="split" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">📂</span>
-                        <h2 class="section-title">Split Borrower to New Application</h2>
-                    </div>
-
-                    <ol class="step-list">
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Open Manage Borrowers</h4>
-                                <p>Click "Manage Borrowers" from the borrower dropdown menu.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Drag and Drop</h4>
-                                <p>Drag the Additional Borrower into the "Drag and drop a borrower here to create a new application" section.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Save</h4>
-                                <p>Click Save. The Additional Borrower will now be on their own separate Borrower Application.</p>
-                            </div>
-                        </li>
-                    </ol>
-
-                    <div class="info-box tip">
-                        <div class="info-box-title">💡 Moving Applications</div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">You can also move Application 2 to Application 1 by dragging and dropping between applications, then clicking Save.</p>
-                    </div>
-                </section>
-
-                <section id="delete" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">🗑️</span>
-                        <h2 class="section-title">Delete a Borrower</h2>
-                    </div>
-
-                    <ol class="step-list">
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Open Manage Borrowers</h4>
-                                <p>Click "Manage Borrowers" from the borrower dropdown.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Click Minus Icon</h4>
-                                <p>Click the minus icon (−) next to the Borrower you want to delete. A warning will appear indicating all information will be deleted.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Confirm Deletion</h4>
-                                <p>A confirmation popup will appear. Click "Yes, Continue" to complete the deletion.</p>
-                            </div>
-                        </li>
-                    </ol>
-
-                    <div class="info-box critical">
-                        <div class="info-box-title">🚨 Surefire Action Required</div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Removing a Borrower from Clear does NOT remove the Borrower from Surefire. For Surefire updates, please email <strong>CMGmarketing@cmgfi.com</strong></p>
-                    </div>
-                </section>
-
-                <section id="quickref" class="content-section">
-                    <div class="quick-ref">
-                        <h3>⚡ Quick Reference</h3>
-                        <div class="quick-ref-grid">
-                            <div class="quick-ref-item">
-                                <strong>Access Point</strong>
-                                <span>URLA / Loan Summary</span>
-                            </div>
-                            <div class="quick-ref-item">
-                                <strong>Primary Role</strong>
-                                <span>Loan Officer / PA</span>
-                            </div>
-                            <div class="quick-ref-item">
-                                <strong>Key Action</strong>
-                                <span>Manage Borrowers</span>
-                            </div>
-                            <div class="quick-ref-item">
-                                <strong>Surefire Contact</strong>
-                                <span>CMGmarketing@cmgfi.com</span>
-                            </div>
+            <section id="section-2" class="section">
+                <div class="section-header"><div class="section-number">2</div><div class="section-title"><h2>Manage Borrowers</h2><span>Access the borrower management screen</span></div></div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">🚀 Open Loan</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Click Borrower Tab</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Manage Borrowers</div>
                         </div>
                     </div>
-                </section>
+                    <div class="tip-box">
+                        <h4>💡 Quick Access</h4>
+                        <p>The "Manage Borrowers" link appears at the top of the borrower section. Click to add, remove, or reorder borrowers on the application.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-3" class="section">
+                <div class="section-header"><div class="section-number">3</div><div class="section-title"><h2>Switch Positions</h2><span>Change borrower order on application</span></div></div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Manage Borrowers</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Click "Switch" Button</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Positions Swapped</div>
+                        </div>
+                    </div>
+                    <div class="exception-box">
+                        <h4>⚠️ Credit Impact</h4>
+                        <p>Switching borrower positions may affect which credit score is used as the qualifying score. The primary borrower's middle score typically drives qualification.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-4" class="section">
+                <div class="section-header"><div class="section-number">4</div><div class="section-title"><h2>Split to Application</h2><span>Create separate loan from co-borrower</span></div></div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Co-Borrower</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node decision">Split to New App?</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">New Loan Created</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h4>📋 Use Case</h4>
+                        <p>Split is useful when a co-borrower needs their own separate loan application, such as for a different property or when they no longer want to proceed jointly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-5" class="section">
+                <div class="section-header"><div class="section-number">5</div><div class="section-title"><h2>Delete Borrower</h2><span>Remove borrower from application</span></div></div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Borrower</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Click Delete</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node decision">Confirm Deletion</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">Borrower Removed</div>
+                        </div>
+                    </div>
+                    <div class="exception-box">
+                        <h4>⚠️ Cannot Delete Primary</h4>
+                        <p>The primary borrower cannot be deleted. To remove the primary, first switch positions with a co-borrower, then delete.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-6" class="section">
+                <div class="section-header"><div class="section-number">6</div><div class="section-title"><h2>Surefire Sync</h2><span>Marketing system synchronization</span></div></div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>🔄 Surefire CRM Integration</h4>
+                        <p>When adding or modifying borrowers, CLEAR automatically syncs contact information with Surefire marketing system. A sync warning appears if contact data differs between systems.</p>
+                    </div>
+                    <div class="tip-box">
+                        <h4>💡 Resolve Sync Issues</h4>
+                        <p>If you see a Surefire sync warning, verify the borrower's email and phone number match across both systems. CLEAR data takes precedence during sync.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Borrower Management Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">📊 6 Process Steps Analyzed</span>
+                    <span class="meta-item">🤖 3 Agent Candidates Identified</span>
+                    <span class="meta-item">⏱️ Est. 35% Time Savings</span>
+                </div>
             </div>
 
-            <!-- AI Agents Tab -->
-            <div id="agentsContent" class="tab-content">
-                <section id="heatmap" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">🎯</span>
-                        <h2 class="section-title">AI Agent Opportunity Heat Map</h2>
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">🔥 Automation Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-privacy')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Privacy Advisor</div>
+                        <div class="heat-desc">Validate consent and privacy compliance</div>
+                        <div class="heat-metrics"><div class="heat-metric">Effort: <span>Low</span></div><div class="heat-metric">Impact: <span>High</span></div></div>
                     </div>
-
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Click on any tile to view the corresponding agent details and build prompt.</p>
-
-                    <div class="heat-map-grid">
-                        <div class="heat-tile high" onclick="scrollToAgent('agent1')">
-                            <div class="heat-score">85</div>
-                            <div class="heat-name">Privacy Advisor</div>
-                            <div class="heat-desc">Decision Support • Step 0</div>
-                        </div>
-                        <div class="heat-tile high" onclick="scrollToAgent('agent2')">
-                            <div class="heat-score">82</div>
-                            <div class="heat-name">Borrower Setup Agent</div>
-                            <div class="heat-desc">Auto-Configure • Step 1</div>
-                        </div>
-                        <div class="heat-tile medium" onclick="scrollToAgent('agent3')">
-                            <div class="heat-score">65</div>
-                            <div class="heat-name">Surefire Sync Monitor</div>
-                            <div class="heat-desc">Monitoring • Step 4</div>
-                        </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-setup')" title="Click to view agent details">
+                        <div class="heat-score">82</div>
+                        <div class="heat-name">Borrower Setup Agent</div>
+                        <div class="heat-desc">Auto-configure borrower profiles</div>
+                        <div class="heat-metrics"><div class="heat-metric">Effort: <span>Med</span></div><div class="heat-metric">Impact: <span>High</span></div></div>
                     </div>
-                </section>
-
-                <section id="agent1" class="content-section">
-                    <div class="agent-card" data-agent="agent1">
-                        <div class="agent-header">
-                            <div>
-                                <div class="agent-title">Privacy Advisor Agent</div>
-                                <div class="agent-type">Decision Support / Conversation Analysis</div>
-                            </div>
-                            <div class="agent-score">
-                                <div class="agent-score-value" style="color: var(--accent-amber);">85</div>
-                                <div class="agent-score-label">Priority Score</div>
-                            </div>
-                        </div>
-
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
-                            Analyzes borrower communication to automatically detect privacy preferences and recommend joint vs. separate application structure based on conversation context.
-                        </p>
-
-                        <div class="agent-flow">
-                            <div class="agent-flow-step">📧 Email/Chat Input</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">🔍 NLP Analysis</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">🎯 Privacy Detection</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">📋 Recommendation</div>
-                        </div>
-
-                        <div class="agent-metrics">
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">3 min</div>
-                                <div class="agent-metric-label">Time Saved</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">95%</div>
-                                <div class="agent-metric-label">Accuracy</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">Medium</div>
-                                <div class="agent-metric-label">Complexity</div>
-                            </div>
-                        </div>
-
-                        <button class="view-prompt-btn" onclick="openPromptModal('agent1')">✨ View AI Prompt to Build This Agent</button>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-sync')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Surefire Sync Monitor</div>
+                        <div class="heat-desc">Auto-resolve CRM sync issues</div>
+                        <div class="heat-metrics"><div class="heat-metric">Effort: <span>Low</span></div><div class="heat-metric">Impact: <span>Med</span></div></div>
                     </div>
-                </section>
-
-                <section id="agent2" class="content-section">
-                    <div class="agent-card" data-agent="agent2">
-                        <div class="agent-header">
-                            <div>
-                                <div class="agent-title">Borrower Setup Automation Agent</div>
-                                <div class="agent-type">Data Integration / Auto-Configure</div>
-                            </div>
-                            <div class="agent-score">
-                                <div class="agent-score-value" style="color: var(--accent-amber);">82</div>
-                                <div class="agent-score-label">Priority Score</div>
-                            </div>
-                        </div>
-
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
-                            Automatically configures borrower positions, application structure, and credit report type based on privacy decision and relationship details.
-                        </p>
-
-                        <div class="agent-flow">
-                            <div class="agent-flow-step">📋 Privacy Decision</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">⚙️ Configure URLA</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">📊 Set Credit Type</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">✓ Validate Setup</div>
-                        </div>
-
-                        <div class="agent-metrics">
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">5 min</div>
-                                <div class="agent-metric-label">Time Saved</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">99%</div>
-                                <div class="agent-metric-label">Accuracy</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">Low</div>
-                                <div class="agent-metric-label">Complexity</div>
-                            </div>
-                        </div>
-
-                        <button class="view-prompt-btn" onclick="openPromptModal('agent2')">✨ View AI Prompt to Build This Agent</button>
-                    </div>
-                </section>
-
-                <section id="agent3" class="content-section">
-                    <div class="agent-card" data-agent="agent3">
-                        <div class="agent-header">
-                            <div>
-                                <div class="agent-title">Surefire Sync Monitor</div>
-                                <div class="agent-type">Monitoring / Alert System</div>
-                            </div>
-                            <div class="agent-score">
-                                <div class="agent-score-value" style="color: var(--accent-blue);">65</div>
-                                <div class="agent-score-label">Priority Score</div>
-                            </div>
-                        </div>
-
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
-                            Monitors borrower deletions in CLEAR and automatically alerts marketing team to sync changes with Surefire system.
-                        </p>
-
-                        <div class="agent-flow">
-                            <div class="agent-flow-step">🗑️ Delete Event</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">📡 Detect Change</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">📧 Email Alert</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">✓ Log Action</div>
-                        </div>
-
-                        <div class="agent-metrics">
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">2 min</div>
-                                <div class="agent-metric-label">Time Saved</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">100%</div>
-                                <div class="agent-metric-label">Alert Rate</div>
-                            </div>
-                            <div class="agent-metric">
-                                <div class="agent-metric-value">Low</div>
-                                <div class="agent-metric-label">Complexity</div>
-                            </div>
-                        </div>
-
-                        <button class="view-prompt-btn" onclick="openPromptModal('agent3')">✨ View AI Prompt to Build This Agent</button>
-                    </div>
-                </section>
+                </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Prompt Modal -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">🤖 Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <div class="agent-card" id="agent-privacy">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🔒</div>
+                        <div class="agent-info"><div class="agent-name">Privacy Advisor Agent</div><div class="agent-type">Compliance Agent</div></div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Ensures proper consent and privacy documentation exists for each borrower before processing. Validates SSN usage authorization and data sharing permissions.</p>
+                        <div class="agent-flow"><div class="agent-flow-title">Agent Flow</div><div class="agent-flow-diagram"><div class="agent-step">New Borrower</div><span class="agent-arrow">→</span><div class="agent-step">Check Consent</div><span class="agent-arrow">→</span><div class="agent-step">Validate Docs</div><span class="agent-arrow">→</span><div class="agent-step">Flag Gaps</div></div></div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Compliance</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">3min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('privacy')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-setup">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">⚙️</div>
+                        <div class="agent-info"><div class="agent-name">Borrower Setup Agent</div><div class="agent-type">Configuration Agent</div></div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically configures borrower profiles based on application data. Sets occupancy type, income source classification, and asset ownership based on detected patterns.</p>
+                        <div class="agent-flow"><div class="agent-flow-title">Agent Flow</div><div class="agent-flow-diagram"><div class="agent-step">Analyze App</div><span class="agent-arrow">→</span><div class="agent-step">Detect Patterns</div><span class="agent-arrow">→</span><div class="agent-step">Configure</div><span class="agent-arrow">→</span><div class="agent-step">Verify</div></div></div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('setup')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-sync">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🔄</div>
+                        <div class="agent-info"><div class="agent-name">Surefire Sync Monitor</div><div class="agent-type">Integration Agent</div></div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors CLEAR-Surefire synchronization and automatically resolves common data conflicts. Alerts on sync failures and provides one-click resolution options.</p>
+                        <div class="agent-flow"><div class="agent-flow-title">Agent Flow</div><div class="agent-flow-diagram"><div class="agent-step">Monitor Sync</div><span class="agent-arrow">→</span><div class="agent-step">Detect Conflict</div><span class="agent-arrow">→</span><div class="agent-step">Auto-Resolve</div><span class="agent-arrow">→</span><div class="agent-step">Confirm</div></div></div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">Auto</div><div class="agent-stat-label">Resolution</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('sync')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <div class="modal-overlay" id="promptModal">
         <div class="modal">
-            <div class="modal-header">
-                <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
-                <div class="modal-header-buttons">
-                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy Prompt</button>
-                    <button class="modal-btn close" onclick="closePromptModal()">✕ Close</button>
-                </div>
-            </div>
+            <div class="modal-header"><h3 id="promptModalTitle">✨ AI Agent Build Prompt</h3><div class="modal-actions"><button class="modal-btn copy" onclick="copyPromptToClipboard()">📋 Copy Prompt</button><button class="modal-btn close" onclick="closePromptModal()">✕ Close</button></div></div>
             <div class="modal-body">
-                <div class="prompt-tags" id="promptTags"></div>
-                <div class="prompt-section">
-                    <div class="prompt-section-title">Agent Purpose</div>
-                    <div class="prompt-content" id="promptPurpose"></div>
-                </div>
-                <div class="prompt-section">
-                    <div class="prompt-section-title">Full Build Prompt</div>
-                    <div class="prompt-content" id="promptFull"></div>
-                </div>
-                <div class="prompt-section">
-                    <div class="prompt-section-title">Integration Points</div>
-                    <div class="prompt-content" id="promptIntegration"></div>
-                </div>
+                <div class="prompt-section"><h4>🎯 Agent Purpose</h4><div class="prompt-box" id="promptPurpose"></div></div>
+                <div class="prompt-section"><h4>📝 Full Build Prompt</h4><div class="prompt-box" id="promptContent"></div></div>
+                <div class="prompt-section"><h4>🔧 Integration Points</h4><div class="prompt-box" id="promptIntegration"></div></div>
             </div>
         </div>
     </div>
 
-    <div id="copySuccess">✓ Copied to clipboard!</div>
+    <div class="copy-success" id="copySuccess">✓ Copied to clipboard!</div>
 
     <script>
-        // Agent Prompts Data
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) { agent.scrollIntoView({ behavior: 'smooth', block: 'center' }); agent.classList.add('highlight'); setTimeout(() => agent.classList.remove('highlight'), 2000); }
+        }
+
         const agentPrompts = {
-            agent1: {
-                title: "Privacy Advisor Agent",
-                type: "Decision Support",
-                complexity: "Medium",
-                priority: "High (85)",
-                purpose: "Analyzes borrower communication to detect privacy preferences and recommend joint vs. separate application structure.",
-                fullPrompt: `You are building a Privacy Advisor Agent for CMG Financial's CLEAR 2.0 LOS.
+            'privacy': {
+                name: 'Privacy Advisor Agent',
+                purpose: 'This agent ensures proper consent and privacy documentation exists for each borrower before processing. Validates SSN usage authorization and data sharing permissions.',
+                prompt: `You are building a Compliance Agent for CMG Financial's CLEAR 2.0 system.
 
 AGENT NAME: Privacy Advisor Agent
-TYPE: Decision Support / NLP Analysis
+TYPE: Compliance Validation
 
 OBJECTIVE:
-Analyze borrower communications (emails, chat transcripts, notes) to detect privacy preferences regarding financial information sharing. Recommend whether to proceed with a Joint Application (Borrower & Co-Borrower) or Separate Applications (Borrower / Borrower).
+Validate that all required privacy consents and authorizations are in place before processing borrower data.
 
-INPUT DATA SOURCES:
-1. Email communications
-   - Sender, recipient, subject, body text
-2. Chat/conversation transcripts
-   - Participant names, message history
-3. Loan officer notes
-   - Free-text notes about borrower preferences
+VALIDATION CHECKS:
+1. Credit Authorization - Signed consent to pull credit
+2. Privacy Policy Acknowledgment - eConsent documented
+3. SSN Usage Authorization - Explicit consent for SSN use
+4. Data Sharing Consent - Authorization for third-party sharing
+5. Marketing Opt-In/Out - Communication preferences recorded
 
-DECISION LOGIC:
-| Signal Detected | Privacy Preference | Recommendation |
-|-----------------|-------------------|----------------|
-| "keep finances separate" | Private | Separate Applications |
-| "don't want them to see" | Private | Separate Applications |
-| "share everything" | Open | Joint Application |
-| "we're married" + no privacy concern | Open | Joint Application |
-| Explicit privacy request | Private | Separate Applications |
-| No privacy indicators | Unknown | Prompt LO to ask |
+TRIGGER EVENTS:
+- New borrower added to application
+- Borrower information updated
+- Credit report ordered
+- Disclosures sent
 
-OUTPUT FORMAT:
+OUTPUT:
 {
-  "recommendation": "joint" | "separate" | "ask_borrower",
-  "confidence": 0.0-1.0,
-  "detected_signals": ["signal1", "signal2"],
-  "reasoning": "Brief explanation",
-  "suggested_question": "Question to ask if confidence < 0.7"
-}
+  "borrowerId": "string",
+  "validationStatus": "COMPLETE|INCOMPLETE|EXPIRED",
+  "missingConsents": ["list"],
+  "expiringConsents": ["list with dates"],
+  "riskLevel": "LOW|MEDIUM|HIGH",
+  "recommendedActions": ["list"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. CLEAR Borrower Module
+   - Trigger on borrower add/update
+   - Display consent status badge
 
-ERROR HANDLING:
-- If no communication provided: Return "ask_borrower" with suggested privacy question
-- If conflicting signals: Return lower confidence and recommend verification`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: Surefire email history, Clear Notes, Velocify conversation logs
-- Output: Loan Summary → Borrower Type recommendation
-- Trigger: New loan creation with multiple borrowers
-- API: POST /api/v1/borrower/privacy-analysis`
+2. DocuSign/eSign System
+   - Verify signed consent documents
+   - Check document timestamps
+
+3. Compliance Dashboard
+   - Aggregate consent status reporting
+   - Alert on expiring consents`
             },
-            agent2: {
-                title: "Borrower Setup Automation Agent",
-                type: "Data Integration",
-                complexity: "Low",
-                priority: "High (82)",
-                purpose: "Automatically configures borrower positions, application structure, and credit report type based on privacy decision.",
-                fullPrompt: `You are building a Borrower Setup Automation Agent for CMG Financial's CLEAR 2.0 LOS.
+            'setup': {
+                name: 'Borrower Setup Agent',
+                purpose: 'This agent automatically configures borrower profiles based on application data. Sets occupancy type, income source classification, and asset ownership based on detected patterns.',
+                prompt: `You are building a Configuration Agent for CMG Financial's CLEAR 2.0 system.
 
-AGENT NAME: Borrower Setup Automation Agent
-TYPE: Data Integration / Auto-Configure
+AGENT NAME: Borrower Setup Agent
+TYPE: Data Analysis / Auto-Configuration
 
 OBJECTIVE:
-Based on the privacy decision and borrower relationship, automatically configure the URLA with correct borrower positions, application structure (joint vs separate), and credit report ordering type.
+Analyze incoming borrower data and automatically configure profile settings based on detected patterns.
 
-INPUT DATA SOURCES:
-1. Privacy Decision
-   - "joint" or "separate"
-2. Borrower Information
-   - Names, SSNs, contact info, relationship
-3. Occupancy Details
-   - Intended occupancy type for each borrower
+DETECTION RULES:
+1. Occupancy Type:
+   - If subject address = current address → Owner Occupied
+   - If subject address ≠ current and owns other property → Investment
+   - If no current ownership → Second Home or Primary
 
-CONFIGURATION RULES:
-| Privacy Decision | Occupancy Match | Credit Report Type | Application Structure |
-|------------------|-----------------|-------------------|----------------------|
-| Joint | Yes | Joint | Borrower & Co-Borrower |
-| Separate | N/A | Individual (x2) | Borrower / Borrower |
-| Joint | No | ERROR | Cannot proceed - notify LO |
+2. Income Source:
+   - W-2 only → Salaried Employee
+   - Schedule C present → Self-Employed
+   - Pension/SS → Retired
+   - Mixed sources → Multiple Income Types
 
-FIELD MAPPING:
-- Borrower 1 → Position: Primary, App: 1
-- Borrower 2 (Joint) → Position: Co-Borrower, App: 1
-- Borrower 2 (Separate) → Position: Primary, App: 2
+3. Asset Ownership:
+   - Married filing jointly → Joint Assets default
+   - Single borrower → Individual Assets
+   - Co-borrower same household → Joint option offered
 
-OUTPUT FORMAT:
+OUTPUT:
 {
-  "success": true,
-  "configuration": {
-    "application_count": 1 | 2,
-    "credit_report_type": "joint" | "individual",
-    "borrower_1": { "position": "primary", "app": 1 },
-    "borrower_2": { "position": "co-borrower" | "primary", "app": 1 | 2 }
+  "borrowerId": "string",
+  "suggestedConfig": {
+    "occupancyType": "string",
+    "incomeClassification": "string",
+    "assetOwnership": "string"
   },
-  "actions_taken": ["Created joint application", "Set credit type to joint"]
-}
+  "confidence": 0.0-1.0,
+  "flagsForReview": ["list"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. CLEAR Application Intake
+   - Analyze on application submit
+   - Pre-populate configuration fields
 
-ERROR HANDLING:
-- Occupancy mismatch on joint: Block and alert LO with specific error
-- Missing required fields: List missing fields and block configuration`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: Privacy Advisor output, URLA Borrower section
-- Output: URLA configuration, Credit ordering setup
-- Trigger: Privacy decision confirmed
-- API: POST /api/v1/borrower/auto-configure`
+2. Document Classification
+   - Parse uploaded docs for income type
+   - Detect asset statements
+
+3. LO Dashboard
+   - Show suggested configurations
+   - One-click accept or modify`
             },
-            agent3: {
-                title: "Surefire Sync Monitor",
-                type: "Monitoring / Alert",
-                complexity: "Low",
-                priority: "Medium (65)",
-                purpose: "Monitors borrower deletions and automatically alerts marketing team to sync with Surefire.",
-                fullPrompt: `You are building a Surefire Sync Monitor Agent for CMG Financial's CLEAR 2.0 LOS.
+            'sync': {
+                name: 'Surefire Sync Monitor',
+                purpose: 'This agent monitors CLEAR-Surefire synchronization and automatically resolves common data conflicts. Alerts on sync failures and provides one-click resolution options.',
+                prompt: `You are building an Integration Agent for CMG Financial's CRM ecosystem.
 
 AGENT NAME: Surefire Sync Monitor
-TYPE: Monitoring / Alert System
+TYPE: Integration Monitoring / Auto-Resolution
 
 OBJECTIVE:
-Monitor borrower deletion events in CLEAR 2.0 and automatically generate alerts to the marketing team (CMGmarketing@cmgfi.com) to ensure Surefire records are updated accordingly.
+Monitor bidirectional sync between CLEAR and Surefire CRM, detect conflicts, and auto-resolve where possible.
 
-INPUT DATA SOURCES:
-1. CLEAR Event Log
-   - Event type: "borrower_deleted"
-   - Loan number, borrower name, deletion timestamp
-2. User Context
-   - Who performed the deletion
-   - Reason (if provided)
+CONFLICT TYPES:
+1. Email Mismatch - Different emails in each system
+2. Phone Mismatch - Different phone numbers
+3. Name Variations - Spelling or format differences
+4. Duplicate Contacts - Same person, multiple records
 
-MONITORING LOGIC:
-1. Listen for "borrower_deleted" events
-2. Extract borrower details and loan information
-3. Generate formatted email alert
-4. Log the alert for audit trail
+AUTO-RESOLUTION RULES:
+- CLEAR is source of truth for loan data
+- Surefire is source of truth for marketing preferences
+- Most recent update wins for contact info
+- Never auto-delete, only flag duplicates
 
-EMAIL TEMPLATE:
-Subject: [Action Required] Surefire Update - Borrower Removed - Loan #{loan_number}
+MONITORING SCHEDULE:
+- Real-time: Critical loan events
+- Hourly: Contact info changes
+- Daily: Full reconciliation scan
 
-Body:
-A borrower has been removed from CLEAR 2.0 and requires Surefire synchronization.
-
-Loan Number: {loan_number}
-Removed Borrower: {borrower_name}
-Removed By: {user_name}
-Timestamp: {timestamp}
-Remaining Borrowers: {remaining_list}
-
-Please update Surefire records to reflect this change.
-
-OUTPUT FORMAT:
+OUTPUT:
 {
-  "alert_sent": true,
-  "email_id": "unique_id",
-  "recipients": ["CMGmarketing@cmgfi.com"],
-  "loan_number": "TEST123456",
-  "borrower_removed": "John Smith",
-  "logged_at": "2026-01-26T10:30:00Z"
-}
+  "syncStatus": "IN_SYNC|CONFLICT|ERROR",
+  "conflicts": [
+    {
+      "field": "string",
+      "clearValue": "string",
+      "surefireValue": "string",
+      "resolution": "AUTO|MANUAL",
+      "action": "string"
+    }
+  ],
+  "lastSyncTime": "ISO8601"
+}`,
+                integration: `INTEGRATION POINTS:
+1. CLEAR Borrower Events
+   - Webhook on borrower changes
+   - Trigger sync validation
 
-ERROR HANDLING:
-- Email send failure: Retry 3 times, then create support ticket
-- Missing borrower data: Log warning and send partial alert`,
-                integration: `CLEAR 2.0 Integration Points:
-- Input: CLEAR event bus → borrower_deleted events
-- Output: Outlook email via Graph API, Audit log entry
-- Trigger: Any borrower deletion in Manage Borrowers
-- API: Event subscription + POST /api/v1/alerts/surefire-sync`
+2. Surefire API
+   - Contact lookup and update
+   - Duplicate detection
+
+3. LO Notification
+   - Alert on manual resolution needed
+   - One-click approve suggestions`
             }
         };
 
-        // Tab Switching
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            event.target.classList.add('active');
-            document.getElementById(tab + 'Content').classList.add('active');
-
-            document.getElementById('workflowNav').style.display = tab === 'workflow' ? 'block' : 'none';
-            document.getElementById('agentsNav').style.display = tab === 'agents' ? 'block' : 'none';
-        }
-
-        // Scroll to Agent
-        function scrollToAgent(agentId) {
-            document.querySelectorAll('.heat-tile').forEach(tile => tile.classList.remove('highlighted'));
-            document.querySelectorAll('.agent-card').forEach(card => card.classList.remove('highlighted'));
-
-            event.target.closest('.heat-tile').classList.add('highlighted');
-
-            const agentCard = document.querySelector(`[data-agent="${agentId}"]`);
-            if (agentCard) {
-                agentCard.classList.add('highlighted');
-                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        // Modal Functions
-        let currentPromptText = '';
-
-        function openPromptModal(agentId) {
-            const agent = agentPrompts[agentId];
-            document.getElementById('modalTitle').textContent = '✨ ' + agent.title + ' - Build Prompt';
-            document.getElementById('promptTags').innerHTML = `
-                <span class="prompt-tag type">${agent.type}</span>
-                <span class="prompt-tag complexity">${agent.complexity}</span>
-                <span class="prompt-tag priority">${agent.priority}</span>
-            `;
-            document.getElementById('promptPurpose').textContent = agent.purpose;
-            document.getElementById('promptFull').textContent = agent.fullPrompt;
-            document.getElementById('promptIntegration').textContent = agent.integration;
-
-            currentPromptText = agent.fullPrompt;
-
-            document.getElementById('promptModal').style.display = 'flex';
+        function showAgentPrompt(agentId) {
+            const prompt = agentPrompts[agentId];
+            if (!prompt) return;
+            document.getElementById('promptModalTitle').textContent = `✨ ${prompt.name} - Build Prompt`;
+            document.getElementById('promptPurpose').textContent = prompt.purpose;
+            document.getElementById('promptContent').textContent = prompt.prompt;
+            document.getElementById('promptIntegration').textContent = prompt.integration;
+            document.getElementById('promptModal').classList.add('show');
             document.body.style.overflow = 'hidden';
         }
 
-        function closePromptModal() {
-            document.getElementById('promptModal').style.display = 'none';
-            document.body.style.overflow = '';
+        function closePromptModal() { document.getElementById('promptModal').classList.remove('show'); document.body.style.overflow = ''; }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try { await navigator.clipboard.writeText(content); const success = document.getElementById('copySuccess'); success.style.display = 'block'; setTimeout(() => { success.style.display = 'none'; }, 2000); } catch (e) { alert('Failed to copy.'); }
         }
 
-        async function copyPrompt() {
-            try {
-                await navigator.clipboard.writeText(currentPromptText);
-                const success = document.getElementById('copySuccess');
-                success.style.display = 'block';
-                setTimeout(() => { success.style.display = 'none'; }, 2000);
-            } catch (e) {
-                alert('Failed to copy to clipboard');
-            }
-        }
-
-        // Close modal on outside click
-        document.getElementById('promptModal').addEventListener('click', (e) => {
-            if (e.target.id === 'promptModal') closePromptModal();
-        });
-
-        // Escape key closes modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closePromptModal();
-        });
-
-        // Scroll spy for navigation
-        const sections = document.querySelectorAll('.content-section');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - 200) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('href') === '#' + current) {
-                    item.classList.add('active');
-                }
-            });
-        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePromptModal(); });
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
     </script>
 </body>
 </html>

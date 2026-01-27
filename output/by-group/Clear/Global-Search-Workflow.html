@@ -6,100 +6,161 @@
     <title>Global Search - CLEAR 2.0 Workflow | CMG Training Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-card: #1a2234; --accent-blue: #3b82f6; --accent-teal: #14b8a6; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-green: #22c55e; --accent-purple: #8b5cf6; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b; --border-subtle: rgba(255,255,255,0.08); }
+        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-card: #1a2234; --accent-blue: #3b82f6; --accent-teal: #14b8a6; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-green: #22c55e; --accent-purple: #8b5cf6; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b; --border-subtle: rgba(255,255,255,0.08); --sidebar-width: 280px; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
-        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-subtle); }
-        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid var(--border-subtle); }
-        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; border: 1px solid var(--border-subtle); }
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
         .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
         .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
-        .page-layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; position: sticky; top: 52px; height: calc(100vh - 52px); }
-        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border-subtle); }
-        .sidebar-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
-        .sidebar-subtitle { font-size: 0.8rem; color: var(--text-muted); }
-        .tab-switcher { display: flex; padding: 12px; gap: 8px; border-bottom: 1px solid var(--border-subtle); }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: var(--text-muted); }
-        .tab-btn.active { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; }
-        .section-nav { flex: 1; overflow-y: auto; padding: 12px; }
-        .nav-group { margin-bottom: 20px; }
-        .nav-group-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); padding: 8px 12px; }
-        .nav-item { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; border-radius: 6px; border-left: 3px solid transparent; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-left-color: var(--accent-blue); }
-        .main-content { flex: 1; overflow-y: auto; padding: 40px; max-width: 1000px; }
-        .content-section { margin-bottom: 50px; }
-        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
-        .section-icon { font-size: 2rem; }
-        .section-title { font-size: 1.6rem; font-weight: 800; }
-        .flow-diagram { display: flex; flex-wrap: wrap; gap: 12px; margin: 25px 0; align-items: center; }
-        .flow-node { padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-align: center; min-width: 120px; }
-        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; }
-        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; }
-        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; }
-        .flow-arrow { color: var(--text-muted); font-size: 1.5rem; }
-        .info-box { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin: 20px 0; }
-        .info-box.tip { border-left: 4px solid var(--accent-green); }
-        .info-box-title { font-weight: 700; margin-bottom: 8px; }
-        .field-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
-        .field-table th, .field-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
-        .field-table th { background: var(--bg-card); font-weight: 700; }
-        .field-table td { color: var(--text-secondary); }
-        .step-list { counter-reset: step; list-style: none; padding: 0; }
-        .step-item { display: flex; gap: 16px; margin-bottom: 20px; padding: 18px; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-subtle); }
-        .step-item::before { counter-increment: step; content: counter(step); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); border-radius: 50%; font-weight: 700; flex-shrink: 0; }
-        .step-content h4 { font-weight: 700; margin-bottom: 6px; }
-        .step-content p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
-        .heat-tile { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.3s; position: relative; }
-        .heat-tile::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
-        .heat-tile.medium::before { background: var(--accent-blue); }
-        .heat-tile.low::before { background: var(--accent-green); }
-        .heat-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
-        .heat-score { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
-        .heat-tile.medium .heat-score { color: var(--accent-blue); }
-        .heat-tile.low .heat-score { color: var(--accent-green); }
-        .heat-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-        .heat-desc { font-size: 0.8rem; color: var(--text-muted); }
-        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
-        .agent-header { display: flex; justify-content: space-between; margin-bottom: 18px; }
-        .agent-title { font-size: 1.2rem; font-weight: 700; }
-        .agent-type { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-        .agent-score-value { font-size: 2rem; font-weight: 800; }
-        .agent-score-label { font-size: 0.75rem; color: var(--text-muted); }
-        .agent-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 18px 0; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .agent-flow-step { padding: 8px 14px; background: var(--bg-secondary); border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
-        .agent-flow-arrow { color: var(--text-muted); }
-        .agent-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
-        .agent-metric { text-align: center; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; }
-        .agent-metric-value { font-size: 1.1rem; font-weight: 700; color: var(--accent-teal); }
-        .agent-metric-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-        .view-prompt-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border: none; border-radius: 8px; color: white; font-weight: 700; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .modal { background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; }
-        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; border-radius: 16px 16px 0 0; }
+
+        .sidebar { position: fixed; top: 54px; left: 0; width: var(--sidebar-width); height: calc(100vh - 54px); background: var(--bg-secondary); overflow-y: auto; z-index: 1000; border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-tab { flex: 1; padding: 14px 10px; text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; background: none; border-left: none; border-right: none; border-top: none; }
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: var(--text-secondary); text-decoration: none; border-left: 3px solid transparent; transition: all 0.2s ease; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+        .nav-number { background: rgba(255,255,255,0.1); color: var(--text-secondary); width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2); }
+        .doc-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; font-size: 0.95rem; }
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%); pointer-events: none; }
+        .header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+        .header .meta-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+
+        .legend { display: flex; flex-wrap: wrap; gap: 15px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 25px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        .section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; margin-bottom: 25px; overflow: hidden; scroll-margin-top: 75px; }
+        .section-header { background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%); border-bottom: 1px solid var(--border-subtle); padding: 22px 25px; display: flex; align-items: center; gap: 18px; }
+        .section-number { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; flex-shrink: 0; }
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        .workflow-diagram { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; margin-bottom: 22px; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+        .flow-node { padding: 14px 22px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 600; min-width: 150px; border: 1px solid var(--border-subtle); }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .field-table th { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 14px 18px; text-align: left; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-subtle); }
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+        .info-box { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .quick-ref { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%); border: 1px solid var(--border-subtle); padding: 28px; border-radius: 16px; margin-top: 30px; }
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); overflow-x: auto; }
+
+        .agent-header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .agent-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .agent-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .heat-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+        .heat-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+        .heat-score { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; font-weight: 800; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        .agent-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .agent-summary-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 25px; text-align: center; }
+        .agent-summary-value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+        .heat-legend { display: flex; gap: 25px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; scroll-margin-top: 75px; }
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        .agent-card.highlight { animation: highlightPulse 2s ease; box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4); }
+        @keyframes highlightPulse { 0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); } 50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); } 100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); } }
+        .agent-card-header { padding: 22px; display: flex; align-items: flex-start; gap: 18px; border-bottom: 1px solid var(--border-subtle); }
+        .agent-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-priority { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-flow { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .agent-step { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .agent-stat { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; text-align: center; }
+        .agent-stat-value { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+        .agent-prompt-btn { width: 100%; margin-top: 18px; padding: 14px 20px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 10px; color: var(--accent-purple); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
+        .agent-prompt-btn:hover { background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%); border-color: var(--accent-purple); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
-        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: transform 0.2s; font-size: 0.9rem; }
+        .modal-btn:hover { transform: scale(1.05); }
         .modal-btn.copy { background: white; color: var(--accent-purple); }
         .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
-        .modal-body { padding: 28px; overflow-y: auto; }
-        .prompt-section { margin-bottom: 24px; }
-        .prompt-section-title { font-weight: 700; color: var(--accent-teal); margin-bottom: 12px; text-transform: uppercase; }
-        .prompt-content { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre-wrap; color: var(--text-secondary); }
-        .prompt-tags { display: flex; gap: 8px; margin-bottom: 20px; }
-        .prompt-tag { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .prompt-tag.type { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
-        .prompt-tag.complexity { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
-        .prompt-tag.priority { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
-        #copySuccess { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
-        .quick-ref { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin: 30px 0; }
-        .quick-ref h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
-        .quick-ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-        .quick-ref-item { background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px; }
-        .quick-ref-item strong { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .prompt-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .copy-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+
+        @media (max-width: 900px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 75px 20px 30px 20px; } .agent-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -111,260 +172,319 @@
         <span class="current">🔍 Global Search</span>
     </nav>
 
-    <div class="page-layout">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">Global Search</div>
-                <div class="sidebar-subtitle">CLEAR 2.0 Module</div>
-            </div>
-            <div class="tab-switcher">
-                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
-                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
-            </div>
-            <nav class="section-nav" id="workflowNav">
-                <div class="nav-group">
-                    <div class="nav-group-title">Overview</div>
-                    <a href="#overview" class="nav-item active">Search Overview</a>
-                    <a href="#search-fields" class="nav-item">Searchable Fields</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Features</div>
-                    <a href="#using-search" class="nav-item">Using Search</a>
-                    <a href="#show-details" class="nav-item">Show All Details</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Reference</div>
-                    <a href="#quickref" class="nav-item">Quick Reference</a>
-                </div>
-            </nav>
-            <nav class="section-nav" id="agentsNav" style="display: none;">
-                <div class="nav-group">
-                    <div class="nav-group-title">Heat Map</div>
-                    <a href="#heatmap" class="nav-item active">Priority Overview</a>
-                </div>
-                <div class="nav-group">
-                    <div class="nav-group-title">Agents</div>
-                    <a href="#agent1" class="nav-item">Natural Language Search</a>
-                </div>
-            </nav>
-        </aside>
+    <aside class="sidebar">
+        <div class="sidebar-header"><h2>🔍 Global Search</h2><p>Interactive Workflow Guide</p></div>
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active"><span class="nav-number">0</span><span class="nav-label">Overview</span></a>
+            <a href="#section-1" class="nav-item"><span class="nav-number">1</span><span class="nav-label">Access Search</span></a>
+            <a href="#section-2" class="nav-item"><span class="nav-number">2</span><span class="nav-label">Search Types</span></a>
+            <a href="#quick-ref" class="nav-item"><span class="nav-number">⚡</span><span class="nav-label">Quick Reference</span></a>
+        </nav>
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active"><span class="nav-number">📊</span><span class="nav-label">Summary</span></a>
+            <a href="#agent-heatmap" class="nav-item"><span class="nav-number">🔥</span><span class="nav-label">Heat Map</span></a>
+            <a href="#agent-details" class="nav-item"><span class="nav-number">🤖</span><span class="nav-label">Agent Details</span></a>
+        </nav>
+        <div class="sidebar-footer"><a href="./index.html" class="doc-btn">← Back to CLEAR Index</a></div>
+    </aside>
 
-        <main class="main-content">
-            <div id="workflowContent" class="tab-content active">
-                <section id="overview" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">🔍</span>
-                        <h2 class="section-title">Global Search in CLEAR 2.0</h2>
-                    </div>
-                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
-                        Global Search allows you to quickly find loans across your pipeline using various identifiers. Located in the top navigation bar, it searches across loan numbers, borrower names, property addresses, and more.
-                    </p>
-                    <div class="flow-diagram">
-                        <div class="flow-node start">Search Bar</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node action">Enter Query</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node action">View Results</div>
-                        <span class="flow-arrow">→</span>
-                        <div class="flow-node output">Open Loan</div>
-                    </div>
-                </section>
+    <main class="main-content">
+        <div id="workflow-panel" class="tab-panel active">
+            <div class="header">
+                <h1>🔍 Global Search in CLEAR 2.0</h1>
+                <p class="subtitle">Find loans, borrowers, and documents quickly across the system</p>
+                <div class="meta">
+                    <span class="meta-item">🏢 System: CLEAR 2.0</span>
+                    <span class="meta-item">👤 Role: All Users</span>
+                    <span class="meta-item">📅 Updated: Jan 2026</span>
+                    <span class="meta-item">⏱️ Duration: 1-2 min</span>
+                </div>
+            </div>
 
-                <section id="search-fields" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">📋</span>
-                        <h2 class="section-title">Searchable Fields</h2>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <section id="section-0" class="section">
+                <div class="section-header"><div class="section-number">0</div><div class="section-title"><h2>Search Overview</h2><span>Understanding global search capabilities</span></div></div>
+                <div class="section-content">
+                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">Global Search in CLEAR 2.0 provides a unified way to find loans, borrowers, properties, and documents across the entire system. Access it from any screen using the keyboard shortcut or search icon.</p>
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">🚀 Start</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node action">Open Search</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node input">Enter Query</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node output">View Results</div>
+                        </div>
                     </div>
+                    <div class="tip-box">
+                        <h4>💡 Pro Tip</h4>
+                        <p>Press Ctrl+K (or Cmd+K on Mac) from anywhere in CLEAR to instantly open global search.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-1" class="section">
+                <div class="section-header"><div class="section-number">1</div><div class="section-title"><h2>Access Search</h2><span>Multiple ways to start searching</span></div></div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>🔍 Access Methods</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li style="margin-bottom: 8px;"><strong>Keyboard Shortcut:</strong> Ctrl+K (Windows) or Cmd+K (Mac)</li>
+                            <li style="margin-bottom: 8px;"><strong>Search Icon:</strong> Click magnifying glass in top navigation</li>
+                            <li><strong>Menu:</strong> Main Menu → Search</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-2" class="section">
+                <div class="section-header"><div class="section-number">2</div><div class="section-title"><h2>Search Types</h2><span>What you can search for</span></div></div>
+                <div class="section-content">
                     <table class="field-table">
-                        <thead><tr><th>Field</th><th>Example</th><th>Notes</th></tr></thead>
+                        <thead><tr><th>Search Type</th><th>Example Query</th><th>Returns</th></tr></thead>
                         <tbody>
-                            <tr><td><strong>Loan Number</strong></td><td>TEST0000100887</td><td>Full or partial loan number</td></tr>
-                            <tr><td><strong>Borrower Name</strong></td><td>John Smith</td><td>First name, last name, or both</td></tr>
-                            <tr><td><strong>Property Address</strong></td><td>123 Main Street</td><td>Street address or city</td></tr>
-                            <tr><td><strong>Email Address</strong></td><td>john@email.com</td><td>Borrower email</td></tr>
-                            <tr><td><strong>Phone Number</strong></td><td>555-123-4567</td><td>Borrower phone</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Loan Number</strong></td><td>123456789</td><td>Direct loan match</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Borrower Name</strong></td><td>John Smith</td><td>All loans with borrower</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Property Address</strong></td><td>123 Main St</td><td>Loans at property</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">SSN (last 4)</strong></td><td>1234</td><td>Matching borrowers</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Phone Number</strong></td><td>555-1234</td><td>Contact matches</td></tr>
                         </tbody>
                     </table>
-                </section>
+                </div>
+            </section>
 
-                <section id="using-search" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">⌨️</span>
-                        <h2 class="section-title">Using Global Search</h2>
-                    </div>
-                    <ol class="step-list">
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Locate Search Bar</h4>
-                                <p>The Global Search bar is located at the top of CLEAR, labeled "Search Leads and Loans".</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Enter Search Term</h4>
-                                <p>Type your search query - loan number, borrower name, address, or other identifier.</p>
-                            </div>
-                        </li>
-                        <li class="step-item">
-                            <div class="step-content">
-                                <h4>Review Results</h4>
-                                <p>Results appear as you type. Click on a result to open that loan.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
+            <section id="quick-ref" class="quick-ref">
+                <h3>⚡ Quick Reference Card</h3>
+                <pre>
+ACCESS: Ctrl+K / Cmd+K or Search Icon
 
-                <section id="show-details" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">📖</span>
-                        <h2 class="section-title">Show All Details</h2>
-                    </div>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                        Click "Show All Details" in the search results to expand and see additional loan information without opening the full loan file.
-                    </p>
-                    <div class="info-box tip">
-                        <div class="info-box-title">💡 Pro Tip</div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Use Show All Details when you need to quickly verify loan information or check borrower contact details without navigating away from your current view.</p>
-                    </div>
-                </section>
+SEARCHABLE FIELDS:
+• Loan Number (full or partial)
+• Borrower Name (first, last, or full)
+• Property Address
+• SSN (last 4 digits)
+• Phone Number
 
-                <section id="quickref" class="content-section">
-                    <div class="quick-ref">
-                        <h3>⚡ Quick Reference</h3>
-                        <div class="quick-ref-grid">
-                            <div class="quick-ref-item"><strong>Location</strong><span>Top Navigation Bar</span></div>
-                            <div class="quick-ref-item"><strong>Shortcut</strong><span>Click Search Bar</span></div>
-                            <div class="quick-ref-item"><strong>Result Limit</strong><span>Top 10 Matches</span></div>
-                            <div class="quick-ref-item"><strong>Expand Results</strong><span>Show All Details</span></div>
-                        </div>
-                    </div>
-                </section>
+TIPS:
+• Results update as you type
+• Click result to open loan
+• Use quotes for exact match
+• Partial matches supported
+                </pre>
+            </section>
+        </div>
+
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Global Search Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">🤖 2 Agent Candidates Identified</span>
+                    <span class="meta-item">⏱️ Est. 25% Time Savings</span>
+                </div>
             </div>
 
-            <div id="agentsContent" class="tab-content">
-                <section id="heatmap" class="content-section">
-                    <div class="section-header">
-                        <span class="section-icon">🎯</span>
-                        <h2 class="section-title">AI Agent Opportunity Heat Map</h2>
-                    </div>
-                    <div class="heat-map-grid">
-                        <div class="heat-tile medium" onclick="scrollToAgent('agent1')">
-                            <div class="heat-score">55</div>
-                            <div class="heat-name">NLP Search Agent</div>
-                            <div class="heat-desc">Natural Language • Query</div>
-                        </div>
-                    </div>
-                </section>
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card"><div class="agent-summary-value">2</div><div class="agent-summary-label">Agent Candidates</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">0</div><div class="agent-summary-label">Critical Priority</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">25%</div><div class="agent-summary-label">Time Savings</div></div>
+                <div class="agent-summary-card"><div class="agent-summary-value">50%</div><div class="agent-summary-label">Automation Potential</div></div>
+            </div>
 
-                <section id="agent1" class="content-section">
-                    <div class="agent-card" data-agent="agent1">
-                        <div class="agent-header">
-                            <div>
-                                <div class="agent-title">Natural Language Search Agent</div>
-                                <div class="agent-type">NLP / Query Understanding</div>
-                            </div>
-                            <div class="agent-score">
-                                <div class="agent-score-value" style="color: var(--accent-blue);">55</div>
-                                <div class="agent-score-label">Priority Score</div>
-                            </div>
-                        </div>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
-                            Understands natural language queries like "show me loans closing this week" and translates them into system searches.
-                        </p>
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong></span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong></span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong></span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong></span></div>
+            </div>
+
+            <div class="heat-map-container">
+                <div class="heat-map-title">🔥 Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-smart')">
+                        <div class="heat-score">55</div>
+                        <div class="heat-name">Smart Search Suggest</div>
+                        <div class="heat-desc">AI-powered query suggestions</div>
+                        <div class="heat-metrics"><div class="heat-metric">Effort: <span>Medium</span></div><div class="heat-metric">Impact: <span>Medium</span></div></div>
+                    </div>
+                    <div class="heat-item low" onclick="scrollToAgent('agent-recent')">
+                        <div class="heat-score">40</div>
+                        <div class="heat-name">Recent Search Agent</div>
+                        <div class="heat-desc">Personalized quick access</div>
+                        <div class="heat-metrics"><div class="heat-metric">Effort: <span>Low</span></div><div class="heat-metric">Impact: <span>Low</span></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 25px; color: var(--text-primary);" id="agent-details">🤖 Agent Details</h2>
+            <div class="agent-grid">
+                <div class="agent-card" id="agent-smart">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🧠</div>
+                        <div class="agent-info"><div class="agent-name">Smart Search Suggest</div><div class="agent-type">AI / NLP</div></div>
+                        <span class="agent-priority medium">55</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Uses natural language processing to understand user intent and suggest relevant search queries based on context.</p>
                         <div class="agent-flow">
-                            <div class="agent-flow-step">💬 Natural Query</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">🤖 NLP Parse</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">🔍 Build Filter</div>
-                            <span class="agent-flow-arrow">→</span>
-                            <div class="agent-flow-step">📊 Results</div>
+                            <div class="agent-flow-title">Process Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">✏️ User Types</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">🧠 Analyze Intent</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">💡 Suggest</span>
+                            </div>
                         </div>
-                        <div class="agent-metrics">
-                            <div class="agent-metric"><div class="agent-metric-value">1 min</div><div class="agent-metric-label">Time Saved</div></div>
-                            <div class="agent-metric"><div class="agent-metric-value">80%</div><div class="agent-metric-label">Accuracy</div></div>
-                            <div class="agent-metric"><div class="agent-metric-value">High</div><div class="agent-metric-label">Complexity</div></div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">3 min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">80%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Medium</div><div class="agent-stat-label">Complexity</div></div>
                         </div>
-                        <button class="view-prompt-btn" onclick="openPromptModal('agent1')">✨ View AI Prompt to Build This Agent</button>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('smart')">✨ View AI Prompt to Build This Agent</button>
                     </div>
-                </section>
+                </div>
+
+                <div class="agent-card" id="agent-recent">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🕐</div>
+                        <div class="agent-info"><div class="agent-name">Recent Search Agent</div><div class="agent-type">Personalization</div></div>
+                        <span class="agent-priority low">40</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Tracks user search patterns and provides quick access to frequently and recently accessed loans.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Process Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">📊 Track History</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">🔄 Analyze Patterns</span>
+                                <span class="agent-arrow">→</span>
+                                <span class="agent-step">⚡ Quick Access</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2 min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Relevance</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('recent')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <div class="modal-overlay" id="promptModal">
         <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
-                <div style="display: flex; gap: 12px;">
-                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy</button>
-                    <button class="modal-btn close" onclick="closePromptModal()">✕</button>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closeModal()">✕ Close</button>
                 </div>
             </div>
             <div class="modal-body">
                 <div class="prompt-tags" id="promptTags"></div>
-                <div class="prompt-section"><div class="prompt-section-title">Purpose</div><div class="prompt-content" id="promptPurpose"></div></div>
-                <div class="prompt-section"><div class="prompt-section-title">Build Prompt</div><div class="prompt-content" id="promptFull"></div></div>
-                <div class="prompt-section"><div class="prompt-section-title">Integration</div><div class="prompt-content" id="promptIntegration"></div></div>
+                <div class="prompt-section"><h4>🎯 Purpose</h4><div class="prompt-box" id="promptPurpose"></div></div>
+                <div class="prompt-section"><h4>📝 Full Build Prompt</h4><div class="prompt-box" id="promptFull"></div></div>
+                <div class="prompt-section"><h4>🔗 Integration Points</h4><div class="prompt-box" id="promptIntegration"></div></div>
             </div>
         </div>
     </div>
-    <div id="copySuccess">✓ Copied!</div>
+    <div class="copy-success" id="copySuccess">✓ Copied to clipboard!</div>
 
     <script>
         const agentPrompts = {
-            agent1: {
-                title: "Natural Language Search Agent", type: "NLP", complexity: "High", priority: "Medium (55)",
-                purpose: "Understands natural language queries and translates them into system searches.",
-                fullPrompt: `You are building a Natural Language Search Agent for CLEAR 2.0.
+            smart: {
+                title: "Smart Search Suggest",
+                tags: ["AI/NLP", "Medium Complexity", "Medium Priority"],
+                purpose: "Uses NLP to understand user intent and suggest relevant search queries.",
+                fullPrompt: `You are building a Smart Search Suggest Agent for CMG Financial's CLEAR 2.0 LOS.
 
-AGENT NAME: Natural Language Search Agent
-TYPE: NLP / Query Understanding
+AGENT NAME: Smart Search Suggest
+TYPE: AI / Natural Language Processing
 
 OBJECTIVE:
-Parse natural language queries and convert them into structured search filters.
+Analyze partial user input in real-time and provide intelligent search suggestions based on context, recent activity, and common patterns.
 
-EXAMPLE QUERIES:
-- "loans closing this week" → filter: closing_date within 7 days
-- "John's purchase loans" → filter: borrower contains "John" AND purpose = "Purchase"
-- "locked loans expiring tomorrow" → filter: lock_status = "Locked" AND lock_expiration = tomorrow
+SUGGESTION TYPES:
+1. Exact matches (loan numbers, names)
+2. Fuzzy matches (typos, partial names)
+3. Contextual suggestions (based on current workflow)
+4. Recent/frequent items
 
-OUTPUT: { "filters": [...], "sort": "...", "confidence": 0.85 }`,
-                integration: `Integration: Search API, Filter builder, Pipeline query engine`
+OUTPUT FORMAT:
+{
+  "suggestions": [
+    {
+      "type": "loan",
+      "display": "John Smith - #123456",
+      "score": 0.95
+    }
+  ]
+}`,
+                integration: `CLEAR 2.0 Integration Points:
+- Input: Partial search query, user context
+- Output: Ranked suggestions
+- Trigger: On keystroke (debounced)
+- API: GET /api/v1/search/suggest`
+            },
+            recent: {
+                title: "Recent Search Agent",
+                tags: ["Personalization", "Low Complexity", "Low Priority"],
+                purpose: "Tracks search patterns and provides quick access to frequent items.",
+                fullPrompt: `You are building a Recent Search Agent for CMG Financial's CLEAR 2.0 LOS.
+
+AGENT NAME: Recent Search Agent
+TYPE: Personalization / User Tracking
+
+OBJECTIVE:
+Track user search and access patterns to provide personalized quick access to frequently used loans and recently viewed items.
+
+TRACKING DATA:
+1. Search queries
+2. Loan access frequency
+3. Time of day patterns
+4. Workflow context
+
+OUTPUT FORMAT:
+{
+  "recent": [
+    {"loan_number": "123456", "last_accessed": "2 hours ago"},
+  ],
+  "frequent": [
+    {"loan_number": "789012", "access_count": 15}
+  ]
+}`,
+                integration: `CLEAR 2.0 Integration Points:
+- Input: User activity events
+- Output: Personalized quick access list
+- Trigger: On search focus
+- API: GET /api/v1/search/recent`
             }
         };
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab + 'Content').classList.add('active');
-            document.getElementById('workflowNav').style.display = tab === 'workflow' ? 'block' : 'none';
-            document.getElementById('agentsNav').style.display = tab === 'agents' ? 'block' : 'none';
-        }
-
-        function scrollToAgent(id) {
-            document.querySelector(`[data-agent="${id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        let currentPromptText = '';
-        function openPromptModal(id) {
-            const a = agentPrompts[id];
-            document.getElementById('modalTitle').textContent = '✨ ' + a.title;
-            document.getElementById('promptTags').innerHTML = `<span class="prompt-tag type">${a.type}</span><span class="prompt-tag complexity">${a.complexity}</span><span class="prompt-tag priority">${a.priority}</span>`;
-            document.getElementById('promptPurpose').textContent = a.purpose;
-            document.getElementById('promptFull').textContent = a.fullPrompt;
-            document.getElementById('promptIntegration').textContent = a.integration;
-            currentPromptText = a.fullPrompt;
-            document.getElementById('promptModal').style.display = 'flex';
-        }
-        function closePromptModal() { document.getElementById('promptModal').style.display = 'none'; }
-        async function copyPrompt() {
-            await navigator.clipboard.writeText(currentPromptText);
-            document.getElementById('copySuccess').style.display = 'block';
-            setTimeout(() => document.getElementById('copySuccess').style.display = 'none', 2000);
-        }
-        document.getElementById('promptModal').onclick = e => { if (e.target.id === 'promptModal') closePromptModal(); };
+        let currentPrompt = '';
+        function switchTab(tab) { document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active')); document.getElementById(tab + '-panel').classList.add('active'); document.getElementById('workflow-nav').style.display = tab === 'workflow' ? 'block' : 'none'; document.getElementById('agents-nav').style.display = tab === 'agents' ? 'block' : 'none'; }
+        function scrollToAgent(agentId) { const card = document.getElementById(agentId); if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('highlight'); setTimeout(() => card.classList.remove('highlight'), 2000); } }
+        function openPromptModal(agentKey) { const agent = agentPrompts[agentKey]; document.getElementById('modalTitle').textContent = '✨ ' + agent.title + ' - Build Prompt'; document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join(''); document.getElementById('promptPurpose').textContent = agent.purpose; document.getElementById('promptFull').textContent = agent.fullPrompt; document.getElementById('promptIntegration').textContent = agent.integration; currentPrompt = agent.fullPrompt; document.getElementById('promptModal').classList.add('show'); document.body.style.overflow = 'hidden'; }
+        function closeModal() { document.getElementById('promptModal').classList.remove('show'); document.body.style.overflow = ''; }
+        async function copyPrompt() { try { await navigator.clipboard.writeText(currentPrompt); const s = document.getElementById('copySuccess'); s.style.display = 'block'; setTimeout(() => s.style.display = 'none', 2000); } catch (e) { alert('Failed to copy'); } }
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); this.classList.add('active'); }); });
     </script>
 </body>
 </html>
