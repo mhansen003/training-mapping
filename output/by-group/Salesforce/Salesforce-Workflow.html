@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce CRM Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #00a1e0;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --accent-cloud: #1798c1;
+            --accent-salesforce: #00a1e0;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover { background: rgba(0, 161, 224, 0.15); color: var(--accent-salesforce); border-color: rgba(0, 161, 224, 0.3); }
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-salesforce); font-weight: 600; padding: 8px 16px; }
+
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header { padding: 25px 20px; background: linear-gradient(135deg, rgba(0, 161, 224, 0.15) 0%, rgba(0,0,0,0.3) 100%); border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-salesforce); border-bottom-color: var(--accent-salesforce); background: rgba(0, 161, 224, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(0, 161, 224, 0.1); border-left-color: var(--accent-salesforce); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-salesforce); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-subtle); background: rgba(0,0,0,0.2); }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-cloud) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 161, 224, 0.3); }
+
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 20% 20%, rgba(0, 161, 224, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(23, 152, 193, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-salesforce) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+        .header .meta-item { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(0, 161, 224, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-cloud) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        .workflow-diagram { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 28px; margin-bottom: 22px; }
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node { padding: 14px 22px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 600; min-width: 150px; border: 1px solid var(--border-subtle); }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-cloud) 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-salesforce); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-salesforce); font-size: 1.5rem; }
+
+        .tip-box, .info-box, .exception-box { padding: 18px 22px; margin: 18px 0; border-radius: 0 10px 10px 0; }
+        .tip-box { background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(0, 161, 224, 0.08); border: 1px solid rgba(0, 161, 224, 0.2); border-left: 4px solid var(--accent-salesforce); }
+        .info-box h4 { color: var(--accent-salesforce); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box ul { color: var(--text-secondary); }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box ul { color: var(--text-secondary); }
+
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+        .field-table th { background: rgba(0, 161, 224, 0.15); color: var(--accent-salesforce); padding: 14px 18px; text-align: left; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-subtle); }
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .badge.required { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.auto { background: rgba(0, 161, 224, 0.15); color: var(--accent-salesforce); }
+        .badge.manual { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Agent Styles */
+        .agent-header { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 35px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .agent-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(0, 161, 224, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .agent-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 10px; position: relative; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-salesforce) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .agent-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .agent-summary-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 25px; text-align: center; }
+        .agent-summary-value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-salesforce) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        .heat-legend { display: flex; gap: 25px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+
+        .heat-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; font-weight: 800; }
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; scroll-margin-top: 80px; }
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        .agent-card.highlight { animation: highlightPulse 2s ease; box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4); }
+        @keyframes highlightPulse { 0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); } 50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); } 100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); } }
+
+        .agent-card-header { padding: 22px; display: flex; align-items: flex-start; gap: 18px; border-bottom: 1px solid var(--border-subtle); }
+        .agent-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-purple) 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-salesforce); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-priority { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .agent-step { background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-purple) 100%); color: white; padding: 8px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+        .agent-arrow { color: var(--accent-salesforce); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .agent-stat { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; text-align: center; }
+        .agent-stat-value { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn { width: 100%; margin-top: 18px; padding: 14px 20px; background: linear-gradient(135deg, rgba(0, 161, 224, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%); border: 1px solid rgba(0, 161, 224, 0.4); border-radius: 10px; color: var(--accent-salesforce); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
+        .agent-prompt-btn:hover { background: linear-gradient(135deg, rgba(0, 161, 224, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%); border-color: var(--accent-salesforce); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 161, 224, 0.25); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+        .modal-header { background: linear-gradient(135deg, var(--accent-salesforce) 0%, var(--accent-purple) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: transform 0.2s; font-size: 0.9rem; }
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-salesforce); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-salesforce); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .prompt-box { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(0, 161, 224, 0.15); color: var(--accent-salesforce); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .copy-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./README.md">Salesforce</a>
+        <span class="separator">></span>
+        <span class="current">Workflow</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Salesforce CRM</h2>
+            <p>Mortgage Lead Management</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Lead Management</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Contacts & Accounts</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Opportunity Pipeline</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Tasks & Activities</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Reports & Dashboards</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">LOS Integration</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="../../index.html" class="doc-btn">
+                Back to Portal Home
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Salesforce CRM Workflow</h1>
+                <p class="subtitle">Comprehensive guide to mortgage lead management and pipeline tracking in Salesforce</p>
+                <div class="meta">
+                    <span class="meta-item">System: Salesforce CRM</span>
+                    <span class="meta-item">Role: Loan Officer / Sales</span>
+                    <span class="meta-item">Updated: Jan 2026</span>
+                    <span class="meta-item">Duration: 15-20 min</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #00a1e0, #1798c1);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #00a1e0;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output/Result</span></div>
+            </div>
+
+            <!-- Section 1: Overview -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Salesforce Overview</h2>
+                        <span>Understanding CMG's CRM platform for mortgage sales</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Lead Capture</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Lead Qualification</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Convert to Opportunity</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Loan in LOS</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>What is Salesforce CRM?</h4>
+                        <p>Salesforce is CMG Financial's customer relationship management platform that enables loan officers to:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Capture and manage mortgage leads from multiple sources</li>
+                            <li>Track borrower interactions and communication history</li>
+                            <li>Manage the sales pipeline from lead to funded loan</li>
+                            <li>Automate follow-up tasks and reminders</li>
+                            <li>Generate reports on conversion rates and sales metrics</li>
+                            <li>Integrate seamlessly with CLEAR/Byte LOS systems</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Key Salesforce Objects for Mortgage</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Object</th>
+                                <th>Purpose</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Lead</strong></td>
+                                <td>Potential borrower not yet qualified</td>
+                                <td>Web inquiry, referral, purchased list</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contact</strong></td>
+                                <td>Qualified individual with full profile</td>
+                                <td>Borrower, co-borrower, realtor partner</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account</strong></td>
+                                <td>Organization or household</td>
+                                <td>Real estate office, builder, household</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Opportunity</strong></td>
+                                <td>Active loan in pipeline</td>
+                                <td>Purchase loan, refinance application</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Task</strong></td>
+                                <td>Action item or follow-up</td>
+                                <td>Call borrower, send pre-approval letter</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Activity</strong></td>
+                                <td>Logged interaction</td>
+                                <td>Completed call, email sent, meeting held</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Always log activities immediately after borrower interactions. This creates a complete communication history and helps other team members assist if needed.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Lead Management -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Lead Management</h2>
+                        <span>Creating, assigning, and tracking leads</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Lead Source</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create Lead</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Qualified?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Convert Lead</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Contact + Opportunity</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Lead Sources at CMG</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Entry Method</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Website Inquiry</td>
+                                <td><span class="badge auto">Auto-Created</span></td>
+                                <td>High - respond within 5 minutes</td>
+                            </tr>
+                            <tr>
+                                <td>Realtor Referral</td>
+                                <td><span class="badge manual">Manual Entry</span></td>
+                                <td>High - same day response</td>
+                            </tr>
+                            <tr>
+                                <td>Zillow/LendingTree</td>
+                                <td><span class="badge auto">Auto-Created</span></td>
+                                <td>High - respond within 5 minutes</td>
+                            </tr>
+                            <tr>
+                                <td>Past Client Referral</td>
+                                <td><span class="badge manual">Manual Entry</span></td>
+                                <td>High - warm lead</td>
+                            </tr>
+                            <tr>
+                                <td>Marketing Campaign</td>
+                                <td><span class="badge auto">Auto-Created</span></td>
+                                <td>Medium - within 24 hours</td>
+                            </tr>
+                            <tr>
+                                <td>Cold Outreach</td>
+                                <td><span class="badge manual">Manual Entry</span></td>
+                                <td>Low - scheduled follow-up</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Required Lead Fields</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>First Name</td>
+                                <td>Borrower's first name</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Last Name</td>
+                                <td>Borrower's last name</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>Primary email address</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Phone</td>
+                                <td>Best contact number</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Lead Source</td>
+                                <td>How they found CMG</td>
+                                <td><span class="badge required">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Loan Purpose</td>
+                                <td>Purchase, Refinance, Cash-Out</td>
+                                <td><span class="badge optional">Optional</span></td>
+                            </tr>
+                            <tr>
+                                <td>Property State</td>
+                                <td>State of subject property</td>
+                                <td><span class="badge optional">Optional</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Lead Status Progression</h4>
+                        <p><strong>New</strong> -> <strong>Contacted</strong> -> <strong>Qualified</strong> -> <strong>Converted</strong></p>
+                        <p style="margin-top: 10px;">Alternative paths: <strong>Unqualified</strong> (does not meet criteria) or <strong>Nurture</strong> (not ready now, future potential)</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Lead Conversion Requirements</h4>
+                        <p>Before converting a lead, verify:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Borrower has confirmed interest in proceeding</li>
+                            <li>Basic qualification criteria met (employment, credit estimate)</li>
+                            <li>Loan purpose and property type identified</li>
+                            <li>Timeline established (actively looking vs. 6+ months out)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Contact & Account Management -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Contact & Account Management</h2>
+                        <span>Managing borrower profiles and relationships</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Convert Lead</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Contact Created</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Link to Account</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Complete Profile</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Contact Record Fields</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>Fields</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Personal Info</td>
+                                <td>Name, DOB, SSN (last 4), Marital Status</td>
+                            </tr>
+                            <tr>
+                                <td>Contact Details</td>
+                                <td>Phone (Home, Cell, Work), Email, Preferred Contact Method</td>
+                            </tr>
+                            <tr>
+                                <td>Address</td>
+                                <td>Current Address, Mailing Address, Years at Address</td>
+                            </tr>
+                            <tr>
+                                <td>Employment</td>
+                                <td>Employer Name, Position, Years Employed, Income Range</td>
+                            </tr>
+                            <tr>
+                                <td>Financial Profile</td>
+                                <td>Estimated Credit Score, Down Payment Available, Other Assets</td>
+                            </tr>
+                            <tr>
+                                <td>Preferences</td>
+                                <td>Communication Preference, Best Time to Call, Language</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Account Types</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Account Type</th>
+                                <th>Use Case</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Household</td>
+                                <td>Group borrower and co-borrower</td>
+                                <td>Smith Family Household</td>
+                            </tr>
+                            <tr>
+                                <td>Realtor Partner</td>
+                                <td>Real estate agent or team</td>
+                                <td>ABC Realty Group</td>
+                            </tr>
+                            <tr>
+                                <td>Builder</td>
+                                <td>New construction partner</td>
+                                <td>Sunrise Homes LLC</td>
+                            </tr>
+                            <tr>
+                                <td>Financial Advisor</td>
+                                <td>Referral partner</td>
+                                <td>Premier Wealth Management</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Link related contacts (borrower + co-borrower) to the same Household account. This keeps all family transactions organized and enables household-level reporting.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Opportunity Pipeline -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title">
+                        <h2>Opportunity Pipeline</h2>
+                        <span>Tracking loans through pipeline stages</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Qualification</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Pre-Approval</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Application</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processing</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Underwriting</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Closed Won</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Opportunity Stages</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Description</th>
+                                <th>Probability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Qualification</td>
+                                <td>Initial discussions, gathering borrower needs</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Pre-Approval</td>
+                                <td>Running credit, issuing pre-approval letter</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>Application Submitted</td>
+                                <td>Full 1003 received, loan created in LOS</td>
+                                <td>50%</td>
+                            </tr>
+                            <tr>
+                                <td>Processing</td>
+                                <td>Gathering documentation, ordering services</td>
+                                <td>65%</td>
+                            </tr>
+                            <tr>
+                                <td>Underwriting</td>
+                                <td>Loan in UW review</td>
+                                <td>80%</td>
+                            </tr>
+                            <tr>
+                                <td>Clear to Close</td>
+                                <td>Approved, preparing closing docs</td>
+                                <td>95%</td>
+                            </tr>
+                            <tr>
+                                <td>Closed Won</td>
+                                <td>Loan funded</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>Closed Lost</td>
+                                <td>Loan withdrawn, denied, or went elsewhere</td>
+                                <td>0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Key Opportunity Fields</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Opportunity Name</td>
+                                <td>Borrower Name - Property Address (auto-generated)</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Amount</td>
+                                <td>Estimated or actual loan amount</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Purpose</td>
+                                <td>Purchase, Rate/Term Refi, Cash-Out Refi</td>
+                            </tr>
+                            <tr>
+                                <td>Property Type</td>
+                                <td>SFR, Condo, Multi-Unit, etc.</td>
+                            </tr>
+                            <tr>
+                                <td>Close Date</td>
+                                <td>Expected closing date</td>
+                            </tr>
+                            <tr>
+                                <td>LOS Loan Number</td>
+                                <td>CLEAR/Byte loan ID (after sync)</td>
+                            </tr>
+                            <tr>
+                                <td>Referral Source</td>
+                                <td>Agent, builder, past client, etc.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Pipeline Hygiene</h4>
+                        <p>Review and update your pipeline weekly:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Update close dates that have slipped</li>
+                            <li>Move stale opportunities to Nurture or Close Lost</li>
+                            <li>Ensure all active loans have next steps scheduled</li>
+                            <li>Verify loan amounts match current scenarios</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Task & Activity Tracking -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title">
+                        <h2>Task & Activity Tracking</h2>
+                        <span>Managing follow-ups, calls, and emails</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Interaction</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Log Activity</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Follow-up Needed?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Create Task</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Task Queue</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Task Types</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Task Type</th>
+                                <th>Description</th>
+                                <th>Default Due</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Call</td>
+                                <td>Phone call to borrower or partner</td>
+                                <td>Today</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>Send email communication</td>
+                                <td>Today</td>
+                            </tr>
+                            <tr>
+                                <td>Send Pre-Approval</td>
+                                <td>Generate and send PAL</td>
+                                <td>Same day</td>
+                            </tr>
+                            <tr>
+                                <td>Document Follow-up</td>
+                                <td>Request missing documents</td>
+                                <td>3 days</td>
+                            </tr>
+                            <tr>
+                                <td>Rate Quote</td>
+                                <td>Provide updated rate options</td>
+                                <td>Today</td>
+                            </tr>
+                            <tr>
+                                <td>Status Update</td>
+                                <td>Proactive borrower update</td>
+                                <td>Weekly</td>
+                            </tr>
+                            <tr>
+                                <td>Referral Thank You</td>
+                                <td>Acknowledge referral source</td>
+                                <td>Same day</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Activity Types to Log</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>What to Include</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Phone Call</td>
+                                <td>Duration, topics discussed, outcomes, next steps</td>
+                            </tr>
+                            <tr>
+                                <td>Email Sent</td>
+                                <td>Subject line, key points, attachments sent</td>
+                            </tr>
+                            <tr>
+                                <td>Meeting</td>
+                                <td>Attendees, agenda items, decisions made</td>
+                            </tr>
+                            <tr>
+                                <td>Text Message</td>
+                                <td>Content summary, response received</td>
+                            </tr>
+                            <tr>
+                                <td>Voicemail</td>
+                                <td>Message left, callback requested</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Use Salesforce's email integration to automatically log emails. Connect your Outlook or Gmail to Salesforce and select "Log to Salesforce" when sending borrower communications.</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Task Best Practices</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Set specific due dates, not "sometime this week"</li>
+                            <li>Include context in task comments for future reference</li>
+                            <li>Assign tasks to yourself immediately after creating</li>
+                            <li>Review task queue at start of each day</li>
+                            <li>Mark tasks complete promptly - overdue tasks hurt metrics</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Reports & Dashboards -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title">
+                        <h2>Reports & Dashboards</h2>
+                        <span>Sales metrics and conversion tracking</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Set Filters</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Run Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Export/Share</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Key Reports for LOs</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Purpose</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>My Pipeline</td>
+                                <td>All active opportunities by stage</td>
+                                <td>Daily</td>
+                            </tr>
+                            <tr>
+                                <td>Lead Conversion</td>
+                                <td>Lead to opportunity conversion rate</td>
+                                <td>Weekly</td>
+                            </tr>
+                            <tr>
+                                <td>Overdue Tasks</td>
+                                <td>Tasks past due date</td>
+                                <td>Daily</td>
+                            </tr>
+                            <tr>
+                                <td>Source Performance</td>
+                                <td>ROI by lead source</td>
+                                <td>Monthly</td>
+                            </tr>
+                            <tr>
+                                <td>Closing Forecast</td>
+                                <td>Expected closings by month</td>
+                                <td>Weekly</td>
+                            </tr>
+                            <tr>
+                                <td>Lost Opportunity Analysis</td>
+                                <td>Reasons for lost deals</td>
+                                <td>Monthly</td>
+                            </tr>
+                            <tr>
+                                <td>Referral Partner Activity</td>
+                                <td>Loans by referral source</td>
+                                <td>Monthly</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Dashboard Metrics</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Target</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Lead Response Time</td>
+                                <td>< 5 minutes</td>
+                                <td>Time from lead creation to first contact</td>
+                            </tr>
+                            <tr>
+                                <td>Lead Conversion Rate</td>
+                                <td>> 15%</td>
+                                <td>Converted leads / total leads</td>
+                            </tr>
+                            <tr>
+                                <td>Pipeline Value</td>
+                                <td>Varies by LO</td>
+                                <td>Sum of loan amounts x probability</td>
+                            </tr>
+                            <tr>
+                                <td>Average Days in Stage</td>
+                                <td>< 7 days</td>
+                                <td>Time spent in each pipeline stage</td>
+                            </tr>
+                            <tr>
+                                <td>Pull-Through Rate</td>
+                                <td>> 70%</td>
+                                <td>Funded loans / applications submitted</td>
+                            </tr>
+                            <tr>
+                                <td>Task Completion Rate</td>
+                                <td>> 95%</td>
+                                <td>Completed tasks / total tasks due</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Subscribe to key reports for automatic email delivery. Go to any report, click Subscribe, and set daily or weekly delivery to start your day with pipeline visibility.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Integration with LOS -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title">
+                        <h2>Integration with LOS</h2>
+                        <span>How Salesforce connects to CLEAR/Byte</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Salesforce Opportunity</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Create Loan?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Push to LOS</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Loan Created</div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">LOS Updates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Sync Back</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">SF Updated</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-salesforce); margin: 20px 0 15px;">Data Flow: Salesforce to LOS</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Salesforce Field</th>
+                                <th>LOS Field</th>
+                                <th>Sync Direction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Contact Name</td>
+                                <td>Borrower Name</td>
+                                <td>SF -> LOS</td>
+                            </tr>
+                            <tr>
+                                <td>Contact Phone/Email</td>
+                                <td>Borrower Contact Info</td>
+                                <td>SF -> LOS</td>
+                            </tr>
+                            <tr>
+                                <td>Property Address</td>
+                                <td>Subject Property</td>
+                                <td>SF -> LOS</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Purpose</td>
+                                <td>Transaction Type</td>
+                                <td>SF -> LOS</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Amount</td>
+                                <td>Base Loan Amount</td>
+                                <td>Bidirectional</td>
+                            </tr>
+                            <tr>
+                                <td>Opportunity Stage</td>
+                                <td>Loan Status</td>
+                                <td>LOS -> SF</td>
+                            </tr>
+                            <tr>
+                                <td>LOS Loan Number</td>
+                                <td>Loan Number</td>
+                                <td>LOS -> SF</td>
+                            </tr>
+                            <tr>
+                                <td>Close Date</td>
+                                <td>Closing Date</td>
+                                <td>Bidirectional</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Integration Features</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>One-Click Loan Creation:</strong> Push opportunity data to create loan in CLEAR/Byte</li>
+                            <li><strong>Status Sync:</strong> LOS milestone updates reflect in Salesforce automatically</li>
+                            <li><strong>Document Link:</strong> Quick access to loan documents from Salesforce</li>
+                            <li><strong>Rate Sheet Access:</strong> View current pricing without leaving SF</li>
+                            <li><strong>Condition Alerts:</strong> Outstanding conditions surface in Salesforce</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Sync Considerations</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Always verify borrower data accuracy before pushing to LOS</li>
+                            <li>LOS is system of record once loan is created</li>
+                            <li>Manual updates in LOS take priority over Salesforce</li>
+                            <li>Sync runs every 15 minutes - not real-time</li>
+                            <li>Contact IT if sync appears broken for more than 1 hour</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>Use the "Open in LOS" button on any synced opportunity to jump directly to the loan in CLEAR or Byte. This saves time navigating between systems.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
++======================================================================+
+|                    SALESFORCE CRM QUICK REFERENCE                    |
++======================================================================+
+|                                                                      |
+|  NAVIGATION                                                          |
+|  ----------                                                          |
+|  Home Tab        -> Dashboard, today's tasks, recent items           |
+|  Leads Tab       -> Lead list views, create new lead                 |
+|  Contacts Tab    -> Contact search, borrower profiles                |
+|  Opportunities   -> Pipeline views, deal tracking                    |
+|  Reports         -> Standard and custom reports                      |
+|                                                                      |
+|  KEYBOARD SHORTCUTS                                                  |
+|  ------------------                                                  |
+|  / (forward slash)  -> Global search                                 |
+|  n                  -> New record                                    |
+|  e                  -> Edit current record                           |
+|  s                  -> Save record                                   |
+|                                                                      |
+|  LEAD CONVERSION                                                     |
+|  ---------------                                                     |
+|  1. Open Lead record                                                 |
+|  2. Click "Convert" button                                           |
+|  3. Create or select existing Account                                |
+|  4. Create new Contact (or merge with existing)                      |
+|  5. Create new Opportunity                                           |
+|  6. Click "Convert"                                                  |
+|                                                                      |
+|  OPPORTUNITY STAGES                                                  |
+|  ------------------                                                  |
+|  Qualification -> Pre-Approval -> Application -> Processing          |
+|  -> Underwriting -> Clear to Close -> Closed Won                     |
+|                                                                      |
+|  LOS INTEGRATION                                                     |
+|  ---------------                                                     |
+|  Push to LOS:  Opportunity -> Actions -> Create Loan in LOS          |
+|  Open in LOS:  Opportunity -> Related -> LOS Loan Link               |
+|  Sync Status:  Check "Last Sync" field on Opportunity                |
+|                                                                      |
+|  SUPPORT                                                             |
+|  -------                                                             |
+|  Salesforce Issues:   IT Help Desk                                   |
+|  LOS Integration:     Clear/Byte Support                             |
+|  Training:            Learning Management System                     |
+|                                                                      |
++======================================================================+
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Salesforce CRM Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 60% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">1</div>
+                    <div class="agent-summary-label">Critical Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">60%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">75%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-1')">
+                        <div class="heat-score">94</div>
+                        <div class="heat-name">Lead Scoring Agent</div>
+                        <div class="heat-desc">Prioritize leads by likelihood to close</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Frequency: <span>High</span></span>
+                            <span class="heat-metric">Complexity: <span>Medium</span></span>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-2')">
+                        <div class="heat-score">90</div>
+                        <div class="heat-name">Follow-up Reminder Bot</div>
+                        <div class="heat-desc">Automated task creation for stale leads</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Frequency: <span>High</span></span>
+                            <span class="heat-metric">Complexity: <span>Low</span></span>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-3')">
+                        <div class="heat-score">82</div>
+                        <div class="heat-name">Pipeline Analytics Agent</div>
+                        <div class="heat-desc">Weekly pipeline health reports</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Frequency: <span>Weekly</span></span>
+                            <span class="heat-metric">Complexity: <span>Medium</span></span>
+                        </div>
+                    </div>
+                    <div class="heat-item low" onclick="scrollToAgent('agent-4')">
+                        <div class="heat-score">70</div>
+                        <div class="heat-name">Data Sync Monitor</div>
+                        <div class="heat-desc">Ensure LOS data stays current</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Frequency: <span>Continuous</span></span>
+                            <span class="heat-metric">Complexity: <span>High</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Cards -->
+            <h2 style="margin-bottom: 25px; color: var(--text-primary);" id="agent-details">Agent Details</h2>
+            <div class="agent-grid">
+                <!-- Agent 1: Lead Scoring Agent -->
+                <div class="agent-card" id="agent-1">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">*</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Lead Scoring Agent</div>
+                            <div class="agent-type">Predictive Analytics</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Analyzes incoming leads using historical conversion data, borrower attributes, and engagement signals to assign a priority score. Helps LOs focus on leads most likely to convert to funded loans.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">New Lead</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Analyze Attributes</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Assign Score</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Prioritize Queue</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">35%</div>
+                                <div class="agent-stat-label">Better Conversion</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">94</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">High</div>
+                                <div class="agent-stat-label">ROI</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('leadscoring')">
+                            View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Follow-up Reminder Bot -->
+                <div class="agent-card" id="agent-2">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">!</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Follow-up Reminder Bot</div>
+                            <div class="agent-type">Task Automation</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors lead and opportunity activity, automatically creating follow-up tasks when leads go stale. Ensures no potential borrower falls through the cracks due to missed follow-ups.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Scan Records</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Detect Stale</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Create Task</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Notify LO</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">50%</div>
+                                <div class="agent-stat-label">Fewer Missed</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">90</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">High</div>
+                                <div class="agent-stat-label">ROI</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('followup')">
+                            View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Pipeline Analytics Agent -->
+                <div class="agent-card" id="agent-3">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">#</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Pipeline Analytics Agent</div>
+                            <div class="agent-type">Business Intelligence</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Generates weekly pipeline health reports with insights on conversion rates, stage velocity, at-risk deals, and forecasting accuracy. Provides actionable recommendations to improve pipeline performance.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Gather Data</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Analyze Trends</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Generate Report</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Email LO</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">2hr</div>
+                                <div class="agent-stat-label">Saved/Week</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">82</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">Med</div>
+                                <div class="agent-stat-label">ROI</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('analytics')">
+                            View Build Prompt
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Data Sync Monitor -->
+                <div class="agent-card" id="agent-4">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">~</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Data Sync Monitor</div>
+                            <div class="agent-type">Integration Management</div>
+                        </div>
+                        <span class="agent-priority low">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Continuously monitors the Salesforce-LOS data sync, detecting discrepancies, sync failures, and data quality issues. Alerts IT and users when intervention is needed to maintain data integrity.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <span class="agent-step">Monitor Sync</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Detect Issues</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Alert Team</span>
+                                <span class="agent-arrow">-></span>
+                                <span class="agent-step">Log Incident</span>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">99%</div>
+                                <div class="agent-stat-label">Data Accuracy</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">70</div>
+                                <div class="agent-stat-label">Priority Score</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">Med</div>
+                                <div class="agent-stat-label">ROI</div>
+                            </div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="openPromptModal('datasync')">
+                            View Build Prompt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Prompt Modal -->
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPrompt()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptFull"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Agent Prompt Data
+        const agentPrompts = {
+            'leadscoring': {
+                title: 'Lead Scoring Agent',
+                tags: ['Predictive', 'ML', 'Prioritization', 'Salesforce'],
+                purpose: 'Analyze incoming mortgage leads using historical conversion data, borrower attributes, and engagement signals to assign a priority score that helps LOs focus on leads most likely to convert.',
+                fullPrompt: `Create an AI agent that scores mortgage leads in Salesforce based on likelihood to close.
+
+Scoring Factors (weighted):
+1. Lead Source Quality (25%)
+   - Web inquiries with specific property: +20
+   - Realtor referrals: +25
+   - Past client referrals: +30
+   - Purchased leads: +5
+   - Marketing campaigns: +10
+
+2. Borrower Readiness Signals (30%)
+   - Has pre-approval from another lender: +15
+   - Under contract on property: +25
+   - Active home search (stated): +15
+   - Timeline < 90 days: +20
+   - Timeline > 6 months: -10
+
+3. Financial Indicators (25%)
+   - Estimated credit score > 720: +20
+   - Down payment > 20%: +15
+   - Debt-to-income < 36%: +10
+   - Self-employed: -5
+   - First-time buyer: +5
+
+4. Engagement Metrics (20%)
+   - Responded to first contact: +15
+   - Multiple interactions: +10
+   - Provided documentation: +20
+   - Opened rate quotes: +10
+   - No response after 48 hours: -15
+
+Score Ranges:
+- 90-100: Hot Lead (contact within 1 hour)
+- 70-89: Warm Lead (contact same day)
+- 50-69: Nurture Lead (weekly touchpoint)
+- Below 50: Long-term nurture (monthly)
+
+Update score in real-time as new data is captured.
+Surface top 10 leads daily on LO dashboard.`,
+                integration: `- Salesforce Lead Object (custom Score field)
+- Lead Source picklist values
+- Activity tracking for engagement
+- LO Dashboard component
+- Daily digest email report
+- Mobile push notifications for hot leads`
+            },
+            'followup': {
+                title: 'Follow-up Reminder Bot',
+                tags: ['Automation', 'Tasks', 'Lead Nurturing', 'Salesforce'],
+                purpose: 'Monitor lead and opportunity activity to automatically create follow-up tasks when records go stale, ensuring no potential borrower is forgotten.',
+                fullPrompt: `Create an AI agent that monitors Salesforce records and auto-generates follow-up tasks.
+
+Stale Lead Rules:
+1. New Lead - No contact within 4 hours
+   -> Create "Urgent: First Contact" task
+   -> Priority: High
+   -> Due: Immediately
+
+2. Contacted Lead - No activity for 3 days
+   -> Create "Follow-up Call" task
+   -> Priority: Normal
+   -> Due: Today
+
+3. Qualified Lead - No activity for 5 days
+   -> Create "Re-engage Lead" task
+   -> Priority: High
+   -> Due: Today
+
+4. Nurture Lead - No activity for 14 days
+   -> Create "Nurture Touchpoint" task
+   -> Priority: Low
+   -> Due: This week
+
+Stale Opportunity Rules:
+1. Any stage - No activity for 7 days
+   -> Create "Pipeline Check-in" task
+   -> Include days since last contact
+   -> Due: Today
+
+2. Pre-Approval stage > 30 days
+   -> Create "Pre-Approval Expiring" task
+   -> Priority: High
+   -> Due: Immediately
+
+3. Application stage - No update for 10 days
+   -> Create "Status Update Call" task
+   -> Include current milestone from LOS
+   -> Due: Today
+
+Task Details Include:
+- Last activity date and type
+- Lead score (if applicable)
+- Suggested talking points
+- Quick links to contact record
+
+Notification Preferences:
+- Email summary at 8 AM daily
+- In-app notification for urgent tasks
+- Escalate to manager if task overdue 2+ days`,
+                integration: `- Salesforce Task Object
+- Lead and Opportunity triggers
+- Activity history scanning
+- Email notification service
+- Salesforce Mobile App push
+- Manager escalation workflow`
+            },
+            'analytics': {
+                title: 'Pipeline Analytics Agent',
+                tags: ['Reporting', 'Analytics', 'Forecasting', 'Business Intelligence'],
+                purpose: 'Generate comprehensive weekly pipeline health reports with actionable insights on conversion rates, stage velocity, at-risk deals, and forecast accuracy.',
+                fullPrompt: `Create an AI agent that generates weekly pipeline analytics reports for loan officers.
+
+Report Sections:
+
+1. Executive Summary
+   - Total pipeline value
+   - Week-over-week change
+   - Predicted closings this month
+   - Key actions needed
+
+2. Conversion Metrics
+   - Lead-to-Opportunity rate (target: 15%)
+   - Application-to-Funding rate (target: 70%)
+   - Comparison to team average
+   - Trend over last 4 weeks
+
+3. Stage Velocity Analysis
+   - Average days in each stage
+   - Deals exceeding normal velocity
+   - Bottleneck identification
+   - Recommendations for stuck deals
+
+4. At-Risk Opportunities
+   - Deals with no activity > 7 days
+   - Close dates that have slipped
+   - Missing critical information
+   - Suggested next actions per deal
+
+5. Forecast Accuracy
+   - Last month's forecast vs actual
+   - This month's projection
+   - Confidence level by deal
+   - Upside and downside scenarios
+
+6. Source Performance
+   - Conversion by lead source
+   - Cost per funded loan by source
+   - Best performing channels
+   - Recommendation for lead investment
+
+7. Weekly Action Items
+   - Top 5 deals to focus on
+   - Leads requiring immediate attention
+   - Partners to thank/nurture
+   - Training or coaching suggestions
+
+Delivery:
+- PDF report every Monday 7 AM
+- Interactive dashboard link
+- Comparison to previous week
+- Personalized to each LO's portfolio`,
+                integration: `- Salesforce Reports API
+- Opportunity pipeline data
+- Activity and task history
+- Lead source tracking
+- Email delivery service
+- PDF generation
+- Interactive Tableau/Einstein dashboard`
+            },
+            'datasync': {
+                title: 'Data Sync Monitor',
+                tags: ['Integration', 'Data Quality', 'Monitoring', 'LOS'],
+                purpose: 'Continuously monitor the Salesforce-LOS integration, detecting sync failures, data discrepancies, and quality issues to maintain data integrity across systems.',
+                fullPrompt: `Create an AI agent that monitors Salesforce-LOS data synchronization health.
+
+Monitoring Scope:
+
+1. Sync Status Checks (every 15 minutes)
+   - Verify sync job completed successfully
+   - Check for error logs in integration layer
+   - Confirm record counts match
+   - Alert if sync delayed > 30 minutes
+
+2. Data Discrepancy Detection
+   - Compare loan amounts (SF vs LOS)
+   - Verify status alignment
+   - Check close date consistency
+   - Flag borrower info mismatches
+
+3. Missing Link Detection
+   - Opportunities without LOS loan number
+   - LOS loans not reflected in SF
+   - Orphaned records in either system
+
+4. Data Quality Alerts
+   - Duplicate contacts/leads
+   - Invalid phone/email formats
+   - Missing required fields
+   - Stale sync timestamps
+
+5. Integration Health Metrics
+   - Sync success rate (target: 99.9%)
+   - Average sync latency
+   - Error rate by type
+   - Records processed per hour
+
+Alert Escalation:
+- Level 1: Email to LO for data review
+- Level 2: IT ticket for sync issues
+- Level 3: Page on-call for system down
+
+Daily Health Report:
+- Sync success rate
+- Records synced
+- Errors encountered
+- Data quality score
+- Recommendations
+
+Recovery Actions:
+- Auto-retry failed syncs (3 attempts)
+- Queue manual review for persistent errors
+- Suggest data cleanup actions
+- Track time-to-resolution`,
+                integration: `- Salesforce-LOS integration middleware
+- CLEAR/Byte API endpoints
+- Error logging system
+- IT ticketing system (ServiceNow)
+- PagerDuty for escalations
+- Daily email digest
+- Health dashboard`
+            }
+        };
+
+        let currentPrompt = '';
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab + '-panel').classList.add('active');
+            document.getElementById('workflow-nav').style.display = tab === 'workflow' ? 'block' : 'none';
+            document.getElementById('agents-nav').style.display = tab === 'agents' ? 'block' : 'none';
+        }
+
+        // Scroll to Agent
+        function scrollToAgent(agentId) {
+            const card = document.getElementById(agentId);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('highlight');
+                setTimeout(() => card.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Modal Functions
+        function openPromptModal(agentKey) {
+            const agent = agentPrompts[agentKey];
+            document.getElementById('modalTitle').textContent = agent.title + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptFull').textContent = agent.fullPrompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+            currentPrompt = agent.fullPrompt;
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPrompt() {
+            try {
+                await navigator.clipboard.writeText(currentPrompt);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => success.style.display = 'none', 2000);
+            } catch (e) {
+                alert('Failed to copy to clipboard');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
