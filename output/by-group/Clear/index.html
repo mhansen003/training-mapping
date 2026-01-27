@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLEAR 2.0 - System Documentation | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .breadcrumb .current {
+            color: var(--accent-amber);
+            font-weight: 600;
+            padding: 8px 16px;
+        }
+
+        /* Header */
+        .system-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 50px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .system-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .system-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .system-description {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 25px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .header-stat {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 18px 28px;
+            border-radius: 12px;
+        }
+
+        .header-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 30px;
+        }
+
+        /* Category Section */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .category-icon {
+            font-size: 1.8rem;
+        }
+
+        .category-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .module-card.complete {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .module-card.complete::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-teal) 100%);
+        }
+
+        .module-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .module-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .module-status {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.complete {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-badge.pending {
+            background: rgba(100, 116, 139, 0.15);
+            color: var(--text-muted);
+        }
+
+        .module-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .module-link:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        .module-link.primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border: none;
+            color: white;
+        }
+
+        .module-link.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .module-link.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .module-link.disabled:hover {
+            background: rgba(0,0,0,0.3);
+            border-color: var(--border-subtle);
+            color: var(--text-muted);
+            transform: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .system-title { font-size: 2rem; }
+            .header-stats { gap: 15px; }
+            .header-stat { padding: 12px 18px; }
+            .module-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <span class="current">🏦 CLEAR 2.0</span>
+    </nav>
+
+    <!-- Header -->
+    <header class="system-header">
+        <div class="header-content">
+            <div class="system-icon">🏦</div>
+            <h1 class="system-title">CLEAR 2.0</h1>
+            <p class="system-description">CMG Financial's Core Loan Origination System — comprehensive documentation for all modules and workflows used by Loan Officers, Processors, and Operations teams.</p>
+
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">24</div>
+                    <div class="header-stat-label">Total Modules</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">1</div>
+                    <div class="header-stat-label">Documented</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">23</div>
+                    <div class="header-stat-label">In Progress</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Rates & Pricing -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📊</span>
+                <h2 class="category-title">Rates & Pricing</h2>
+                <span class="category-count">1 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Scenario Pricing</h3>
+                    <p class="module-description">Pre-qualification rate quoting without requiring a formal loan application or credit pull.</p>
+                    <div class="module-status">
+                        <span class="status-badge complete">✓ Complete</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="./Scenario-Pricing-Workflow.html" class="module-link primary">📊 View Workflow</a>
+                        <a href="javascript:void(0)" onclick="openDocModal('./Scenario-Pricing.md')" class="module-link">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Lock Request</h3>
+                    <p class="module-description">Rate lock request process and lock desk communication workflow.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Borrower Management -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">👥</span>
+                <h2 class="category-title">Borrower Management</h2>
+                <span class="category-count">0 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Borrower Management</h3>
+                    <p class="module-description">Managing borrower information and profiles in CLEAR.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Borrower Needs List</h3>
+                    <p class="module-description">Document collection tracking and needs list management.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Opportunity Loans</h3>
+                    <p class="module-description">Pre-application opportunity tracking and conversion.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credit & Underwriting -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h2 class="category-title">Credit & Underwriting</h2>
+                <span class="category-count">0 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Ordering Credit</h3>
+                    <p class="module-description">Credit report ordering process and credit service integration.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">AUS Services</h3>
+                    <p class="module-description">Automated Underwriting System integration with DU/LP.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">PMI Quotes</h3>
+                    <p class="module-description">Private Mortgage Insurance quoting and selection.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline & Workflow -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📈</span>
+                <h2 class="category-title">Pipeline & Workflow</h2>
+                <span class="category-count">0 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Pipeline Views</h3>
+                    <p class="module-description">Managing and customizing pipeline views and filters.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">LO Workflow</h3>
+                    <p class="module-description">Loan Officer daily workflow and task management in CLEAR.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Global Search</h3>
+                    <p class="module-description">System-wide search functionality and shortcuts.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Disclosures & Compliance -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📜</span>
+                <h2 class="category-title">Disclosures & Compliance</h2>
+                <span class="category-count">0 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Request Initial Disclosures</h3>
+                    <p class="module-description">Disclosure generation and delivery process.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Self-Disclosure</h3>
+                    <p class="module-description">Borrower self-disclosure workflow and portal.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Disclosure History</h3>
+                    <p class="module-description">Viewing and managing disclosure history.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Specialty Processing -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🏗️</span>
+                <h2 class="category-title">Specialty Processing</h2>
+                <span class="category-count">0 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Condo Processing</h3>
+                    <p class="module-description">Condominium loan processing and questionnaires.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Builder Credits</h3>
+                    <p class="module-description">Builder credit entry and tracking process.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">HOI Coverage</h3>
+                    <p class="module-description">Homeowner's Insurance coverage verification.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Utilities -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🔧</span>
+                <h2 class="category-title">Utilities</h2>
+                <span class="category-count">0 of 4</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card">
+                    <h3 class="module-name">Copying a Loan</h3>
+                    <p class="module-description">Loan duplication and template process.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Withdrawing a Loan</h3>
+                    <p class="module-description">Loan withdrawal and adverse action procedures.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">Sandbox</h3>
+                    <p class="module-description">Testing environment usage and guidelines.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+                <div class="module-card">
+                    <h3 class="module-name">CLEAR Reports</h3>
+                    <p class="module-description">System reporting and data export capabilities.</p>
+                    <div class="module-status">
+                        <span class="status-badge pending">📋 Pending</span>
+                    </div>
+                    <div class="module-links">
+                        <a href="#" class="module-link disabled">📊 Workflow</a>
+                        <a href="#" class="module-link disabled">📄 Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>CMG Training Documentation Portal — Last Updated: January 2026</p>
+    </footer>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px);">
+        <div class="modal" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 950px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0;">
+                <h3 style="font-size: 1.25rem; font-weight: 700;">📄 Documentation</h3>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="copyDocToClipboard()" style="padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; background: white; color: var(--accent-blue); font-size: 0.9rem;">📋 Copy</button>
+                    <button onclick="closeDocModal()" style="padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem;">✕ Close</button>
+                </div>
+            </div>
+            <div style="padding: 28px; overflow-y: auto; flex: 1;">
+                <pre id="docContent" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 22px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; word-wrap: break-word; color: var(--text-secondary);">Loading documentation...</pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="copySuccess" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none;">✓ Copied to clipboard!</div>
+
+    <script>
+        let currentDocContent = '';
+
+        async function openDocModal(path) {
+            const modal = document.getElementById('docModal');
+            const content = document.getElementById('docContent');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            try {
+                const response = await fetch(path);
+                currentDocContent = await response.text();
+                content.textContent = currentDocContent;
+            } catch (e) {
+                content.textContent = 'Error loading documentation.';
+            }
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        async function copyDocToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentDocContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy.');
+            }
+        }
+
+        document.getElementById('docModal').addEventListener('click', (e) => {
+            if (e.target.id === 'docModal') closeDocModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDocModal();
+        });
+    </script>
+</body>
+</html>
