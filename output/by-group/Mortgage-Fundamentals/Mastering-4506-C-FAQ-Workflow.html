@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering the 4506-C FAQ - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* FAQ Item */
+        .faq-item {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .faq-question::before {
+            content: 'Q';
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .faq-answer {
+            padding: 18px 22px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .faq-answer strong { color: var(--text-primary); }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.vendor-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Vendor Comparison Cards */
+        .vendor-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .vendor-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .vendor-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .vendor-card-header h4 { font-size: 1.05rem; }
+        .vendor-card-body { padding: 22px; }
+        .vendor-card ul { list-style: none; padding: 0; }
+        .vendor-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .vendor-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Mastering the 4506-C FAQ</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>4506-C FAQ Guide</h2>
+            <p>Interactive Workflow Reference</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Form Requirements</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Borrower Information</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Name & Address Variations</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Transcript Types</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Vendor Requirements</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Document Processing</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Mastering the 4506-C FAQ</h1>
+                <p class="subtitle">Comprehensive guide to completing IRS Form 4506-C for tax transcript requests in mortgage origination</p>
+                <div class="meta">
+                    <span class="meta-item">Form: IRS 4506-C</span>
+                    <span class="meta-item">Role: Processor / Underwriter</span>
+                    <span class="meta-item">Updated: March 11, 2025</span>
+                    <span class="meta-item">Vendors: Equifax, Xactus</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Form Requirements -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>4506-C Form Requirements</h2><span>Understanding when and why the form is required</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">New Loan File</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Transcripts Needed for UW?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Complete 4506-C</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Complete 4506-C Anyway</div>
+                            </div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node output">Form Ready for QC/Investor</div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Is a completed 4506 required on every loan, even if transcripts are unnecessary?</div>
+                        <div class="faq-answer">
+                            <strong>Yes, a 4506-C is required on every loan.</strong> Even when transcripts are not required for Underwriting approval, the 4506-C may be processed by the QC department. Additionally, <strong>investors reserve the right to validate any application information</strong> as they deem necessary. As such, an accurately completed and fully executed 4506-C is required upon investor delivery.
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical Requirement</h4>
+                        <p>Never assume a 4506-C is optional. Investors can request transcripts at any time, and an incomplete or missing form can delay funding or cause a loan to be unsaleable.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Every Loan</h4>
+                            <div class="value">100%</div>
+                            <div class="label">Requires 4506-C</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>QC Processing</h4>
+                            <div class="value">May</div>
+                            <div class="label">Order Transcripts</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Investor Right</h4>
+                            <div class="value">Any</div>
+                            <div class="label">Application Data</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Borrower Information -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Borrower Information Fields</h2><span>Required contact information and data sources</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Access Borrower Info</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Home Phone Listed?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Use Home Phone</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Copy Cell Number</div>
+                                <div class="flow-node output">Paste to Home Field</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Is the borrower's phone number a requirement of the form?</div>
+                        <div class="faq-answer">
+                            <strong>Yes, the borrower's phone number must be listed.</strong> The number will pull from the borrower's <strong>'Home'</strong> number listed in the borrower's information. If no 'Home' number is listed, <strong>copy and paste the number from the borrower's 'Cell' field</strong>.
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Data Source</th>
+                                <th>Requirement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Phone Number</strong></td>
+                                <td>Borrower Info > Home (primary) or Cell (fallback)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Borrower Name</strong></td>
+                                <td>Borrower Info > Legal Name</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Current Address</strong></td>
+                                <td>Borrower Info > Current Address</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SSN</strong></td>
+                                <td>Borrower Info > Social Security Number</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Best Practice</h4>
+                        <p>Always verify the phone number is current and valid before submitting. An outdated or incorrect phone number can cause transcript request failures.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Name & Address Variations -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Name & Address Variations</h2><span>Handling discrepancies between current and tax filing information</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Tax Returns</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Name/Address Match?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed with Current Info</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Enter Previous Name/Address</div>
+                                <div class="flow-node output">Complete Both Fields</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">If the borrower filed their recent taxes under a different name, how do we input that name on the form?</div>
+                        <div class="faq-answer">
+                            The borrower's name variation can be entered under the <strong>"Previous Name"</strong> fields on the form. Additionally, if the address where the borrower filed is different than the current address, the address at the time of filing can be entered under <strong>"Previous Address"</strong>.
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Name/Address Variation Decision Tree</h3>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Is the borrower's current name different from tax filing name?</span>
+                        </div>
+                        <div class="tree-node">
+                            <strong>YES:</strong> Enter the tax filing name in "Previous Name" field
+                        </div>
+                        <div class="tree-node">
+                            <strong>NO:</strong> Leave "Previous Name" field blank
+                        </div>
+                        <div class="tree-node level-1">
+                            <span class="tree-label">Is the current address different from tax filing address?</span>
+                        </div>
+                        <div class="tree-node">
+                            <strong>YES:</strong> Enter the tax filing address in "Previous Address" field
+                        </div>
+                        <div class="tree-node">
+                            <strong>NO:</strong> Leave "Previous Address" field blank
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Common Name Variation Scenarios</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Recent marriage (maiden name on tax returns)</li>
+                            <li>Divorce (former married name on tax returns)</li>
+                            <li>Legal name change</li>
+                            <li>Hyphenated vs. non-hyphenated name</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Transcript Types -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Transcript Types (1040 vs W2)</h2><span>Understanding different transcript requests</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Identify Transcript Need</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Which Transcript Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">1040 ONLY</span>
+                                <div class="flow-node output">Single Form</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">W2 ONLY</span>
+                                <div class="flow-node output">Single Form</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">BOTH</span>
+                                <div class="flow-node decision">Check Vendor</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">If a 4506-C Request for Transcripts for both a 1040 and W2 are needed is it required to complete two separate forms?</div>
+                        <div class="faq-answer">
+                            <strong>It depends which vendor is being utilized for the order.</strong>
+                            <ul style="margin-top: 10px; margin-left: 20px;">
+                                <li><strong>Equifax:</strong> Allows for both the 1040 and W2 transcripts to be ordered on a singular form</li>
+                                <li><strong>Xactus:</strong> Requires the requests to be separated into two forms - one for 1040; one for W2</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="vendor-comparison">
+                        <div class="vendor-card">
+                            <div class="vendor-card-header">
+                                <h4>Equifax</h4>
+                            </div>
+                            <div class="vendor-card-body">
+                                <ul>
+                                    <li><span class="check-icon">+</span> 1040 and W2 on single form</li>
+                                    <li><span class="check-icon">+</span> Streamlined processing</li>
+                                    <li><span class="check-icon">+</span> Fewer signatures required</li>
+                                    <li><span class="check-icon">+</span> Reduced document count</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="vendor-card">
+                            <div class="vendor-card-header" style="background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-rose) 100%);">
+                                <h4>Xactus</h4>
+                            </div>
+                            <div class="vendor-card-body">
+                                <ul>
+                                    <li><span class="x-icon">-</span> Separate form for 1040</li>
+                                    <li><span class="x-icon">-</span> Separate form for W2</li>
+                                    <li><span class="x-icon">-</span> Multiple signatures needed</li>
+                                    <li><span class="x-icon">-</span> More documents to manage</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Transcript Type</th>
+                                <th>Purpose</th>
+                                <th>Common Use Cases</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1040 Transcript</strong></td>
+                                <td>Verify tax return information</td>
+                                <td>Self-employed borrowers, rental income verification</td>
+                            </tr>
+                            <tr>
+                                <td><strong>W2 Transcript</strong></td>
+                                <td>Verify wage and salary information</td>
+                                <td>W-2 employees, income verification</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Both Types</strong></td>
+                                <td>Comprehensive income verification</td>
+                                <td>Multiple income sources, complex employment</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Vendor Selection Matters</h4>
+                        <p>Always confirm which vendor is being used <strong>before</strong> completing the 4506-C forms. Using the wrong format for a vendor will result in rejected requests and processing delays.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Vendor Requirements -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Vendor-Specific Requirements</h2><span>Understanding differences between Equifax and Xactus</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Transcript Order</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Which Vendor?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">EQUIFAX</span>
+                                <div class="flow-node action">Single Combined Form</div>
+                                <div class="flow-node output">Submit Order</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">XACTUS</span>
+                                <div class="flow-node action">Separate 1040 Form</div>
+                                <div class="flow-node action">Separate W2 Form</div>
+                                <div class="flow-node output">Submit Both Orders</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Equifax</th>
+                                <th>Xactus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Combined 1040 + W2</strong></td>
+                                <td><span class="badge" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">Supported</span></td>
+                                <td><span class="badge required-badge">Not Supported</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Forms Required (Both Types)</strong></td>
+                                <td>1 Form</td>
+                                <td>2 Forms</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Processing Method</strong></td>
+                                <td>Single submission</td>
+                                <td>Dual submission</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Efficiency Tip</h4>
+                        <p>When possible, using Equifax for loans requiring both 1040 and W2 transcripts can reduce processing time and minimize the chance of missing signatures or incomplete forms.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Document Processing -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Document Processing Workflow</h2><span>Processor and Underwriter responsibilities</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">UW Condition Issued</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processor Completes IRS 4506 Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Resubmit to UW</div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">UW Reviews IRS-4506</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Complete & Accurate?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Auto-Print to Closing Package</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Return to Processor</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Update: Are processors required to print 4506 forms into Stored Documents and tag to the condition for underwriter review?</div>
+                        <div class="faq-answer">
+                            <strong>No.</strong> Processors must complete the <strong>IRS 4506 screen</strong> based on the underwriter's condition. Upon resubmission, the underwriter will review the IRS-4506 for completion and accuracy. Any form created on that screen will <strong>print to the Closing Package</strong>, as such, the Underwriter will review for completion and <strong>delete any unnecessary forms</strong>.
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Underwriter issues condition requiring 4506-C completion</li>
+                        <li><strong>Step 2:</strong> Processor navigates to IRS 4506 screen in LOS</li>
+                        <li><strong>Step 3:</strong> Processor completes all required fields per underwriter's condition</li>
+                        <li><strong>Step 4:</strong> Processor resubmits file to underwriting</li>
+                        <li><strong>Step 5:</strong> Underwriter reviews IRS-4506 screen for completion and accuracy</li>
+                        <li><strong>Step 6:</strong> Forms auto-print to Closing Package</li>
+                        <li><strong>Step 7:</strong> Underwriter deletes any unnecessary forms from package</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <h4>Key Process Change</h4>
+                        <p>Processors are <strong>NOT</strong> required to:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Print 4506 forms to Stored Documents</li>
+                            <li>Tag forms to the condition manually</li>
+                        </ul>
+                        <p style="margin-top: 10px;">The system handles document routing automatically when the IRS 4506 screen is properly completed.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Processor Responsibility Summary</h4>
+                        <p>Focus on accurate completion of the IRS 4506 screen. The system and underwriter handle document management, storage, and closing package inclusion.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>4506-C Quick Reference</h3>
+                <pre>
+4506-C FORM COMPLETION CHECKLIST
+================================
+
+ALWAYS REQUIRED (Every Loan):
+[ ] Borrower's full legal name
+[ ] Borrower's SSN
+[ ] Borrower's phone number (Home or Cell)
+[ ] Current address
+[ ] Signature and date
+
+CONDITIONAL FIELDS:
+[ ] Previous Name - if tax filing name differs from current
+[ ] Previous Address - if tax filing address differs from current
+
+VENDOR-SPECIFIC REQUIREMENTS
+============================
+
+EQUIFAX:
+- Single form for 1040 + W2 transcripts
+- Combined submission allowed
+
+XACTUS:
+- Separate form required for 1040
+- Separate form required for W2
+- Two submissions needed for both transcript types
+
+PHONE NUMBER FIELD
+==================
+Priority: Home Phone > Cell Phone
+- System pulls from 'Home' field first
+- If no Home number: copy/paste Cell number
+
+DOCUMENT PROCESSING WORKFLOW
+============================
+1. Processor completes IRS 4506 screen
+2. DO NOT print to Stored Documents
+3. DO NOT manually tag to condition
+4. Resubmit to Underwriting
+5. UW reviews for accuracy
+6. Forms auto-print to Closing Package
+7. UW removes unnecessary forms
+
+WHY 4506-C IS ALWAYS REQUIRED
+==============================
+- QC department may process transcripts
+- Investors can validate ANY application data
+- Required for investor delivery
+- Missing form = unsaleable loan risk
+
+COMMON ERRORS TO AVOID
+======================
+- Missing phone number
+- Wrong vendor format (Equifax vs Xactus)
+- Forgetting Previous Name when applicable
+- Forgetting Previous Address when applicable
+- Printing forms to Stored Docs (no longer required)
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the 4506-C completion process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">3</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">65%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-autofill')">
+                        <div class="heat-score">9.0</div>
+                        <div class="heat-name">Auto-Fill Agent</div>
+                        <div class="heat-desc">Auto-populate 4506-C fields from borrower data</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-namevariation')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Name Variation Detector</div>
+                        <div class="heat-desc">Identify tax filing name/address discrepancies</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>1 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-vendorrouter')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">Vendor Router Agent</div>
+                        <div class="heat-desc">Auto-route to correct vendor with proper form format</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>1 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Auto-Fill Agent -->
+                    <div class="agent-card" id="agent-autofill">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">A</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Auto-Fill Agent</div>
+                                <div class="agent-type">Data Population / LOS Integration</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically populates all 4506-C fields from existing borrower data in the LOS. Handles phone number fallback logic (Home > Cell), validates SSN format, and ensures all required fields are completed before submission.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read Borrower Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Fields</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Phone Fallback</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Populate Form</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('autofill')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Name Variation Detector -->
+                    <div class="agent-card" id="agent-namevariation">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">N</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Name Variation Detector</div>
+                                <div class="agent-type">Document Analysis / AI Comparison</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Analyzes tax returns and compares names/addresses against current borrower information. Automatically flags discrepancies and pre-populates Previous Name and Previous Address fields when variations are detected.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract Tax Return Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Names</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Variations</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Auto-Fill Previous</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">1 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('namevariation')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vendor Router Agent -->
+                    <div class="agent-card" id="agent-vendorrouter">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Vendor Router Agent</div>
+                                <div class="agent-type">Workflow Automation / Routing</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Determines the correct vendor (Equifax vs Xactus) based on loan configuration and automatically generates the appropriate number of forms. Ensures correct format is used for each vendor's requirements.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Check Vendor Config</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Identify Transcript Types</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Forms</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Route to Vendor</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">1 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('vendorrouter')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>4506-C FAQ Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Mastering the 4506-C FAQ - Workflow Documentation
+
+## Overview
+The IRS Form 4506-C is required on EVERY loan, regardless of whether transcripts are needed for underwriting approval. This form authorizes the release of tax return information and is critical for QC and investor validation.
+
+## Key Requirements
+
+### Form Always Required
+- Even when transcripts not needed for UW
+- QC department may process transcripts
+- Investors can validate any application data
+- Required upon investor delivery
+
+### Borrower Phone Number
+- REQUIRED field
+- Priority: Home phone > Cell phone
+- If no Home number listed, copy Cell to Home field
+
+### Name/Address Variations
+- Previous Name: Use if tax filing name differs from current
+- Previous Address: Use if tax filing address differs from current
+- Common scenarios: marriage, divorce, legal name change
+
+## Vendor-Specific Requirements
+
+### Equifax
+- Single form for both 1040 AND W2 transcripts
+- Combined submission allowed
+
+### Xactus
+- SEPARATE form required for 1040
+- SEPARATE form required for W2
+- Two submissions needed when both types required
+
+## Document Processing Workflow
+1. Processor completes IRS 4506 screen per UW condition
+2. DO NOT print to Stored Documents
+3. DO NOT manually tag to condition
+4. Resubmit to Underwriting
+5. UW reviews for completion and accuracy
+6. Forms auto-print to Closing Package
+7. UW deletes unnecessary forms
+
+## Common Errors to Avoid
+- Missing borrower phone number
+- Wrong vendor format (Equifax vs Xactus)
+- Forgetting Previous Name when applicable
+- Forgetting Previous Address when applicable
+- Printing forms to Stored Docs (no longer required)
+
+---
+Updated: March 11, 2025</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            autofill: {
+                name: 'Auto-Fill Agent',
+                tags: ['Data Population', 'LOS Integration', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically populates all 4506-C form fields from existing borrower data in the LOS. It handles the phone number fallback logic (Home phone priority, Cell phone fallback), validates SSN format, and ensures all required fields are completed before allowing submission.`,
+                prompt: `You are building a Data Population Agent for CMG Financial's 4506-C form completion process.
+
+AGENT NAME: Auto-Fill Agent
+TYPE: Data Population / LOS Integration
+
+OBJECTIVE:
+Automatically populate all 4506-C form fields from existing borrower data in the LOS, handling field validation and fallback logic.
+
+INPUT DATA SOURCES:
+- Borrower Information Screen
+  - Legal Name
+  - SSN
+  - Home Phone
+  - Cell Phone
+  - Current Address
+
+FIELD MAPPING:
+{
+  "borrower_name": "BorrowerInfo.LegalName",
+  "ssn": "BorrowerInfo.SSN",
+  "phone": "BorrowerInfo.HomePhone || BorrowerInfo.CellPhone",
+  "current_address": "BorrowerInfo.CurrentAddress"
+}
+
+PHONE NUMBER LOGIC:
+1. Check if HomePhone exists and is valid
+2. If HomePhone is empty or null, use CellPhone
+3. Validate phone format: (XXX) XXX-XXXX or XXX-XXX-XXXX
+4. If neither phone exists, flag for manual entry
+
+VALIDATION RULES:
+- SSN: 9 digits, no dashes in storage
+- Name: Not empty, proper capitalization
+- Address: Complete with street, city, state, zip
+- Phone: Valid 10-digit format
+
+ERROR HANDLING:
+- Missing required field: Highlight field, prevent submission
+- Invalid format: Show validation message
+- Data mismatch: Flag for review`,
+                integration: `INTEGRATION POINTS:
+1. LOS Data Access
+   - Read-only access to Borrower Info
+   - Real-time data pull on form load
+
+2. Form Population
+   - Direct field mapping to IRS 4506 screen
+   - Preserve existing manual entries if present
+
+3. Validation Service
+   - SSN format validation
+   - Phone number formatting
+   - Address completeness check
+
+DEPLOYMENT:
+- Trigger: IRS 4506 screen load
+- Execution: Immediate auto-fill
+- Override: Allow manual edits after auto-fill`
+            },
+            namevariation: {
+                name: 'Name Variation Detector',
+                tags: ['Document Analysis', 'AI Comparison', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent analyzes uploaded tax returns and compares the name and address information against current borrower data. It automatically detects discrepancies (maiden names, previous addresses, name changes) and pre-populates the Previous Name and Previous Address fields when variations are found.`,
+                prompt: `You are building a Document Analysis Agent for CMG Financial's 4506-C form completion process.
+
+AGENT NAME: Name Variation Detector
+TYPE: Document Analysis / AI Comparison
+
+OBJECTIVE:
+Analyze tax returns to detect name and address variations, automatically flagging discrepancies and pre-filling Previous Name/Address fields.
+
+INPUT DOCUMENTS:
+- Tax Returns (1040, W-2)
+- Current Borrower Information
+
+EXTRACTION TARGETS:
+{
+  "tax_return": {
+    "name": "Line 1 - Name as shown on return",
+    "spouse_name": "Line 1 - Spouse name if joint",
+    "address": "Address block on return"
+  },
+  "current_data": {
+    "legal_name": "BorrowerInfo.LegalName",
+    "current_address": "BorrowerInfo.CurrentAddress"
+  }
+}
+
+COMPARISON LOGIC:
+1. Name Comparison:
+   - Normalize names (remove Jr, Sr, III, etc.)
+   - Check for maiden name vs married name
+   - Detect hyphenation differences
+   - Flag spelling variations
+
+2. Address Comparison:
+   - Normalize address format
+   - Compare street, city, state, zip
+   - Account for unit/apt variations
+
+VARIATION DETECTION:
+{
+  "name_match": true | false,
+  "name_variation_type": "maiden" | "married" | "legal_change" | "spelling",
+  "address_match": true | false,
+  "previous_name": "extracted name from tax return",
+  "previous_address": "extracted address from tax return"
+}
+
+AUTO-FILL RULES:
+- If name_match = false: Populate Previous Name field
+- If address_match = false: Populate Previous Address field
+- Always show comparison for user confirmation`,
+                integration: `INTEGRATION POINTS:
+1. Document OCR Service
+   - Extract text from tax returns
+   - Handle various tax form formats
+
+2. AI Comparison Engine
+   - Fuzzy name matching
+   - Address normalization
+
+3. Form Population
+   - Write to Previous Name field
+   - Write to Previous Address field
+
+DEPLOYMENT:
+- Trigger: Tax documents uploaded
+- Processing: Background analysis
+- Notification: Alert processor of variations found`
+            },
+            vendorrouter: {
+                name: 'Vendor Router Agent',
+                tags: ['Workflow Automation', 'Routing', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent determines the correct transcript vendor (Equifax or Xactus) based on loan configuration and automatically generates the appropriate number of forms. For Xactus, it creates separate 1040 and W2 forms; for Equifax, it creates a single combined form.`,
+                prompt: `You are building a Workflow Automation Agent for CMG Financial's 4506-C transcript ordering process.
+
+AGENT NAME: Vendor Router Agent
+TYPE: Workflow Automation / Routing
+
+OBJECTIVE:
+Automatically determine the correct vendor and generate the appropriate form configuration based on transcript requirements.
+
+VENDOR CONFIGURATION:
+{
+  "equifax": {
+    "combined_form": true,
+    "max_transcript_types": "unlimited",
+    "form_count": 1
+  },
+  "xactus": {
+    "combined_form": false,
+    "max_transcript_types": 1,
+    "form_count": "per_transcript_type"
+  }
+}
+
+ROUTING LOGIC:
+1. Read loan configuration for assigned vendor
+2. Identify required transcript types (1040, W2, or both)
+3. Generate appropriate form count:
+   - Equifax: Always 1 form
+   - Xactus: 1 form per transcript type
+
+FORM GENERATION:
+{
+  "vendor": "equifax" | "xactus",
+  "transcript_types": ["1040", "W2"],
+  "forms_to_generate": [
+    {
+      "form_id": 1,
+      "transcript_types": ["1040", "W2"],
+      "vendor": "equifax"
+    }
+  ]
+}
+
+OR for Xactus:
+{
+  "forms_to_generate": [
+    { "form_id": 1, "transcript_types": ["1040"], "vendor": "xactus" },
+    { "form_id": 2, "transcript_types": ["W2"], "vendor": "xactus" }
+  ]
+}
+
+VALIDATION:
+- Ensure correct form count for vendor
+- Verify all required transcript types covered
+- Flag if vendor assignment missing`,
+                integration: `INTEGRATION POINTS:
+1. Loan Configuration
+   - Read vendor assignment
+   - Identify transcript requirements
+
+2. Form Generation
+   - Create correct number of 4506-C forms
+   - Pre-assign transcript types to each form
+
+3. Submission Routing
+   - Route to correct vendor API/portal
+   - Track submission status
+
+DEPLOYMENT:
+- Trigger: Transcript order initiated
+- Processing: Real-time routing decision
+- Output: Generated forms ready for signature`
+            }
+        };
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(tag =>
+                `<span class="prompt-tag">${tag}</span>`
+            ).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try {
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>

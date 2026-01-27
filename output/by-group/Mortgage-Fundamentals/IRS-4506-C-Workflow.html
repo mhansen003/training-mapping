@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRS 4506-C Workflow - Process Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Role Cards */
+        .role-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .role-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .role-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .role-card-header h4 { font-size: 1.05rem; }
+        .role-card-body { padding: 22px; }
+        .role-card ul { list-style: none; padding: 0; }
+        .role-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .role-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; flex-shrink: 0; }
+
+        /* Condition Card */
+        .condition-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 18px 0;
+        }
+
+        .condition-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .condition-badge {
+            background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
+            color: var(--bg-primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .condition-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .condition-detail {
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .condition-detail label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .condition-detail span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">IRS 4506-C Workflow</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>IRS 4506-C Workflow</h2>
+            <p>Tax Transcript Request Process</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Overview & Purpose</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Disclosure Coordinators</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Processors - File Received</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Processors - Approved</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Underwriting</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Conditions for Review</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Closer & Funder</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>IRS 4506-C Workflow</h1>
+                <p class="subtitle">Complete guide for managing IRS 4506-C forms for tax transcript requests across all Operations roles</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Roles: All Operations</span>
+                    <span class="meta-item">Updated: 11/7/2024</span>
+                    <span class="meta-item">Purpose: Income Verification & QC</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Overview & Purpose -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Overview & Purpose</h2><span>Understanding the IRS 4506-C form and its importance</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>What is the 4506-C Form?</h4>
+                        <p>The 4506-C form is used to request tax transcripts directly from the IRS, ensuring accurate income verification and compliance. Even when transcripts are not required for UW approval, the 4506-C is required for <strong>Post-Closing QC</strong> and <strong>Investor requirements</strong>.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Primary Purpose</h4>
+                            <div class="value" style="font-size: 1.5rem;">IRS</div>
+                            <div class="label">Tax Transcript Request</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Required For</h4>
+                            <div class="value" style="font-size: 1.5rem;">QC</div>
+                            <div class="label">Post-Closing Quality Control</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Compliance</h4>
+                            <div class="value" style="font-size: 1.5rem;">INV</div>
+                            <div class="label">Investor Requirements</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Roles Involved</h4>
+                            <div class="value" style="font-size: 1.5rem;">5+</div>
+                            <div class="label">Operations Team Members</div>
+                        </div>
+                    </div>
+
+                    <div class="role-cards">
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <h4>Roles Responsible</h4>
+                            </div>
+                            <div class="role-card-body">
+                                <ul>
+                                    <li><span class="check-icon">1.</span> Disclosure Coordinators - Initial verification</li>
+                                    <li><span class="check-icon">2.</span> Processors - Form creation & management</li>
+                                    <li><span class="check-icon">3.</span> Underwriters - Condition setting</li>
+                                    <li><span class="check-icon">4.</span> Closers - Package verification</li>
+                                    <li><span class="check-icon">5.</span> Funders - Final verification & clearing</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <h4>Common Form Types</h4>
+                            </div>
+                            <div class="role-card-body">
+                                <ul>
+                                    <li><span class="check-icon">1040</span> Individual Tax Return Transcripts</li>
+                                    <li><span class="check-icon">W2</span> Wage and Income Transcripts</li>
+                                    <li><span class="check-icon">1065</span> Partnership Return (Business)</li>
+                                    <li><span class="check-icon">1120</span> Corporation Return (Business)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Pay Attention to Form Accuracy!</h4>
+                        <p>The most common rejection reason from the IRS is a <strong>borrower address variance</strong>. Make sure to add any previous addresses and name variations to the 4506-C Form.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Disclosure Coordinators -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Disclosure Coordinators</h2><span>Initial document review and IRS 4506-C screen verification</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Check Stored Documents</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Verify Name & Address</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">4506-C Complete?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Select 1040 Forms</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Document Review Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Check stored documents for applicable records that can confirm the borrower's name and address</li>
+                            <li><strong>Step 2:</strong> Compare the information in these documents to the IRS 4506-C screen for accuracy</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>IRS 4506-C Screen Verification</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Verify that the IRS 4506-C screen is complete</li>
+                            <li><strong>Step 2:</strong> If the IRS 4506-C screen is incomplete: Select the 1040 tax forms</li>
+                            <li><strong>Step 3:</strong> Choose the <strong>two most recent tax years</strong> for review</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Best Practice</h4>
+                        <p>Always cross-reference borrower information across multiple loan documents to ensure accuracy before finalizing the 4506-C screen.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Processors - File Received -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Processors - File Received Status</h2><span>Determine if transcripts are needed and review accuracy</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Receive File</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Income from Tax Returns?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES - Transcripts Needed</span>
+                                <div class="flow-node action">Order 1040 Transcripts</div>
+                                <div class="flow-node output">Processing Initial Review</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO - Transcripts Not Needed</span>
+                                <div class="flow-node action">Review Name & Address</div>
+                                <div class="flow-node output">Compare to IRS 4506 Screen</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>Action Required</th>
+                                <th>Timing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Transcripts Needed</strong></td>
+                                <td>Order 1040 transcript(s) - required for UW Final Approval</td>
+                                <td><span class="badge required-badge">Processing Initial Review</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Transcripts Not Needed</strong></td>
+                                <td>Review borrower name/address for accuracy against known history</td>
+                                <td><span class="badge optional-badge">File Received</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>When Are Transcripts Needed?</h4>
+                        <p>If income derived from tax returns is being used to qualify the borrower, transcripts are required for Underwriting Final Approval. Order them during Processing Initial Review to avoid delays.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Processors - Approved Status -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Processors - Approved Status</h2><span>Managing Condition Disc 216 and form creation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Condition 216</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Match Forms to Condition</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Delete Unnecessary Forms</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Auto-Pull to Closing Package</div>
+                        </div>
+                    </div>
+
+                    <div class="condition-card">
+                        <div class="condition-header">
+                            <span class="condition-badge">DISC 216</span>
+                            <span style="color: var(--text-secondary);">Completed 4506 Forms</span>
+                        </div>
+                        <div class="condition-details">
+                            <div class="condition-detail">
+                                <label>Stage</label>
+                                <span>PTD</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Class</label>
+                                <span>UW</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Responsibility</label>
+                                <span>Underwriter</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Description</label>
+                                <span>Editable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Processor Actions for Approved Status</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> The underwriter will condition for all necessary 4506-C forms based on the borrower(s)' qualifying income</li>
+                            <li><strong>Step 2:</strong> In the IRS 4506 Byte screen, ensure all created forms match the Underwriter's condition</li>
+                            <li><strong>Step 3:</strong> Delete any previously created forms not needed to satisfy the condition</li>
+                            <li><strong>Step 4:</strong> <strong>Do NOT</strong> print forms to Stored Documents - all 4506 forms are automatically pulled to the Closing Package</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Example: Condition Matching</h4>
+                        <p><strong>Scenario:</strong> Underwriter conditioned for Borrower 1 W2 4506 for 2023 & 2022 and Borrower 2 W2 4506 for 2023 and 2022.</p>
+                        <p style="margin-top: 10px;"><strong>Action:</strong> In the IRS 4506 Byte screen, the processor deleted the initial 4506 that was created for a 1040 transcript and created 2 new forms - one for B1 W2 and one for B2 W2.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Business 4506-C Forms</h4>
+                        <p>Business 4506-C forms will also generate in the closing package but must be created correctly to generate to the Closing Package. For step-by-step instructions, follow the <strong>4506 Guide</strong>.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Stored Documents Management</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Ensure any signed 4506 forms that are not needed are made "Inactive".</p>
+                        <div class="warning-box" style="margin-top: 15px;">
+                            <h4>Example</h4>
+                            <p>The initial disclosures contained a 1040 4506-C. The borrower only has W2 income. The 1040 4506-C is unnecessary and should be made "Inactive" in Stored Documents.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Underwriting -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Underwriting</h2><span>Setting conditions 216 and 412 for 4506-C requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">UW Received</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Set Condition 216</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Set Condition 412</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">List All Required Forms</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>UW Received Actions</h4>
+                        <p>The underwriter will set condition 216 and 412 and list all required 4506-C forms needed on the file. In Stored Documents, if any 4506 forms have been added that are not required based on qualifying income, the document status should be set to "Inactive".</p>
+                    </div>
+
+                    <div class="condition-card">
+                        <div class="condition-header">
+                            <span class="condition-badge">DISC 216</span>
+                            <span style="color: var(--text-secondary);">Completed 4506 Forms</span>
+                        </div>
+                        <div class="condition-details">
+                            <div class="condition-detail">
+                                <label>Stage</label>
+                                <span>PTD</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Class</label>
+                                <span>UW</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Responsibility</label>
+                                <span>Underwriter</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Description</label>
+                                <span>Editable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Condition 216 - Completed 4506 Forms</h3>
+                        <ul class="step-list">
+                            <li><strong>Action:</strong> Add condition 216 and complete the description lines for ALL IRS 4506 forms required to be in file</li>
+                            <li><strong>Include:</strong> Even previously disclosed & signed versions</li>
+                            <li><strong>Purpose:</strong> This will capture ALL the forms the processor needs to ensure they remain in file for the closing package</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field Type</th>
+                                <th>Example Entry</th>
+                                <th>Years</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>B1 Tax Forms</strong></td>
+                                <td>1040</td>
+                                <td>2023; 2022</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B1 Tax Forms</strong></td>
+                                <td>W2</td>
+                                <td>2023; 2022</td>
+                            </tr>
+                            <tr>
+                                <td><strong>B2 Tax Forms</strong></td>
+                                <td>W2</td>
+                                <td>2023; 2022</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Name</strong></td>
+                                <td>Genie Cleaning (Partner Title)</td>
+                                <td>Partner 1065 - 2023; 2022</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="condition-card">
+                        <div class="condition-header">
+                            <span class="condition-badge">INC 412</span>
+                            <span style="color: var(--text-secondary);">Fully Executed 4506 Forms</span>
+                        </div>
+                        <div class="condition-details">
+                            <div class="condition-detail">
+                                <label>Stage</label>
+                                <span>PTF</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Class</label>
+                                <span>PTF</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Responsibility</label>
+                                <span>Closer & Funder</span>
+                            </div>
+                            <div class="condition-detail">
+                                <label>Description</label>
+                                <span>Editable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Auto-Condition Inc 412</h4>
+                        <p>Copy and paste the description of condition 216 to condition 412 for Closer & Funder to confirm closing package accuracy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Conditions for Review -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Conditions for Review</h2><span>Resubmission review and form verification</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Resubmission Received</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review IRS 4506 Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Forms Match Conditions?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Delete Unnecessary Forms</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Resubmission Review Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> At Resubmission, review the IRS 4506 Byte screen for form completion and accuracy</li>
+                            <li><strong>Step 2:</strong> All conditioned forms should be created and forms not needed for the file should be deleted</li>
+                            <li><strong>Step 3:</strong> Remember any form in the drop-down field will pull to the closing package</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Critical Verification Step</h4>
+                        <p>Prior to clearing Condition 216, ensure the borrower(s)' <strong>current and previous addresses & name</strong> on the 4506(s) match the loan file documentation on all created 4506 forms in the drop down of the IRS 4506 screen.</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Stored Documents</h4>
+                        <p>Ensure any signed 4506 forms in Stored Documents that are not needed are made "Inactive".</p>
+                        <p style="margin-top: 10px;"><strong>Example:</strong> The initial disclosures contained a 1040 4506-C. The borrower only has W2 income. The 1040 4506-C is unnecessary and should be made "Inactive" in Stored Documents.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Closer & Funder -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Closer & Funder</h2><span>Final verification and condition clearing</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Condition 412</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Compare to Closing Package</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Forms Present & Executed?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Clear Condition</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Resolve Missing Forms</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="role-cards">
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <h4>Closer Responsibilities</h4>
+                            </div>
+                            <div class="role-card-body">
+                                <ul>
+                                    <li><span class="check-icon">1.</span> Review condition 412 for the number of IRS 4506-C forms that should be in the closing package</li>
+                                    <li><span class="check-icon">2.</span> Compare closing package to condition and ensure forms are present</li>
+                                    <li><span class="check-icon">3.</span> Change condition Responsibility to <strong>Funder</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <h4>Funder Responsibilities</h4>
+                            </div>
+                            <div class="role-card-body">
+                                <ul>
+                                    <li><span class="check-icon">1.</span> Review condition 412 for the number of IRS 4506-C forms that should be in the closing package</li>
+                                    <li><span class="check-icon">2.</span> Compare signed closing package to condition and ensure all forms are present & <strong>fully executed</strong></li>
+                                    <li><span class="check-icon">3.</span> Clear Condition</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Condition 412 Action</th>
+                                <th>Final Step</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Closer</strong></td>
+                                <td>Compare closing package to condition</td>
+                                <td><span class="badge calculated-badge">Change Responsibility to Funder</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Funder</strong></td>
+                                <td>Verify all forms present & fully executed</td>
+                                <td><span class="badge required-badge">Clear Condition</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Completion</h4>
+                        <p>Once the Funder has verified all 4506-C forms are present, properly executed, and match the condition requirements, the condition can be cleared and the loan can proceed to funding.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>IRS 4506-C Quick Reference</h3>
+                <pre>
+IRS 4506-C WORKFLOW SUMMARY
+===========================
+
+PURPOSE
+-------
+- Request tax transcripts from IRS for income verification
+- Required for Post-Closing QC and Investor requirements
+- Even when not needed for UW approval
+
+COMMON REJECTION REASON
+-----------------------
+BORROWER ADDRESS VARIANCE - Always add previous addresses and name variations!
+
+ROLE RESPONSIBILITIES
+=====================
+
+DISCLOSURE COORDINATORS:
+[ ] Check stored documents for name/address confirmation
+[ ] Verify IRS 4506-C screen is complete
+[ ] If incomplete: Select 1040 forms, choose 2 most recent years
+
+PROCESSORS - FILE RECEIVED:
+[ ] If transcripts needed: Order 1040 during Processing Initial Review
+[ ] If not needed: Review name/address accuracy vs. loan docs
+
+PROCESSORS - APPROVED STATUS:
+[ ] Match forms in IRS 4506 screen to Condition 216
+[ ] Delete forms not needed for the condition
+[ ] DO NOT print to Stored Docs (auto-pulls to Closing Package)
+[ ] Make unnecessary signed forms "Inactive" in Stored Docs
+
+UNDERWRITERS - UW RECEIVED:
+[ ] Set Condition 216 (DISC) - List ALL required 4506 forms
+[ ] Set Condition 412 (INC) - Copy description from 216
+[ ] Mark non-required forms as "Inactive" in Stored Docs
+
+CONDITIONS FOR REVIEW:
+[ ] Verify IRS 4506 screen - forms complete and accurate
+[ ] Delete unnecessary forms from drop-down
+[ ] Ensure borrower addresses/names match loan file docs
+
+CLOSER:
+[ ] Review Condition 412 for required form count
+[ ] Compare closing package to condition
+[ ] Change responsibility to Funder
+
+FUNDER:
+[ ] Review Condition 412 for required form count
+[ ] Verify all forms present AND fully executed
+[ ] Clear Condition
+
+KEY CONDITIONS
+==============
+DISC 216: Completed 4506 Forms
+- Stage: PTD | Class: UW | Resp: Underwriter
+
+INC 412: Fully Executed 4506 Forms
+- Stage: PTF | Class: PTF | Resp: Closer & Funder
+
+COMMON FORM TYPES
+=================
+1040    - Individual Tax Return Transcript
+W2      - Wage and Income Transcript
+1065    - Partnership Return (Business)
+1120    - Corporation Return (Business)
+
+IMPORTANT REMINDERS
+===================
+- Forms in drop-down auto-pull to Closing Package
+- Business 4506-C must be created correctly to generate
+- Follow 4506 Guide for step-by-step instructions
+- Always verify address history matches loan documentation
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the IRS 4506-C workflow</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-addressvalidation')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Address Validation Agent</div>
+                        <div class="heat-desc">Auto-validate borrower addresses against IRS records</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-formmatching')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Form Matching Agent</div>
+                        <div class="heat-desc">Auto-match 4506 forms to UW conditions</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-conditioncopy')">
+                        <div class="heat-score">7.6</div>
+                        <div class="heat-name">Condition Sync Agent</div>
+                        <div class="heat-desc">Auto-copy condition 216 to 412</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>1 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-closingverify')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">Closing Package Verifier</div>
+                        <div class="heat-desc">Verify all 4506 forms in closing package</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Address Validation Agent -->
+                    <div class="agent-card" id="agent-addressvalidation">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">A</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Address Validation Agent</div>
+                                <div class="agent-type">Data Validation / Compliance</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically validates borrower current and previous addresses against loan file documentation and known IRS formatting requirements. Flags address variances that could cause IRS rejection - the most common rejection reason.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract Addresses</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare to 4506</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Format</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Variances</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('addressvalidation')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Form Matching Agent -->
+                    <div class="agent-card" id="agent-formmatching">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">F</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Form Matching Agent</div>
+                                <div class="agent-type">Workflow Automation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically parses Condition 216 requirements and matches them against forms in the IRS 4506 Byte screen. Identifies missing forms, flags unnecessary forms for deletion, and ensures compliance with underwriter conditions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Condition 216</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Scan 4506 Screen</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Forms</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Report</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('formmatching')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Condition Sync Agent -->
+                    <div class="agent-card" id="agent-conditioncopy">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Condition Sync Agent</div>
+                                <div class="agent-type">Workflow Automation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically copies the description from Condition 216 to Condition 412 when the underwriter sets 4506 requirements. Ensures Closer and Funder have accurate reference for closing package verification.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Detect 216 Update</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Copy Description</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update 412</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Log Action</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">1 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('conditioncopy')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Closing Package Verifier -->
+                    <div class="agent-card" id="agent-closingverify">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Closing Package Verifier</div>
+                                <div class="agent-type">Quality Control</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Scans the closing package to verify all required 4506-C forms are present and properly executed. Compares against Condition 412 requirements and alerts Closer/Funder of any missing or incomplete forms.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Condition 412</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Scan Package</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Signatures</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Checklist</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('closingverify')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>IRS 4506-C Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># IRS 4506-C Workflow - Byte LOS
+
+## Overview
+The 4506-C form is used to request tax transcripts directly from the IRS, ensuring accurate income verification and compliance. Required for Post-Closing QC and Investor requirements.
+
+## Role Responsibilities
+
+### Disclosure Coordinators
+- Check stored documents for borrower name/address confirmation
+- Verify IRS 4506-C screen is complete
+- If incomplete: Select 1040 forms for 2 most recent years
+
+### Processors - File Received
+- Transcripts Needed: Order 1040 during Processing Initial Review
+- Transcripts Not Needed: Review name/address accuracy
+
+### Processors - Approved Status
+- Match forms to Condition 216
+- Delete unnecessary forms
+- Do NOT print to Stored Docs (auto-pulls)
+- Make unneeded signed forms "Inactive"
+
+### Underwriters
+- Set Condition 216 (Completed 4506 Forms)
+- Set Condition 412 (Fully Executed 4506 Forms)
+- List ALL required forms in description
+
+### Closer
+- Review Condition 412
+- Compare closing package to condition
+- Change responsibility to Funder
+
+### Funder
+- Review Condition 412
+- Verify all forms present and fully executed
+- Clear Condition
+
+## Key Conditions
+- DISC 216: Stage PTD, Class UW, Resp Underwriter
+- INC 412: Stage PTF, Class PTF, Resp Closer and Funder
+
+## Common Form Types
+- 1040: Individual Tax Return Transcript
+- W2: Wage and Income Transcript
+- 1065: Partnership Return (Business)
+- 1120: Corporation Return (Business)
+
+## Critical Note
+Most common IRS rejection: BORROWER ADDRESS VARIANCE
+Always verify current and previous addresses match loan documentation!</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            addressvalidation: {
+                name: 'Address Validation Agent',
+                tags: ['Data Validation', 'Compliance', 'Medium Complexity', 'Critical Priority'],
+                purpose: 'This agent automatically validates borrower current and previous addresses against loan file documentation and known IRS formatting requirements. It flags address variances that could cause IRS rejection - the most common rejection reason for 4506-C forms.',
+                prompt: 'You are building a Data Validation Agent for CMG Financial Byte LOS IRS 4506-C process.\n\nAGENT NAME: Address Validation Agent\nTYPE: Data Validation / Compliance\n\nOBJECTIVE:\nCreate an agent that automatically extracts and validates borrower addresses from the loan file, compares them against the IRS 4506-C form entries, and flags any variances that could cause IRS rejection.\n\nINPUT DATA:\n- Borrower current address (from URLA)\n- Borrower previous addresses (from URLA/credit report)\n- Addresses entered on IRS 4506-C forms\n- Name variations (maiden names, aliases)\n\nVALIDATION RULES:\n1. Address Format Validation\n   - Street number and name match\n   - Unit/Apt numbers properly formatted\n   - City, State, ZIP match exactly\n   - No abbreviation inconsistencies\n\n2. Historical Address Check\n   - Verify all addresses from past 2 years included\n   - Cross-reference credit report addresses\n   - Flag addresses on tax returns not in 4506\n\n3. Name Validation\n   - Current legal name matches\n   - Previous names/maiden names included\n   - Name format matches IRS records\n\nOUTPUT:\n{\n  "validation_status": "PASS" | "WARNING" | "FAIL",\n  "address_variances": [...],\n  "missing_addresses": [],\n  "name_issues": []\n}',
+                integration: 'INTEGRATION POINTS:\n1. Byte LOS API\n   - Read URLA borrower information\n   - Read IRS 4506-C screen data\n   - Read credit report addresses\n\n2. Document Parser\n   - Extract addresses from stored documents\n   - OCR capability for scanned documents\n\n3. Address Standardization API\n   - USPS address validation\n   - Format normalization\n\n4. Alert System\n   - Flag variances in Byte\n   - Email notification to processor\n   - Dashboard warning indicator'
+            },
+            formmatching: {
+                name: 'Form Matching Agent',
+                tags: ['Workflow Automation', 'Compliance', 'Low Complexity', 'High Priority'],
+                purpose: 'This agent automatically parses Condition 216 requirements and matches them against forms in the IRS 4506 Byte screen. It identifies missing forms, flags unnecessary forms for deletion, and ensures compliance with underwriter conditions.',
+                prompt: 'You are building a Workflow Automation Agent for CMG Financial Byte LOS IRS 4506-C process.\n\nAGENT NAME: Form Matching Agent\nTYPE: Workflow Automation\n\nOBJECTIVE:\nParse underwriter Condition 216 to extract required 4506-C form specifications, then compare against forms in the IRS 4506 Byte screen. Generate actionable report for processors.\n\nINPUT DATA:\n- Condition 216 description text\n- IRS 4506 Byte screen form list\n- Borrower information\n\nPARSING LOGIC:\n1. Extract from Condition 216:\n   - Borrower identifiers (B1, B2)\n   - Form types (1040, W2, 1065, 1120)\n   - Tax years required\n   - Business names (if applicable)\n\n2. Scan IRS 4506 Screen:\n   - List all forms in dropdown\n   - Extract form type and years\n   - Identify borrower assignment\n\n3. Compare and Report:\n   - Required forms present\n   - Extra forms to delete\n   - Missing forms to create',
+                integration: 'INTEGRATION POINTS:\n1. Byte Conditions API\n   - Read Condition 216 description\n   - Parse structured condition data\n\n2. IRS 4506 Screen API\n   - Read form dropdown contents\n   - Identify form metadata\n\n3. Processor Dashboard\n   - Display match report\n   - One-click delete recommendations\n   - Create missing form shortcuts'
+            },
+            conditioncopy: {
+                name: 'Condition Sync Agent',
+                tags: ['Workflow Automation', 'Efficiency', 'Low Complexity', 'High Priority'],
+                purpose: 'This agent automatically copies the description from Condition 216 to Condition 412 when the underwriter sets 4506 requirements. Ensures Closer and Funder have accurate reference for closing package verification.',
+                prompt: 'You are building a Workflow Automation Agent for CMG Financial Byte LOS IRS 4506-C process.\n\nAGENT NAME: Condition Sync Agent\nTYPE: Workflow Automation\n\nOBJECTIVE:\nMonitor Condition 216 for updates and automatically sync the description to Condition 412, ensuring consistency between underwriting conditions and closing/funding verification requirements.\n\nTRIGGER:\n- Condition 216 description updated\n- Condition 216 newly created\n- Manual sync request\n\nSYNC LOGIC:\n1. Detect 216 Change\n2. Copy to 412 with appropriate header change\n3. Log Action with timestamp',
+                integration: 'INTEGRATION POINTS:\n1. Byte Conditions API\n   - Read Condition 216\n   - Write to Condition 412\n   - Check condition locks\n\n2. Event System\n   - Subscribe to condition updates\n   - Trigger on save events\n\n3. Audit Trail\n   - Log all sync operations\n   - Track version history'
+            },
+            closingverify: {
+                name: 'Closing Package Verifier',
+                tags: ['Quality Control', 'Compliance', 'Low Complexity', 'Medium Priority'],
+                purpose: 'This agent scans the closing package to verify all required 4506-C forms are present and properly executed. It compares against Condition 412 requirements and alerts Closer/Funder of any missing or incomplete forms.',
+                prompt: 'You are building a Quality Control Agent for CMG Financial Byte LOS IRS 4506-C process.\n\nAGENT NAME: Closing Package Verifier\nTYPE: Quality Control\n\nOBJECTIVE:\nScan the closing package to verify all required 4506-C forms per Condition 412 are present, properly executed with signatures, and ready for funding.\n\nVERIFICATION LOGIC:\n1. Parse Condition 412\n2. Scan Closing Package\n3. Signature Verification\n4. Generate Checklist',
+                integration: 'INTEGRATION POINTS:\n1. Document Management\n   - Access closing package\n   - Read PDF/image content\n\n2. Signature Detection\n   - ML model for signature presence\n   - Date field extraction\n\n3. Closer/Funder Dashboard\n   - Display verification checklist\n   - One-click condition clearing'
+            }
+        };
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => '<span class="prompt-tag">' + t + '</span>').join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try {
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
