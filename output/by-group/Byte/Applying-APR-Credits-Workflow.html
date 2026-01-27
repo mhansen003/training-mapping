@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applying Credits Toward APR - Byte Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+        .flow-node.end { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.warning-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Step List */
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .step-list li:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .prompt-modal .modal {
+            max-width: 800px;
+        }
+
+        .prompt-modal .modal-header {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+        }
+
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .prompt-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Applying Credits Toward APR</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Applying Credits Toward APR</h2>
+            <p>ComplianceEase QM Points & Fees</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Identify the Fail</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Review Report</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Enable Itemized Credit</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Apply Lender Credits</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Update Section J</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Re-run Compliance</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Verify & Notify</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Applying Credits Toward APR (Not for Interest Rate Chosen)</h1>
+                <p class="subtitle">Resolve QM Points and Fees ComplianceEase Fails with Lender Credits</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte</span>
+                    <span class="meta-item">Role: Disclosure Team Lead Only</span>
+                    <span class="meta-item">Updated: June 2, 2020</span>
+                    <span class="meta-item">Typical Duration: 10-15 min</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Overview Flow Diagram -->
+            <section class="section" style="margin-bottom: 30px;">
+                <div class="section-header">
+                    <div class="section-number">O</div>
+                    <div class="section-title"><h2>Process Overview</h2><span>End-to-end workflow visualization</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">ComplianceEase Fail Discovered</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Email Disclosure Team Lead</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Report & Note Variance</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Enable Itemized Lender Credit</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Apply Credits to APR Fees</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Update Section J Totals</div>
+                        </div>
+                        <div class="flow-row">
+                            <span class="flow-arrow down">|</span>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Re-run ComplianceEase</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Pass?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Notify Disclosure Coordinator</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Apply Additional Credits</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Authorization Required</h4>
+                        <p><strong>Only Disclosure Team Leads</strong> can apply lender credits toward APR fees. If you are not a Disclosure Team Lead, you must escalate to one for this process.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Identify the Fail -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Identify the ComplianceEase Fail</h2><span>Escalate QM Points and Fees failure</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">QM Points & Fees Fail Discovered</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Email Disclosure Team Lead</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Request Review</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>What Triggers This Process?</h4>
+                        <p>A ComplianceEase fail may occur for <strong>QM Points and Fees</strong>. When this happens, a Lender credit may be applied toward an APR fee to cure the variance.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Finding</th>
+                                <th>Result</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Qualified Mortgage Points and Fees Finding</strong></td>
+                                <td><span class="badge required-badge">YES (Fail)</span></td>
+                                <td>Apply Lender Credits to APR fees</td>
+                            </tr>
+                            <tr>
+                                <td>Qualified Mortgage Negative Amortization Loan</td>
+                                <td><span class="badge optional-badge">NO</span></td>
+                                <td>No action needed</td>
+                            </tr>
+                            <tr>
+                                <td>Qualified Mortgage Interest Only Loan</td>
+                                <td><span class="badge optional-badge">NO</span></td>
+                                <td>No action needed</td>
+                            </tr>
+                            <tr>
+                                <td>Qualified Mortgage Balloon Payment Loan</td>
+                                <td><span class="badge optional-badge">NO</span></td>
+                                <td>No action needed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 2: Review Report -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Review ComplianceEase Report</h2><span>Note the variance amount</span></div>
+                </div>
+                <div class="section-content">
+                    <ul class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Open Stored Documents in Byte</strong>
+                                <p>Navigate to the loan file and access the stored documents section.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Review the ComplianceEase Report</strong>
+                                <p>Locate the Findings Summary section and identify the QM Points and Fees Finding.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Note the Amount of the Variance</strong>
+                                <p>Record the variance amount shown in the report. This is the total credit amount needed to cure the fail.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <h4>Don't Forget!</h4>
+                        <p><strong>Write down the amount of the fail.</strong> You will need this exact amount when applying lender credits to APR fees.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Report Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Loan Data</strong></td>
+                                <td>The actual points and fees from the loan</td>
+                                <td>$5,395.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Comparison Data</strong></td>
+                                <td>The QM threshold limit</td>
+                                <td>$3,155.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Variance</strong></td>
+                                <td>Amount over the threshold (credit needed)</td>
+                                <td>+$2,240.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 3: Enable Itemized Credit -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Enable Itemized Lender Credit</h2><span>Configure Loan Estimate Page 2</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Loan Estimate Page 2</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Check "Itemized Lender Credit" Box</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Lender Credits Section Enabled</div>
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Open the Loan Estimate Page 2 Screen</strong>
+                                <p>Navigate to the Loan Estimate section in Byte and open Page 2.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Check the Itemized Lender Credit Box</strong>
+                                <p>Enable the itemized lender credit functionality by checking the checkbox.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="info-box">
+                        <h4>Lender Credits Section</h4>
+                        <p>Once enabled, you will see the following fields in the Lender Credits section:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Ops Lender Credit NFIRC</li>
+                            <li>Lender Credit Not for Interest Rate Chosen</li>
+                            <li>Lender Credit for Interest Rate Chosen</li>
+                            <li>Total Lender Lump Sum Credits</li>
+                            <li>Reason For Lender Credit Request</li>
+                            <li>Was Lender Credit Requested?</li>
+                            <li>Lender Credit Approver</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Apply Lender Credits -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Apply Lender Credits to APR Fees</h2><span>Edit origination charges</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="tip-box">
+                        <h4>Credit Application Order</h4>
+                        <p>The credit <strong>must be applied toward APR fees</strong>. Begin with <strong>Admin Fee - Lender</strong> and continue applying credit to other APR fees until the total amount to cure the ComplianceEase fail is met.</p>
+                    </div>
+
+                    <ul class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Navigate to Section A. Origination Charges</strong>
+                                <p>Locate the origination charges section on the Loan Estimate.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Click the Edit Link Next to the Appropriate Fee</strong>
+                                <p>Start with "Admin Fee - Lender". The Closing Cost Details window will open.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Modify the Paid by Borrower Field</strong>
+                                <p>Delete or modify the amount currently shown in "Paid by Borrower".</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">4</span>
+                            <div class="step-content">
+                                <strong>Change the Paid By Drop-down to Lender</strong>
+                                <p>Select "Lender" from the Paid by dropdown menu.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">5</span>
+                            <div class="step-content">
+                                <strong>Add the Credit Amount</strong>
+                                <p>Enter the credit amount in the "Paid by" field for the Lender.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">6</span>
+                            <div class="step-content">
+                                <strong>Click OK</strong>
+                                <p>Save the changes to the fee.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">7</span>
+                            <div class="step-content">
+                                <strong>Repeat for Additional Fees if Needed</strong>
+                                <p>Continue adding Lender Credits to other APR fees until the total amount to cure the ComplianceEase fail is met.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>APR Fee Type</th>
+                                <th>Priority</th>
+                                <th>POC To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Admin Fee - Lender</strong></td>
+                                <td><span class="badge required-badge">First</span></td>
+                                <td>L (Lender)</td>
+                            </tr>
+                            <tr>
+                                <td>Loan Discount Points</td>
+                                <td><span class="badge optional-badge">As Needed</span></td>
+                                <td>L (Lender)</td>
+                            </tr>
+                            <tr>
+                                <td>Application Fee</td>
+                                <td><span class="badge optional-badge">As Needed</span></td>
+                                <td>L (Lender)</td>
+                            </tr>
+                            <tr>
+                                <td>Application Fee - Lender</td>
+                                <td><span class="badge optional-badge">As Needed</span></td>
+                                <td>L (Lender)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Closing Cost Details Window Fields</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>HUD Line No:</strong> Line number reference</li>
+                            <li><strong>Line Name:</strong> Fee description (e.g., Admin Fee - Lender)</li>
+                            <li><strong>Paid by Borrower:</strong> Amount paid by borrower</li>
+                            <li><strong>Paid by (dropdown):</strong> Select Lender</li>
+                            <li><strong>Paid by (amount):</strong> Enter credit amount</li>
+                            <li><strong>Total Amount:</strong> Sum of all payments</li>
+                            <li><strong>TRID Block:</strong> Origination Charges</li>
+                            <li><strong>Paid To Type:</strong> Lender</li>
+                            <li><strong>Paid To:</strong> CMG Mortgage Inc., DBA CMG Financial</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Update Section J -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Update Section J - Total Closing Costs</h2><span>Reconcile lender credit totals</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Scroll to Section J</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Calculate Lump Sum Amount</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Update Lender Credits Fields</div>
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Scroll to Section J. Total Closing Costs</strong>
+                                <p>Navigate to the J. Total Closing Costs section of the Loan Estimate.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Subtract Itemized Amount from Lender Credits - Total</strong>
+                                <p>Calculate: Lender Credits Total - Itemized Amount = Lump Sum Amount</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <strong>Enter the Result in Lender Credits - Lump Sum Field</strong>
+                                <p>Input the calculated lump sum amount.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>D+I (Total Loan Costs + Total Other Costs)</strong></td>
+                                <td>Sum of all loan and other costs</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lender Credits - Total</strong></td>
+                                <td>Total lender credits available</td>
+                                <td>($3,000)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lender Credits - Lump Sum</strong></td>
+                                <td>Credits not itemized (Total - Itemized)</td>
+                                <td>$500.00</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lender Credits - Itemized</strong></td>
+                                <td>Credits applied to specific fees</td>
+                                <td>$2,500.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Verification Formula</h4>
+                        <p><strong>Lender Credits - Itemized</strong> should equal <strong>Total - Lump Sum</strong></p>
+                        <p style="margin-top: 10px;">Example: If Total = $3,000 and Lump Sum = $500, then Itemized = $2,500</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Re-run Compliance -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Re-run ComplianceEase</h2><span>Submit for compliance check</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Compliance Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click Submit</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Review New Report</div>
+                        </div>
+                    </div>
+
+                    <ul class="step-list">
+                        <li>
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <strong>Open the Compliance Screen</strong>
+                                <p>Navigate to the ComplianceEase section in Byte.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <strong>Click Submit</strong>
+                                <p>Re-run ComplianceEase to check if the fail has been cured.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="info-box">
+                        <h4>ComplianceEase Screen Options</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>ComplianceEase Web Site:</strong> External compliance resource</li>
+                            <li><strong>E-Mail ComplianceEase Support:</strong> Contact support</li>
+                            <li><strong>Audit Type:</strong> Select Pre-Close</li>
+                            <li><strong>Submit:</strong> Run the compliance check</li>
+                            <li><strong>View Documents:</strong> Review generated documents</li>
+                            <li><strong>Create XML:</strong> Generate XML output</li>
+                            <li><strong>Defaults:</strong> Reset to default settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Verify & Notify -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Verify Results & Notify</h2><span>Complete the process</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review New Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Fails Present?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">NO FAILS</span>
+                                <div class="flow-node output">Notify Disclosure Coordinator</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node end">Complete</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">FAILS PRESENT</span>
+                                <div class="flow-node exception">Additional APR Credits Required</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Return to Step 4</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Success Verification</h4>
+                        <p>After a successful compliance run, the APR credit will appear on:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>Initial Fee Worksheet</strong> - As Lender Paid</li>
+                            <li><strong>Closing Disclosure</strong> - As Lender Paid</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Result</th>
+                                <th>Action</th>
+                                <th>Next Step</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge calculated-badge">NO FAILS</span></td>
+                                <td>Compliance passed</td>
+                                <td>Notify Disclosure Coordinator</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge required-badge">FAILS PRESENT</span></td>
+                                <td>Additional credits needed</td>
+                                <td>Confirm if additional APR fees require credit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Closing Cost Details Display</h4>
+                        <p>After successful completion, the fee will display as follows:</p>
+                        <table class="field-table" style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Items Payable in Connection with Loan</th>
+                                    <th>Amount</th>
+                                    <th>Paid By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Admin Fee: CMG Mortgage Inc., DBA CMG Financial</td>
+                                    <td>$2,500.00</td>
+                                    <td>Borrower</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>$2,500.00</td>
+                                    <td>Lender</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Checklist</h3>
+                <pre>
+APPLYING CREDITS TOWARD APR - QUICK REFERENCE
+==============================================
+
+PRE-REQUISITES:
+[ ] User must be Disclosure Team Lead
+[ ] ComplianceEase fail for QM Points and Fees identified
+[ ] Variance amount documented
+
+STEP-BY-STEP:
+1. [ ] Email Disclosure Team Lead about ComplianceEase fail
+2. [ ] Open Stored Documents in Byte
+3. [ ] Review ComplianceEase report and note variance amount
+4. [ ] Open Loan Estimate Page 2 screen
+5. [ ] Check "Itemized Lender Credit" checkbox
+6. [ ] Edit Admin Fee - Lender (or other APR fee):
+       - Delete/modify Paid by Borrower amount
+       - Change Paid by dropdown to "Lender"
+       - Enter credit amount
+       - Click OK
+7. [ ] Repeat for additional fees if needed
+8. [ ] Scroll to Section J. Total Closing Costs
+9. [ ] Update Lender Credits - Lump Sum field
+       Formula: Total - Itemized = Lump Sum
+10.[ ] Open Compliance Screen
+11.[ ] Click Submit to re-run ComplianceEase
+12.[ ] Review report for pass/fail
+13.[ ] If pass: Notify Disclosure Coordinator
+14.[ ] If fail: Apply additional credits and repeat
+
+VERIFICATION:
+[ ] Lender Credits - Itemized = Total - Lump Sum
+[ ] APR credit shows on Initial Fee Worksheet as "Lender Paid"
+[ ] APR credit shows on Closing Disclosure as "Lender Paid"
+
+APR FEE PRIORITY ORDER:
+1. Admin Fee - Lender (START HERE)
+2. Loan Discount Points
+3. Application Fee
+4. Application Fee - Lender
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation potential for APR Credit Application workflow</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">3</div>
+                    <div class="agent-summary-label">Potential Agents</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">65%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">8 min</div>
+                    <div class="agent-summary-label">Est. Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">ROI Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Automation Opportunity Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-1')">
+                        <div class="heat-score">8</div>
+                        <div class="heat-name">Variance Calculator Agent</div>
+                        <div class="heat-desc">Auto-extract variance amounts from ComplianceEase reports</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Frequency: <span>Daily</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-2')">
+                        <div class="heat-score">7</div>
+                        <div class="heat-name">Credit Allocation Agent</div>
+                        <div class="heat-desc">Optimize credit distribution across APR fees</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Frequency: <span>Daily</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-3')">
+                        <div class="heat-score">6</div>
+                        <div class="heat-name">Section J Reconciliation Agent</div>
+                        <div class="heat-desc">Auto-calculate and validate lender credit totals</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Frequency: <span>Daily</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Agent 1: Variance Calculator -->
+                    <div class="agent-card" id="agent-1">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Variance Calculator Agent</div>
+                                <div class="agent-type">Data Extraction</div>
+                            </div>
+                            <div class="agent-priority high">High</div>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically extracts QM Points and Fees variance amounts from ComplianceEase reports, eliminating manual review and calculation errors.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Workflow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Report</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Extract Variance</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Alert Team Lead</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3m</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="openPromptModal('variance-calc')">View AI Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- Agent 2: Credit Allocation -->
+                    <div class="agent-card" id="agent-2">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Credit Allocation Agent</div>
+                                <div class="agent-type">Decision Support</div>
+                            </div>
+                            <div class="agent-priority high">High</div>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Intelligently distributes lender credits across APR fees following the priority order (Admin Fee first), optimizing for compliance while minimizing over-allocation.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Workflow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read Variance</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Map APR Fees</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Allocate Credits</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4m</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">90%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="openPromptModal('credit-alloc')">View AI Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- Agent 3: Section J Reconciliation -->
+                    <div class="agent-card" id="agent-3">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">R</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Section J Reconciliation Agent</div>
+                                <div class="agent-type">Validation</div>
+                            </div>
+                            <div class="agent-priority medium">Medium</div>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically calculates and validates the relationship between Total, Lump Sum, and Itemized lender credits in Section J, ensuring mathematical accuracy.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Workflow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read Totals</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2m</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="openPromptModal('section-j')">View AI Prompt</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Document Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyDoc()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent">
+# Applying Credits Toward APR (Not for Interest Rate Chosen)
+
+## Overview
+A ComplianceEase fail may occur for QM Points and Fees. If this occurs, a Lender credit may be applied toward an APR fee. Only Disclosure Team Leads can apply lender credits toward these APR fees.
+
+## Prerequisites
+- User must be Disclosure Team Lead
+- ComplianceEase fail identified for QM Points and Fees
+- Access to Byte system
+
+## Process Steps
+
+### Step 1: Identify the Fail
+When a ComplianceEase fail is discovered for QM Points and Fees, email the Disclosure Team Lead to review the ComplianceEase Fail.
+
+### Step 2: Review the Report
+1. Open Stored Documents in Byte
+2. Review the ComplianceEase report
+3. Note the amount of the Variance
+4. Write down the amount of the fail
+
+### Step 3: Enable Itemized Lender Credit
+1. Open the Loan Estimate Page 2 screen
+2. Check the "Itemized Lender Credit" box
+
+### Step 4: Apply Lender Credits to APR Fees
+The credit must be applied toward APR fees. Begin with Admin Fee - Lender and continue applying credit to other APR fees.
+
+1. Click the Edit link next to the appropriate fee
+2. Delete or Modify the amount in Paid by Borrower
+3. Change the Paid by drop-down to Lender
+4. Add the credit amount in the Paid by field
+5. Click OK
+6. Continue adding Lender Credits until the total amount to cure the ComplianceEase fail is met
+
+### Step 5: Update Section J
+1. Scroll to Section J
+2. Subtract the itemized amount from Lender Credits - Total
+3. Enter the itemized amount in the Lender Credits - Lump Sum field
+4. Verify: Lender Credits - Itemized total should equal Total - Lump Sum
+
+### Step 6: Re-run ComplianceEase
+1. Open the Compliance Screen
+2. Click Submit to re-run ComplianceEase
+
+### Step 7: Verify & Notify
+1. Review the report
+2. If no fails are present, notify the Disclosure Coordinator
+3. If fails are present, confirm if additional APR fees require a credit
+
+## Result
+The APR credit now appears on the Initial Fee Worksheet and the Closing Disclosure as Lender Paid.
+
+---
+Updated: June 2, 2020
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPrompt()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body" id="promptModalBody">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Success Toast -->
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Scroll-spy with click debounce
+        let isScrolling = false;
+        let scrollTimeout = null;
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.sidebar-tab').forEach(tab => tab.classList.remove('active'));
+            if (tabName === 'workflow') {
+                document.querySelector('.sidebar-tab:first-child').classList.add('active');
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+            }
+
+            // Update panels
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(tabName + '-panel').classList.add('active');
+
+            // Update nav visibility
+            document.getElementById('workflow-nav').style.display = tabName === 'workflow' ? 'block' : 'none';
+            document.getElementById('agents-nav').style.display = tabName === 'agents' ? 'block' : 'none';
+        }
+
+        // Scroll spy for workflow navigation
+        function updateScrollSpy() {
+            if (isScrolling) return;
+
+            const sections = document.querySelectorAll('.section, .quick-ref');
+            const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+            let currentSection = '';
+            const scrollPos = window.scrollY + 150;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPos) {
+                    currentSection = section.id;
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + currentSection) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Nav click handler with debounce
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                isScrolling = true;
+
+                // Clear existing timeout
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // Update active state immediately
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Scroll to section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateScrollSpy);
+
+        // Agent heat map click
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) {
+                agent.scrollIntoView({ behavior: 'smooth' });
+                agent.classList.add('highlight');
+                setTimeout(() => agent.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Document modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+        }
+
+        function copyDoc() {
+            const content = document.getElementById('docContent').textContent;
+            navigator.clipboard.writeText(content);
+            showCopySuccess();
+        }
+
+        // Prompt modal
+        const prompts = {
+            'variance-calc': {
+                title: 'Variance Calculator Agent',
+                tags: ['Data Extraction', 'ComplianceEase', 'QM Points & Fees'],
+                prompt: `You are a Variance Calculator Agent for mortgage compliance.
+
+TASK: Extract QM Points and Fees variance from ComplianceEase reports.
+
+INPUT: ComplianceEase Findings Summary report
+
+PROCESS:
+1. Locate "Qualified Mortgage Points and Fees Finding" row
+2. Check if Result = "YES" (indicating a fail)
+3. Extract values:
+   - Loan Data: Actual points and fees amount
+   - Comparison Data: QM threshold limit
+   - Variance: Amount over threshold
+4. Calculate required credit: Variance amount
+
+OUTPUT FORMAT:
+{
+  "status": "FAIL",
+  "loan_data": "$X,XXX.XX",
+  "threshold": "$X,XXX.XX",
+  "variance": "$X,XXX.XX",
+  "credit_needed": "$X,XXX.XX",
+  "alert": "Disclosure Team Lead review required"
+}
+
+VALIDATION:
+- Verify Variance = Loan Data - Comparison Data
+- Flag any discrepancies for manual review`
+            },
+            'credit-alloc': {
+                title: 'Credit Allocation Agent',
+                tags: ['Decision Support', 'APR Fees', 'Optimization'],
+                prompt: `You are a Credit Allocation Agent for mortgage compliance.
+
+TASK: Optimally distribute lender credits across APR fees to cure QM Points and Fees fail.
+
+INPUT:
+- Required credit amount (variance)
+- Available APR fees and their amounts
+
+APR FEE PRIORITY ORDER:
+1. Admin Fee - Lender (ALWAYS START HERE)
+2. Loan Discount Points
+3. Application Fee
+4. Application Fee - Lender
+5. Other APR-eligible fees
+
+PROCESS:
+1. Start with Admin Fee - Lender
+2. Apply credit up to the full fee amount
+3. If variance not cured, move to next fee in priority
+4. Continue until total credits = required variance
+5. Never over-allocate (credits should equal variance exactly)
+
+ALLOCATION RULES:
+- Credit cannot exceed individual fee amount
+- Sum of credits must equal variance amount
+- Document each allocation for audit trail
+
+OUTPUT FORMAT:
+{
+  "total_required": "$X,XXX.XX",
+  "allocations": [
+    {"fee": "Admin Fee - Lender", "credit": "$X,XXX.XX"},
+    {"fee": "Application Fee", "credit": "$XXX.XX"}
+  ],
+  "remaining": "$0.00",
+  "status": "COMPLETE"
+}`
+            },
+            'section-j': {
+                title: 'Section J Reconciliation Agent',
+                tags: ['Validation', 'Calculation', 'Section J'],
+                prompt: `You are a Section J Reconciliation Agent for mortgage compliance.
+
+TASK: Calculate and validate lender credit fields in Section J - Total Closing Costs.
+
+INPUT:
+- Lender Credits - Total
+- Itemized credit amount (sum of individual credits applied)
+
+CALCULATION:
+Lump Sum = Total - Itemized
+
+VALIDATION RULE:
+Itemized MUST equal Total - Lump Sum
+
+PROCESS:
+1. Read Lender Credits - Total value
+2. Sum all itemized lender credits applied to APR fees
+3. Calculate: Lump Sum = Total - Itemized
+4. Validate: Itemized = Total - Lump Sum
+5. Flag discrepancies
+
+OUTPUT FORMAT:
+{
+  "lender_credits_total": "$X,XXX.XX",
+  "lender_credits_itemized": "$X,XXX.XX",
+  "lender_credits_lump_sum": "$XXX.XX",
+  "validation": "PASS",
+  "formula_check": "Itemized ($X,XXX.XX) = Total ($X,XXX.XX) - Lump Sum ($XXX.XX)"
+}
+
+ERROR HANDLING:
+If validation fails, return:
+{
+  "validation": "FAIL",
+  "discrepancy": "$XX.XX",
+  "action": "Manual review required"
+}`
+            }
+        };
+
+        function openPromptModal(promptKey) {
+            const prompt = prompts[promptKey];
+            document.getElementById('promptModalTitle').textContent = prompt.title;
+
+            let tagsHtml = '<div class="prompt-tags">';
+            prompt.tags.forEach(tag => {
+                tagsHtml += `<span class="prompt-tag">${tag}</span>`;
+            });
+            tagsHtml += '</div>';
+
+            document.getElementById('promptModalBody').innerHTML = `
+                ${tagsHtml}
+                <div class="prompt-section">
+                    <h4>Agent Prompt</h4>
+                    <div class="prompt-box" id="currentPrompt">${prompt.prompt}</div>
+                </div>
+            `;
+
+            document.getElementById('promptModal').classList.add('show');
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+        }
+
+        function copyPrompt() {
+            const prompt = document.getElementById('currentPrompt').textContent;
+            navigator.clipboard.writeText(prompt);
+            showCopySuccess();
+        }
+
+        function showCopySuccess() {
+            const toast = document.getElementById('copySuccess');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        }
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        });
+
+        // Initialize
+        updateScrollSpy();
+    </script>
+</body>
+</html>
