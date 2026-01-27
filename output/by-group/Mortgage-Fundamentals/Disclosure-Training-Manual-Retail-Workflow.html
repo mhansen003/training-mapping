@@ -1,0 +1,2836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclosure Training Manual (Retail) - CMG Financial</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --border-color: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Fixed Breadcrumb */
+        .breadcrumb {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--accent-blue); }
+        .breadcrumb .separator { color: var(--text-secondary); opacity: 0.5; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+
+        /* Fixed Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 45px;
+            bottom: 0;
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .sidebar-tab:hover { color: var(--text-primary); background: rgba(59, 130, 246, 0.1); }
+        .sidebar-tab.active { color: var(--accent-blue); background: rgba(59, 130, 246, 0.15); border-bottom: 2px solid var(--accent-blue); }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .nav-item:hover { background: rgba(59, 130, 246, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-left: 3px solid var(--accent-blue); }
+
+        .nav-number {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-label { flex: 1; }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .doc-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 75px 40px 40px 40px;
+            min-height: 100vh;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 20px; }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .meta-item {
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 20px; height: 20px; border-radius: 4px; }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 40px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.1));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .section-title h2 { font-size: 1.3rem; color: var(--text-primary); margin-bottom: 5px; }
+        .section-title span { font-size: 0.9rem; color: var(--text-secondary); }
+
+        .section-content { padding: 25px; }
+
+        /* Workflow Diagram */
+        .workflow-diagram {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .flow-node {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .flow-node.action { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .flow-node.decision { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 8px; }
+        .flow-node.input { background: #111827; border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.exception { background: linear-gradient(135deg, #f43f5e, #dc2626); color: white; }
+        .flow-node.output { background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; }
+
+        .flow-arrow { color: var(--text-secondary); font-weight: bold; }
+
+        .decision-branch {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding-left: 30px;
+        }
+
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .branch-label {
+            background: var(--bg-card-hover);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-amber);
+        }
+
+        /* Tables */
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .field-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .field-table tr:hover td { background: rgba(59, 130, 246, 0.05); }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .required-badge { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .optional-badge { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .calculated-badge { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .warning-badge { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+        /* Info/Tip/Exception Boxes */
+        .info-box, .tip-box, .exception-box {
+            padding: 18px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .tip-box {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .exception-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 8px; }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 8px; }
+        .exception-box h4 { color: var(--accent-red); margin-bottom: 8px; }
+
+        .info-box p, .tip-box p, .exception-box p { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .quick-ref h3 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+        }
+
+        .quick-ref pre {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .decision-tree h3 {
+            color: var(--accent-teal);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Agent Styles */
+        .agent-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .agent-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .agent-summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { color: var(--text-secondary); font-size: 0.85rem; margin-top: 5px; }
+
+        /* Heat Map */
+        .heat-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 60px; height: 12px; border-radius: 6px; }
+
+        .heat-map-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .heat-map-title { font-size: 1.2rem; color: var(--text-primary); margin-bottom: 20px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .heat-item.critical { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .heat-item.high { background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 179, 8, 0.2)); border: 1px solid rgba(249, 115, 22, 0.3); }
+        .heat-item.medium { background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(34, 197, 94, 0.2)); border: 1px solid rgba(234, 179, 8, 0.3); }
+        .heat-item.low { background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(20, 184, 166, 0.2)); border: 1px solid rgba(34, 197, 94, 0.3); }
+
+        .heat-score { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
+        .heat-name { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 5px 0; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 10px; }
+        .heat-metric { font-size: 0.8rem; color: var(--text-secondary); }
+        .heat-metric span { color: var(--accent-blue); font-weight: 600; }
+
+        /* Agent Grid */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+        .agent-card.highlight { box-shadow: 0 0 0 3px var(--accent-blue), 0 15px 40px rgba(59, 130, 246, 0.3); }
+
+        .agent-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .agent-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .agent-type { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+
+        .agent-card-body { padding: 20px; }
+        .agent-description { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .agent-flow-title { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+        .agent-step {
+            background: var(--bg-card-hover);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .agent-arrow { color: var(--accent-blue); }
+
+        .agent-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .agent-stat {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .agent-stat-value { font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); }
+        .agent-stat-label { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .agent-prompt-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .agent-prompt-btn:hover { transform: scale(1.02); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 { color: var(--text-primary); }
+
+        .modal-actions { display: flex; gap: 10px; }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-btn.copy { background: var(--accent-blue); color: white; }
+        .modal-btn.close { background: var(--bg-card-hover); color: var(--text-secondary); }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-success {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+            z-index: 3000;
+        }
+
+        /* Prompt Modal Styles */
+        .prompt-section { margin-bottom: 20px; }
+        .prompt-section h4 { color: var(--accent-purple); margin-bottom: 10px; font-size: 0.9rem; }
+        .prompt-box {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .agent-summary { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Disclosure Training Manual (Retail)</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Disclosure Training</h2>
+            <p>Retail Disclosure Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">BytePro Introduction</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Managing Assigned Loans</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Disclosure Checklist</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Fire Rules Engine</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">HMDA Geocoding</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Loan Estimate Pages</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">IRS 4506 & Addendums</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">ComplianceEase</span>
+            </a>
+            <a href="#section-9" class="nav-item">
+                <span class="nav-number">9</span>
+                <span class="nav-label">DocuTech & IDS</span>
+            </a>
+            <a href="#section-10" class="nav-item">
+                <span class="nav-number">10</span>
+                <span class="nav-label">Re-Disclosures</span>
+            </a>
+            <a href="#section-11" class="nav-item">
+                <span class="nav-number">11</span>
+                <span class="nav-label">Change of Circumstances</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Disclosure Training Manual (Retail)</h1>
+                <p class="subtitle">Comprehensive guide for disclosure processing, compliance audits, and document preparation in BytePro LOS</p>
+                <div class="meta">
+                    <span class="meta-item">System: BytePro LOS</span>
+                    <span class="meta-item">Role: Disclosure Desk</span>
+                    <span class="meta-item">Updated: December 5, 2024</span>
+                    <span class="meta-item">Pages: 97</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: BytePro Introduction -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>BytePro Introduction</h2><span>System overview and navigation fundamentals</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Login</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Navigate Dashboard</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Access Loan Pipeline</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Open Loan File</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>BytePro LOS Overview</h4>
+                        <p>BytePro is CMG Financial's Loan Origination System used for processing mortgage applications, managing disclosures, and ensuring regulatory compliance. The system integrates with ComplianceEase for audits and DocuTech/IDS for document preparation.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Navigation Element</th>
+                                <th>Purpose</th>
+                                <th>Access</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dashboard</strong></td>
+                                <td>Central hub for loan pipeline and tasks</td>
+                                <td><span class="badge calculated-badge">Home Screen</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Loan Pipeline</strong></td>
+                                <td>View and manage assigned loans</td>
+                                <td><span class="badge calculated-badge">Pipeline Menu</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Disclosure Checklist</strong></td>
+                                <td>Track disclosure requirements and status</td>
+                                <td><span class="badge required-badge">Per Loan</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fire Rules</strong></td>
+                                <td>Automated compliance validation</td>
+                                <td><span class="badge calculated-badge">Auto-Run</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Best Practice</h4>
+                        <p>Always verify your assigned loans at the start of each day. Use the pipeline filters to prioritize loans approaching disclosure deadlines.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Managing Assigned Loans -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Managing Assigned Loans</h2><span>Pipeline management and loan prioritization</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Access Pipeline</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Apply Filters</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Disclosure Due?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node exception">Priority Action</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Standard Queue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Loan Prioritization Criteria</h3>
+                        <ul class="step-list">
+                            <li><strong>Critical (Same Day):</strong> Loans with disclosure deadlines within 24 hours</li>
+                            <li><strong>High Priority:</strong> Initial disclosures for new applications (3-day rule)</li>
+                            <li><strong>Standard:</strong> Re-disclosures with adequate timeline remaining</li>
+                            <li><strong>Monitoring:</strong> Loans in underwriting awaiting changes</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>TRID 3-Day Rule</h4>
+                        <p>Initial Loan Estimates MUST be delivered within 3 business days of receiving a complete application. Failure to meet this deadline is a serious compliance violation.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Pipeline Filter</th>
+                                <th>Description</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Disclosure Status</strong></td>
+                                <td>Filter by pending, sent, or expired disclosures</td>
+                                <td>Daily prioritization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Loan Officer</strong></td>
+                                <td>Filter by originating LO</td>
+                                <td>Team workload management</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Application Date</strong></td>
+                                <td>Filter by when application was received</td>
+                                <td>3-day deadline tracking</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Loan Type</strong></td>
+                                <td>Conventional, FHA, VA, USDA</td>
+                                <td>Product-specific workflows</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 3: Retail Disclosure Checklist -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Retail Disclosure Checklist</h2><span>Required disclosures and compliance documentation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">New Application</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Generate Checklist</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Verify Data</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Run Fire Rules</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Prepare Disclosures</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Disclosure Checklist Overview</h4>
+                        <p>The Retail Disclosure Checklist ensures all required documents are prepared, reviewed, and delivered within regulatory timeframes. Each item must be verified before disclosure package generation.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Checklist Item</th>
+                                <th>Requirement</th>
+                                <th>Timing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Loan Estimate (LE)</strong></td>
+                                <td>Initial disclosure with loan terms and costs</td>
+                                <td><span class="badge required-badge">Within 3 Business Days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Intent to Proceed</strong></td>
+                                <td>Borrower acknowledgment to continue</td>
+                                <td><span class="badge required-badge">Before Fees Charged</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>HMDA Data</strong></td>
+                                <td>Home Mortgage Disclosure Act reporting</td>
+                                <td><span class="badge required-badge">At Application</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>State Disclosures</strong></td>
+                                <td>State-specific required documents</td>
+                                <td><span class="badge warning-badge">Varies by State</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA/VA Addendum</strong></td>
+                                <td>Government loan specific disclosures</td>
+                                <td><span class="badge optional-badge">If Applicable</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>IRS Form 4506-C</strong></td>
+                                <td>Tax transcript authorization</td>
+                                <td><span class="badge required-badge">At Application</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Checklist Verification Steps</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Open the Disclosure Checklist from the loan file</li>
+                            <li><strong>Step 2:</strong> Review each line item for completeness</li>
+                            <li><strong>Step 3:</strong> Verify borrower information matches application</li>
+                            <li><strong>Step 4:</strong> Check property address and loan terms</li>
+                            <li><strong>Step 5:</strong> Run Fire Rules to validate compliance</li>
+                            <li><strong>Step 6:</strong> Address any errors or warnings before proceeding</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Fire Rules Engine -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Fire Rules Engine</h2><span>Automated compliance validation and error detection</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Run Fire Rules</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Errors Found?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node exception">Review & Correct</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Proceed to Disclosure</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Fire Rules Overview</h4>
+                        <p>The Fire Rules Engine is an automated compliance validation system that checks loan data against regulatory requirements and business rules. It identifies errors, warnings, and informational messages that must be addressed before disclosure.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Message Type</th>
+                                <th>Severity</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Error (Red)</strong></td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                                <td>Must be resolved before proceeding</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Warning (Yellow)</strong></td>
+                                <td><span class="badge warning-badge">High</span></td>
+                                <td>Review and document reason if proceeding</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Info (Blue)</strong></td>
+                                <td><span class="badge calculated-badge">Low</span></td>
+                                <td>Informational only, no action required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Common Fire Rules Errors</h3>
+                        <ul class="step-list">
+                            <li><strong>HMDA Data Missing:</strong> Geocoding information incomplete - run HMDA audit</li>
+                            <li><strong>APR Tolerance:</strong> Annual Percentage Rate exceeds allowed variance</li>
+                            <li><strong>Fee Tolerance:</strong> Disclosed fees exceed tolerance thresholds</li>
+                            <li><strong>Missing Signatures:</strong> Required borrower acknowledgments not received</li>
+                            <li><strong>State Disclosure:</strong> State-specific documents not generated</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical: Never Bypass Errors</h4>
+                        <p>Fire Rules errors indicate compliance violations that could result in regulatory penalties. All errors MUST be resolved before generating disclosures. Document any warnings that are overridden with justification.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: HMDA Geocoding -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>HMDA Geocoding Audit</h2><span>Home Mortgage Disclosure Act data validation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Access HMDA Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Run Geocoding</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Data Valid?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Continue Processing</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Manual Correction</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>HMDA Requirements</h4>
+                        <p>The Home Mortgage Disclosure Act requires lenders to collect and report data about mortgage lending activity. Geocoding translates property addresses into census tract information for regulatory reporting.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>HMDA Field</th>
+                                <th>Description</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Census Tract</strong></td>
+                                <td>Geographic subdivision for statistical purposes</td>
+                                <td><span class="badge calculated-badge">Auto-Geocoded</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>MSA/MD</strong></td>
+                                <td>Metropolitan Statistical Area/Division</td>
+                                <td><span class="badge calculated-badge">Auto-Geocoded</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>State Code</strong></td>
+                                <td>FIPS state code</td>
+                                <td><span class="badge calculated-badge">Auto-Geocoded</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>County Code</strong></td>
+                                <td>FIPS county code</td>
+                                <td><span class="badge calculated-badge">Auto-Geocoded</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Minority Population %</strong></td>
+                                <td>Demographic data for fair lending analysis</td>
+                                <td><span class="badge calculated-badge">Census Data</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Geocoding Troubleshooting</h3>
+                        <ul class="step-list">
+                            <li><strong>Address Not Found:</strong> Verify property address format and spelling</li>
+                            <li><strong>Multiple Matches:</strong> Select the correct address from the list</li>
+                            <li><strong>New Construction:</strong> May require manual census tract entry</li>
+                            <li><strong>Rural Properties:</strong> Verify county and state codes manually</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Audit Trail</h4>
+                        <p>All HMDA data changes are logged for compliance auditing. If manual corrections are made, document the reason in the loan notes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Loan Estimate Pages -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Loan Estimate Pages 1-3</h2><span>TRID-compliant Loan Estimate preparation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Access LE Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Verify Page 1</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Page 2</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Check Page 3</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Generate LE</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Page 1: Loan Terms and Projected Payments</h3>
+                        <ul class="step-list">
+                            <li><strong>Loan Terms Box:</strong> Loan amount, interest rate, monthly P&I payment</li>
+                            <li><strong>Projected Payments:</strong> Payment breakdown including taxes, insurance, MI</li>
+                            <li><strong>Costs at Closing:</strong> Estimated closing costs and cash to close</li>
+                            <li><strong>Loan Features:</strong> Balloon, prepayment penalty, negative amortization flags</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Page 2: Closing Cost Details</h3>
+                        <ul class="step-list">
+                            <li><strong>Section A - Origination Charges:</strong> Points, origination fees, underwriting</li>
+                            <li><strong>Section B - Services You Cannot Shop For:</strong> Appraisal, credit report, flood cert</li>
+                            <li><strong>Section C - Services You Can Shop For:</strong> Title, survey, pest inspection</li>
+                            <li><strong>Section D - Total Loan Costs:</strong> Sum of A + B + C</li>
+                            <li><strong>Section E - Taxes and Government Fees:</strong> Recording, transfer taxes</li>
+                            <li><strong>Section F - Prepaids:</strong> Interest, insurance, taxes</li>
+                            <li><strong>Section G - Initial Escrow:</strong> Monthly escrow deposits</li>
+                            <li><strong>Section H - Other:</strong> Additional fees and charges</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Page 3: Comparisons and Additional Information</h3>
+                        <ul class="step-list">
+                            <li><strong>Comparisons:</strong> 5-year cost, APR, TIP</li>
+                            <li><strong>Other Considerations:</strong> Appraisal, servicing, assumption</li>
+                            <li><strong>Contact Information:</strong> Lender, broker, settlement agent</li>
+                            <li><strong>Confirm Receipt:</strong> Borrower signature line</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>LE Section</th>
+                                <th>Tolerance</th>
+                                <th>Change Allowed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>0% Tolerance (Section A, B)</strong></td>
+                                <td>No increase allowed</td>
+                                <td><span class="badge required-badge">Lender Absorbs</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>10% Tolerance (Section C)</strong></td>
+                                <td>Cumulative 10% increase allowed</td>
+                                <td><span class="badge warning-badge">Limited Increase</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Unlimited (Section E-H)</strong></td>
+                                <td>No tolerance limit</td>
+                                <td><span class="badge optional-badge">Can Increase</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Tolerance Violations</h4>
+                        <p>If closing costs exceed tolerance limits without a valid Changed Circumstance, the lender must provide a cure (refund) to the borrower. Monitor tolerance carefully throughout the loan process.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: IRS 4506 & Addendums -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>IRS 4506 & FHA/VA Addendums</h2><span>Tax verification and government loan requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Generate 4506-C</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Govt Loan?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">FHA/VA</span>
+                                <div class="flow-node action">Add Addendums</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">CONV</span>
+                                <div class="flow-node output">Standard Package</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>IRS Form 4506-C</h4>
+                        <p>The 4506-C (formerly 4506-T) authorizes the IRS to release tax transcript information to the lender for income verification. This form must be signed by all borrowers and is valid for 120 days.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Required For</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IRS Form 4506-C</strong></td>
+                                <td>All Loans</td>
+                                <td>Tax transcript authorization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA Amendatory Clause</strong></td>
+                                <td>FHA Loans</td>
+                                <td>Appraisal value contingency</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA For Your Protection</strong></td>
+                                <td>FHA Loans</td>
+                                <td>Home inspection notice</td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA Addendum</strong></td>
+                                <td>VA Loans</td>
+                                <td>VA-specific disclosures</td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA Disclosures</strong></td>
+                                <td>USDA Loans</td>
+                                <td>Rural development requirements</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>4506-C Preparation Steps</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Verify borrower SSN and legal name match tax returns</li>
+                            <li><strong>Step 2:</strong> Enter current address and prior addresses if moved</li>
+                            <li><strong>Step 3:</strong> Select tax years required (typically 2 years)</li>
+                            <li><strong>Step 4:</strong> Include all borrowers on the form</li>
+                            <li><strong>Step 5:</strong> Generate and include in disclosure package</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>FHA Amendatory Clause</h4>
+                        <p>The FHA Amendatory Clause protects borrowers if the appraised value comes in lower than the purchase price. It must be signed before or at the same time as the sales contract for purchases.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: ComplianceEase -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>ComplianceEase Audit</h2><span>Regulatory compliance verification system</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Run CE Audit</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Pass?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">PASS</span>
+                                <div class="flow-node output">Generate Docs</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">FAIL</span>
+                                <div class="flow-node exception">Review Findings</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>ComplianceEase Overview</h4>
+                        <p>ComplianceEase is an integrated compliance audit system that validates loan data against federal, state, and investor requirements. It must pass before disclosures can be generated and delivered.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Audit Category</th>
+                                <th>Checks</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>TRID Compliance</strong></td>
+                                <td>LE/CD timing, tolerances, disclosures</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>RESPA</strong></td>
+                                <td>Affiliated business, kickbacks, fee splitting</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ECOA</strong></td>
+                                <td>Fair lending, adverse action, equal credit</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>State Laws</strong></td>
+                                <td>State-specific disclosure requirements</td>
+                                <td><span class="badge warning-badge">High</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>High Cost</strong></td>
+                                <td>HOEPA, state high-cost thresholds</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>QM/ATR</strong></td>
+                                <td>Qualified Mortgage, Ability to Repay</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>ComplianceEase Workflow</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Access ComplianceEase from the loan file menu</li>
+                            <li><strong>Step 2:</strong> Click "Run Audit" to initiate compliance check</li>
+                            <li><strong>Step 3:</strong> Review the audit results - errors, warnings, passed items</li>
+                            <li><strong>Step 4:</strong> Click into each error to see the specific issue</li>
+                            <li><strong>Step 5:</strong> Correct loan data or calculations as needed</li>
+                            <li><strong>Step 6:</strong> Re-run audit until all critical items pass</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical Audit Failures</h4>
+                        <p>Loans with critical ComplianceEase failures CANNOT proceed to disclosure. Common issues include APR errors, fee tolerance violations, and missing required disclosures. All critical findings must be resolved.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: DocuTech & IDS -->
+            <section id="section-9" class="section">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title"><h2>DocuTech & IDS Document Preparation</h2><span>Disclosure package generation and delivery</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Doc System</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Which System?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">DocuTech</span>
+                                <div class="flow-node action">Generate Package</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">IDS</span>
+                                <div class="flow-node action">Create Disclosure Set</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Document Preparation Systems</h4>
+                        <p>CMG Financial uses DocuTech and IDS (Integrated Document Systems) for generating disclosure packages. These systems pull loan data from BytePro and produce compliant disclosure documents for delivery to borrowers.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>Primary Use</th>
+                                <th>Key Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>DocuTech</strong></td>
+                                <td>Initial and revised disclosures</td>
+                                <td>Automated generation, e-delivery</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IDS</strong></td>
+                                <td>Closing document packages</td>
+                                <td>Closing Disclosure, state forms</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>DocuTech Disclosure Generation</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Verify all Fire Rules pass and ComplianceEase audit is clean</li>
+                            <li><strong>Step 2:</strong> Access DocuTech integration from BytePro</li>
+                            <li><strong>Step 3:</strong> Select disclosure package type (Initial LE, Revised LE, CD)</li>
+                            <li><strong>Step 4:</strong> Review generated documents for accuracy</li>
+                            <li><strong>Step 5:</strong> Choose delivery method (e-sign, mail, both)</li>
+                            <li><strong>Step 6:</strong> Send disclosures and track delivery confirmation</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>IDS Closing Package</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Ensure loan is cleared to close</li>
+                            <li><strong>Step 2:</strong> Access IDS through the closing integration</li>
+                            <li><strong>Step 3:</strong> Generate Closing Disclosure package</li>
+                            <li><strong>Step 4:</strong> Verify CD matches final loan terms</li>
+                            <li><strong>Step 5:</strong> Deliver CD at least 3 business days before closing</li>
+                            <li><strong>Step 6:</strong> Obtain borrower acknowledgment</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>E-Delivery Best Practices</h4>
+                        <p>Electronic delivery requires borrower consent (E-Sign Act). Verify consent is on file before sending e-disclosures. Track open/view confirmations for compliance documentation.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Re-Disclosures -->
+            <section id="section-10" class="section">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title"><h2>Re-Disclosures</h2><span>When and how to issue revised Loan Estimates</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">Change Occurred?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Valid CoC?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Issue Revised LE</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Document CoC</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Re-Disclosure Requirements</h4>
+                        <p>A revised Loan Estimate must be issued when there is a valid Changed Circumstance that affects the loan terms or closing costs. The revised LE must be delivered within 3 business days of learning of the change.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Valid Changed Circumstance</th>
+                                <th>Example</th>
+                                <th>Timing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Changed Information</strong></td>
+                                <td>Appraisal value different than estimated</td>
+                                <td><span class="badge required-badge">3 Business Days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Borrower Requested Change</strong></td>
+                                <td>Rate lock, loan amount change, product change</td>
+                                <td><span class="badge required-badge">3 Business Days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inaccurate Information</strong></td>
+                                <td>Credit score changed eligibility</td>
+                                <td><span class="badge required-badge">3 Business Days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rate Lock</strong></td>
+                                <td>Borrower locks rate after floating</td>
+                                <td><span class="badge required-badge">3 Business Days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Settlement Delay</strong></td>
+                                <td>Closing date pushed beyond lock expiration</td>
+                                <td><span class="badge warning-badge">Before Expiration</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Re-Disclosure Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Identify the changed circumstance trigger</li>
+                            <li><strong>Step 2:</strong> Document the CoC in the loan file with date and reason</li>
+                            <li><strong>Step 3:</strong> Update loan data in BytePro to reflect changes</li>
+                            <li><strong>Step 4:</strong> Run Fire Rules and ComplianceEase audit</li>
+                            <li><strong>Step 5:</strong> Generate revised Loan Estimate via DocuTech</li>
+                            <li><strong>Step 6:</strong> Deliver within 3 business days of CoC</li>
+                            <li><strong>Step 7:</strong> Obtain borrower acknowledgment</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Re-Disclosure Timing Rules</h4>
+                        <p>Revised LE must be issued within 3 business days of learning of the Changed Circumstance. If the change occurs within 4 business days of closing, a revised CD may be required instead. Always document the timeline.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 11: Change of Circumstances -->
+            <section id="section-11" class="section">
+                <div class="section-header">
+                    <div class="section-number">11</div>
+                    <div class="section-title"><h2>Change of Circumstances Documentation</h2><span>Proper documentation for tolerance resets</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Identify CoC</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Document Reason</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Update Fees</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Issue Revised LE</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Changed Circumstance Categories</h4>
+                        <p>A Changed Circumstance resets fee tolerances, allowing the lender to disclose updated costs. Proper documentation is critical to support the validity of the change and protect against compliance findings.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>CoC Category</th>
+                                <th>Required Documentation</th>
+                                <th>Tolerance Reset</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Borrower Request</strong></td>
+                                <td>Written request or recorded call notation</td>
+                                <td><span class="badge calculated-badge">All Affected Fees</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Changed Information</strong></td>
+                                <td>Appraisal, title, credit report showing change</td>
+                                <td><span class="badge calculated-badge">Related Fees Only</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inaccurate Information</strong></td>
+                                <td>Documentation of original error and correction</td>
+                                <td><span class="badge calculated-badge">Related Fees Only</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Act of God</strong></td>
+                                <td>Evidence of natural disaster, emergency</td>
+                                <td><span class="badge calculated-badge">Affected Fees</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rate Lock</strong></td>
+                                <td>Lock confirmation with date and terms</td>
+                                <td><span class="badge calculated-badge">Interest Rate, Points</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>CoC Documentation Requirements</h3>
+                        <ul class="step-list">
+                            <li><strong>Date of Change:</strong> When the change occurred or was discovered</li>
+                            <li><strong>Nature of Change:</strong> Specific description of what changed</li>
+                            <li><strong>Impact on Fees:</strong> Which costs are affected and by how much</li>
+                            <li><strong>Supporting Evidence:</strong> Appraisal, email, lock confirmation, etc.</li>
+                            <li><strong>Revised LE Date:</strong> When the revised disclosure was issued</li>
+                            <li><strong>Delivery Method:</strong> How the revised LE was delivered to borrower</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Best Practice: CoC Log</h4>
+                        <p>Maintain a Change of Circumstances log in the loan file documenting each CoC event chronologically. This provides a clear audit trail for compliance reviews and investor audits.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Invalid Changed Circumstances</h4>
+                        <p>The following are NOT valid Changed Circumstances: lender error in fee estimation, market rate changes (unless locked), vendor quote changes without underlying change, or internal process delays. These cannot reset tolerances.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Disclosure Training Quick Reference</h3>
+                <pre>
+DISCLOSURE TIMELINE SUMMARY
+===========================
+
+INITIAL LOAN ESTIMATE (LE)
+- Deliver within 3 BUSINESS DAYS of application
+- Application = name, income, SSN, property, loan amount, estimated value
+- Intent to Proceed required before charging fees (except credit report)
+
+REVISED LOAN ESTIMATE
+- Issue within 3 BUSINESS DAYS of Changed Circumstance
+- Cannot issue after CD is provided (use CD revision instead)
+- Must have valid CoC to reset tolerances
+
+CLOSING DISCLOSURE (CD)
+- Deliver at least 3 BUSINESS DAYS before closing
+- New 3-day waiting period required for certain changes:
+  - APR increases by more than 0.125%
+  - Loan product changes
+  - Prepayment penalty added
+
+TOLERANCE CATEGORIES
+====================
+0% TOLERANCE (Cannot Increase):
+- Creditor charges (origination, underwriting, points)
+- Services where creditor selects provider
+- Transfer taxes
+
+10% TOLERANCE (Cumulative):
+- Recording fees
+- Third-party services borrower CAN shop for
+- Services from creditor's written list of providers
+
+NO TOLERANCE LIMIT:
+- Prepaid interest
+- Property insurance premiums
+- Initial escrow deposits
+- Services borrower shops for (using own provider)
+
+VALID CHANGED CIRCUMSTANCES
+===========================
+- Changed or inaccurate information discovered after LE issued
+- Borrower-requested changes (rate lock, loan amount, product)
+- Act of God or emergency
+- Settlement delays beyond parties' control
+- New information (credit score change, appraisal)
+
+KEY COMPLIANCE SYSTEMS
+======================
+FIRE RULES:
+- Run before every disclosure
+- Must clear all ERRORS before proceeding
+- Document warnings if overridden
+
+COMPLIANCEASE:
+- Validates TRID, RESPA, ECOA, state laws
+- Must PASS before disclosure generation
+- Critical failures block disclosure
+
+HMDA GEOCODING:
+- Required for all loans
+- Provides census tract data
+- Run audit to validate
+
+DOCUMENT PREPARATION
+====================
+DocuTech:
+- Initial and revised LE
+- State-specific disclosures
+- E-delivery capability
+
+IDS:
+- Closing Disclosure packages
+- Closing documents
+- Final loan package
+
+APPENDICES REFERENCE
+====================
+Appendix 1: Audit Scenarios - Examples and resolutions
+Appendix 2: Lender Credits - Tolerance and cure calculations
+Appendix 3: Changed Circumstances - Documentation examples
+Appendix 4: State-Specific Requirements - By state reference
+Appendix 5: Common Errors - Troubleshooting guide
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Disclosure process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">6</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">78%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">45 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">Critical</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-deadline')">
+                        <div class="heat-score">9.5</div>
+                        <div class="heat-name">Deadline Monitor Agent</div>
+                        <div class="heat-desc">Track TRID 3-day disclosure deadlines automatically</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>15 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-firerules')">
+                        <div class="heat-score">9.2</div>
+                        <div class="heat-name">Fire Rules Auto-Fix Agent</div>
+                        <div class="heat-desc">Automatically resolve common Fire Rules errors</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>10 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-tolerance')">
+                        <div class="heat-score">8.4</div>
+                        <div class="heat-name">Tolerance Calculator Agent</div>
+                        <div class="heat-desc">Real-time fee tolerance tracking and alerts</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-coc')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">CoC Documentation Agent</div>
+                        <div class="heat-desc">Auto-generate Changed Circumstance documentation</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-hmda')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">HMDA Validation Agent</div>
+                        <div class="heat-desc">Validate and auto-correct geocoding data</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-docgen')">
+                        <div class="heat-score">6.2</div>
+                        <div class="heat-name">Smart Doc Generator</div>
+                        <div class="heat-desc">Intelligent disclosure package preparation</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Deadline Monitor Agent -->
+                    <div class="agent-card" id="agent-deadline">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Deadline Monitor Agent</div>
+                                <div class="agent-type">Monitoring / Alerts</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Continuously monitors all active loans for TRID disclosure deadlines. Sends proactive alerts for initial LE (3-day), revised LE, and CD (3-day before closing) deadlines to prevent compliance violations.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Scan Pipeline</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Deadlines</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Thresholds</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Send Alerts</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">15 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('deadline')">View Build Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- Fire Rules Auto-Fix Agent -->
+                    <div class="agent-card" id="agent-firerules">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">F</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Fire Rules Auto-Fix Agent</div>
+                                <div class="agent-type">Data Correction / Automation</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Analyzes Fire Rules errors and automatically applies known fixes for common issues. Handles HMDA data gaps, fee calculations, and field validation errors without manual intervention.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Errors</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Match Fix Rules</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Apply Corrections</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Re-Validate</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">10 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('firerules')">View Build Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- Tolerance Calculator Agent -->
+                    <div class="agent-card" id="agent-tolerance">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">T</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Tolerance Calculator Agent</div>
+                                <div class="agent-type">Calculation / Monitoring</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Real-time monitoring of fee tolerances across 0%, 10%, and unlimited categories. Alerts when approaching tolerance limits and calculates potential cure amounts before they occur.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Track Fees</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Variance</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Limits</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Alert/Cure</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('tolerance')">View Build Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- CoC Documentation Agent -->
+                    <div class="agent-card" id="agent-coc">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">CoC Documentation Agent</div>
+                                <div class="agent-type">Document Generation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically generates compliant Changed Circumstance documentation when loan changes occur. Captures date, reason, affected fees, and supporting evidence in audit-ready format.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Detect Change</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Classify CoC</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Doc</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Store in File</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('coc')">View Build Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- HMDA Validation Agent -->
+                    <div class="agent-card" id="agent-hmda">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">H</div>
+                            <div class="agent-info">
+                                <div class="agent-name">HMDA Validation Agent</div>
+                                <div class="agent-type">Data Validation</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates HMDA geocoding data and automatically corrects common issues. Handles address formatting, census tract lookups, and MSA code validation with minimal manual intervention.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Validate Address</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Geocode</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Verify Codes</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update Fields</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('hmda')">View Build Prompt</button>
+                        </div>
+                    </div>
+
+                    <!-- Smart Doc Generator Agent -->
+                    <div class="agent-card" id="agent-docgen">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">G</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Smart Doc Generator</div>
+                                <div class="agent-type">Document Automation</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Intelligently determines required disclosure documents based on loan type, state, and product. Automatically generates complete disclosure packages with proper ordering and state-specific forms.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Analyze Loan</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Select Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Package</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Queue Delivery</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">94%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docgen')">View Build Prompt</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Disclosure Training Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Disclosure Training Manual (Retail) - BytePro LOS
+
+## Overview
+Comprehensive training guide for disclosure processing, compliance audits, and document preparation in BytePro LOS for CMG Financial retail operations.
+
+## Key Systems
+- BytePro LOS: Primary loan origination system
+- Fire Rules: Automated compliance validation
+- ComplianceEase: Regulatory audit system
+- DocuTech/IDS: Document preparation and delivery
+
+## Disclosure Timeline
+- Initial LE: Within 3 business days of application
+- Revised LE: Within 3 business days of Changed Circumstance
+- Closing Disclosure: At least 3 business days before closing
+
+## Tolerance Categories
+- 0% Tolerance: Creditor charges, selected services, transfer taxes
+- 10% Tolerance: Recording fees, shoppable services
+- Unlimited: Prepaids, insurance, escrow deposits
+
+## Compliance Workflow
+1. Run Fire Rules before every disclosure
+2. Pass ComplianceEase audit
+3. Validate HMDA geocoding
+4. Generate disclosure package via DocuTech
+5. Deliver and track acknowledgment
+
+## Changed Circumstances
+Valid CoC events allow tolerance resets:
+- Borrower-requested changes
+- Changed/inaccurate information
+- Rate lock events
+- Settlement delays
+- Acts of God
+
+## Related Resources
+- Appendix 1: Audit Scenarios
+- Appendix 2: Lender Credits
+- Appendix 3: CoC Documentation
+- Appendix 4: State Requirements
+- Appendix 5: Common Errors</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            deadline: {
+                name: 'Deadline Monitor Agent',
+                tags: ['Monitoring', 'Alerts', 'Low Complexity', 'Critical Priority'],
+                purpose: 'This agent continuously monitors all active loans for TRID disclosure deadlines including initial LE (3-day), revised LE, and CD (3-day before closing) deadlines. It sends proactive alerts to prevent compliance violations and tracks acknowledgment of alerts.',
+                prompt: `You are building a Monitoring Agent for CMG Financial's BytePro LOS disclosure process.
+
+AGENT NAME: Deadline Monitor Agent
+TYPE: Monitoring / Push Notifications
+
+OBJECTIVE:
+Monitor all active loans for TRID disclosure deadlines and alert disclosure desk staff before deadlines expire.
+
+DEADLINE TYPES:
+1. Initial Loan Estimate
+   - Trigger: Application received (6 data points)
+   - Deadline: 3 BUSINESS DAYS from application
+   - Alert thresholds: 48hrs, 24hrs, 4hrs, OVERDUE
+
+2. Revised Loan Estimate
+   - Trigger: Changed Circumstance documented
+   - Deadline: 3 BUSINESS DAYS from CoC
+   - Alert thresholds: 48hrs, 24hrs, 4hrs, OVERDUE
+
+3. Closing Disclosure
+   - Trigger: Clear to Close issued
+   - Deadline: 3 BUSINESS DAYS before scheduled closing
+   - Alert thresholds: 5 days, 4 days, 3 days (CRITICAL)
+
+BUSINESS DAY CALCULATION:
+- Exclude Sundays and federal holidays
+- Saturday counts unless lender is closed
+- Use CMG Financial holiday calendar
+
+ALERT CHANNELS:
+- Email notification with loan details
+- BytePro dashboard notification
+- SMS for OVERDUE items
+- Teams webhook for team visibility`,
+                integration: `INTEGRATION POINTS:
+1. BytePro LOS Database
+   - Query loan applications by date
+   - Check disclosure status
+   - Read Changed Circumstance log
+   - Get scheduled closing dates
+
+2. Notification Services
+   - Email via SendGrid
+   - SMS via Twilio
+   - Teams webhooks
+
+3. Business Calendar
+   - Federal holiday API
+   - CMG Financial office schedule
+
+DEPLOYMENT:
+- Run every 30 minutes during business hours
+- Run daily at 6 AM for overnight changes
+- Process all loans in active statuses`
+            },
+            firerules: {
+                name: 'Fire Rules Auto-Fix Agent',
+                tags: ['Data Correction', 'Automation', 'Medium Complexity', 'Critical Priority'],
+                purpose: 'This agent analyzes Fire Rules errors and automatically applies known fixes for common issues including HMDA data gaps, fee calculations, and field validation errors, reducing manual correction time.',
+                prompt: `You are building a Data Correction Agent for CMG Financial's BytePro LOS Fire Rules system.
+
+AGENT NAME: Fire Rules Auto-Fix Agent
+TYPE: Data Correction / Automation
+
+OBJECTIVE:
+Parse Fire Rules error messages and automatically apply fixes for common, well-defined issues without manual intervention.
+
+AUTO-FIX RULES:
+
+1. HMDA GEOCODING ERRORS
+   Pattern: "Census tract missing" or "Geocoding incomplete"
+   Fix: Trigger HMDA geocoding API with property address
+   Confidence: 95%
+
+2. MISSING REQUIRED FIELDS
+   Pattern: "Field [X] is required"
+   Fix: Check if data exists in related screens, copy if found
+   Confidence: 85%
+
+3. FEE CALCULATION ERRORS
+   Pattern: "APR calculation error" or "Finance charge mismatch"
+   Fix: Recalculate using standard formulas
+   Confidence: 90%
+
+4. DATE VALIDATION
+   Pattern: "Date [X] cannot be before [Y]"
+   Fix: Identify logical date order, suggest correction
+   Confidence: 80%
+
+5. TOLERANCE WARNINGS
+   Pattern: "Fee tolerance exceeded"
+   Fix: Calculate cure amount, document CoC if valid
+   Confidence: 75%
+
+ERROR CATEGORIES:
+- AUTO_FIX: Apply fix automatically
+- SUGGEST: Present fix for user approval
+- ESCALATE: Cannot fix, needs human review`,
+                integration: `INTEGRATION POINTS:
+1. Fire Rules Engine
+   - Parse error messages
+   - Access field references
+   - Trigger re-validation
+
+2. BytePro Data API
+   - Read/write loan fields
+   - Access related screens
+   - Copy data between fields
+
+3. HMDA Geocoding Service
+   - Address validation
+   - Census tract lookup
+   - MSA code lookup
+
+4. Calculation Engine
+   - APR calculator
+   - Fee tolerance calculator
+   - Finance charge calculator`
+            },
+            tolerance: {
+                name: 'Tolerance Calculator Agent',
+                tags: ['Calculation', 'Monitoring', 'Medium Complexity', 'High Priority'],
+                purpose: 'Real-time monitoring of fee tolerances across 0%, 10%, and unlimited categories. Alerts when approaching tolerance limits and calculates potential cure amounts before violations occur.',
+                prompt: `You are building a Calculation Agent for CMG Financial's BytePro LOS tolerance tracking.
+
+AGENT NAME: Tolerance Calculator Agent
+TYPE: Calculation / Monitoring
+
+OBJECTIVE:
+Track fee tolerances in real-time and prevent tolerance violations by alerting before limits are exceeded.
+
+TOLERANCE CATEGORIES:
+
+0% TOLERANCE (Zero Variance Allowed):
+- Origination charges
+- Points and fees to creditor
+- Services creditor selects provider
+- Transfer taxes
+RULE: Any increase = violation, lender absorbs
+
+10% TOLERANCE (Cumulative):
+- Recording fees
+- Third-party services from provider list
+- Borrower can shop services (used list)
+RULE: Total increase cannot exceed 10% of original total
+
+UNLIMITED (No Cap):
+- Prepaid interest
+- Property insurance premiums
+- Initial escrow deposits
+- Services borrower selected own provider
+
+MONITORING LOGIC:
+1. Capture baseline fees from initial LE
+2. Track all fee changes with timestamps
+3. Calculate current variance by category
+4. Alert at 80%, 90%, 100% of tolerance
+5. Calculate cure amount when exceeded
+
+OUTPUT:
+{
+  "loan_number": "2026-001234",
+  "zero_tolerance_status": "PASS",
+  "ten_percent_status": "WARNING",
+  "ten_percent_variance": 8.5,
+  "cure_amount": 0,
+  "fees_at_risk": ["Recording Fee", "Title Search"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. BytePro Fee Screens
+   - Initial LE fees
+   - Current fee values
+   - Fee change history
+
+2. Tolerance Calculator
+   - Category classification
+   - Variance calculation
+   - Cure amount calculation
+
+3. Alert System
+   - Threshold monitoring
+   - Email/dashboard alerts
+   - Cure tracking
+
+4. Audit Trail
+   - Log all calculations
+   - Document CoC events
+   - Store for compliance review`
+            },
+            coc: {
+                name: 'CoC Documentation Agent',
+                tags: ['Document Generation', 'Compliance', 'Low Complexity', 'High Priority'],
+                purpose: 'Automatically generates compliant Changed Circumstance documentation when loan changes occur, capturing date, reason, affected fees, and supporting evidence in audit-ready format.',
+                prompt: `You are building a Document Generation Agent for CMG Financial's Changed Circumstance documentation.
+
+AGENT NAME: CoC Documentation Agent
+TYPE: Document Generation / Compliance
+
+OBJECTIVE:
+Automatically detect loan changes and generate compliant Changed Circumstance documentation with proper evidence and timing.
+
+COC CATEGORIES:
+
+1. BORROWER REQUEST
+   Triggers: Rate lock request, loan amount change, product change
+   Evidence: Email, recorded call, written request
+   Template: borrower_request_coc.docx
+
+2. CHANGED INFORMATION
+   Triggers: Appraisal value difference, title findings
+   Evidence: Appraisal report, title commitment
+   Template: changed_info_coc.docx
+
+3. INACCURATE INFORMATION
+   Triggers: Credit score change, income verification variance
+   Evidence: Credit report, verification documents
+   Template: inaccurate_info_coc.docx
+
+4. RATE LOCK
+   Triggers: Borrower locks rate
+   Evidence: Lock confirmation
+   Template: rate_lock_coc.docx
+
+DOCUMENT CONTENTS:
+- Date of change/discovery
+- Category of Changed Circumstance
+- Detailed description
+- Affected fees and amounts
+- Supporting evidence references
+- Disclosure timing calculation
+- Preparer signature line`,
+                integration: `INTEGRATION POINTS:
+1. BytePro Change Detection
+   - Monitor key field changes
+   - Trigger on rate locks
+   - Detect fee updates
+
+2. Document Generator
+   - Template selection
+   - Field population
+   - PDF generation
+
+3. Evidence Collection
+   - Link supporting documents
+   - Capture timestamps
+   - Store in loan file
+
+4. Compliance Tracking
+   - Calculate disclosure deadline
+   - Track delivery status
+   - Audit trail logging`
+            },
+            hmda: {
+                name: 'HMDA Validation Agent',
+                tags: ['Data Validation', 'Geocoding', 'Low Complexity', 'Medium Priority'],
+                purpose: 'Validates HMDA geocoding data and automatically corrects common issues including address formatting, census tract lookups, and MSA code validation.',
+                prompt: `You are building a Data Validation Agent for CMG Financial's HMDA geocoding process.
+
+AGENT NAME: HMDA Validation Agent
+TYPE: Data Validation / Geocoding
+
+OBJECTIVE:
+Validate and auto-correct HMDA geocoding data to ensure accurate regulatory reporting.
+
+VALIDATION RULES:
+
+1. ADDRESS FORMATTING
+   - Standardize street abbreviations
+   - Validate ZIP+4 format
+   - Check city/state consistency
+
+2. CENSUS TRACT
+   - 11-digit format validation
+   - Cross-reference with FFIEC database
+   - Handle boundary changes
+
+3. MSA/MD CODES
+   - Validate 5-digit format
+   - Check property location match
+   - Handle metropolitan changes
+
+4. STATE/COUNTY CODES
+   - FIPS code validation
+   - Cross-reference with address
+
+5. DEMOGRAPHIC DATA
+   - Minority population %
+   - Median income %
+   - Tract to MSA income ratio
+
+GEOCODING SOURCES:
+- FFIEC Geocoder API (primary)
+- Census Bureau API (backup)
+- Google Maps API (address validation)
+
+AUTO-CORRECTION LOGIC:
+1. Attempt FFIEC geocode with raw address
+2. If fail, standardize address and retry
+3. If fail, use Google for address validation
+4. If success, retry FFIEC with cleaned address
+5. Log all attempts for audit`,
+                integration: `INTEGRATION POINTS:
+1. FFIEC Geocoder API
+   - Primary geocoding source
+   - Census tract lookup
+   - MSA code lookup
+
+2. Address Validation
+   - USPS address API
+   - Google Maps API
+   - Address standardization
+
+3. BytePro HMDA Screen
+   - Read property address
+   - Write geocoding results
+   - Update demographic data
+
+4. Audit Logging
+   - Track all lookups
+   - Document corrections
+   - Store for compliance`
+            },
+            docgen: {
+                name: 'Smart Doc Generator',
+                tags: ['Document Automation', 'Package Generation', 'Medium Complexity', 'Medium Priority'],
+                purpose: 'Intelligently determines required disclosure documents based on loan type, state, and product, then automatically generates complete disclosure packages with proper ordering and state-specific forms.',
+                prompt: `You are building a Document Automation Agent for CMG Financial's disclosure package generation.
+
+AGENT NAME: Smart Doc Generator
+TYPE: Document Automation / Package Generation
+
+OBJECTIVE:
+Intelligently assemble disclosure packages based on loan characteristics, ensuring all required documents are included.
+
+DOCUMENT SELECTION LOGIC:
+
+LOAN TYPE RULES:
+- Conventional: Standard TRID package
+- FHA: Add FHA Amendatory, For Your Protection
+- VA: Add VA Addendum, Certificate of Eligibility
+- USDA: Add Rural Development disclosures
+
+STATE RULES:
+- Load state-specific disclosure matrix
+- Include required state forms
+- Handle multi-state scenarios (property vs. borrower)
+
+PRODUCT RULES:
+- ARM: Include ARM disclosures
+- HELOC: Include HELOC-specific forms
+- Refinance: Include right of rescission
+- Construction: Include construction addendum
+
+PACKAGE ASSEMBLY:
+1. Analyze loan characteristics
+2. Query document matrix
+3. Generate required documents
+4. Order documents properly
+5. Create cover sheet with checklist
+6. Queue for delivery
+
+DOCUMENT ORDERING:
+1. Cover letter
+2. Loan Estimate (Pages 1-3)
+3. Federal disclosures
+4. State disclosures
+5. Product-specific forms
+6. Authorization forms (4506-C, etc.)
+7. Acknowledgment forms`,
+                integration: `INTEGRATION POINTS:
+1. BytePro Loan Data
+   - Loan type
+   - Product features
+   - Property state
+   - Borrower states
+
+2. Document Matrix Database
+   - Federal requirements
+   - State requirements
+   - Product requirements
+   - Investor requirements
+
+3. DocuTech/IDS
+   - Document generation
+   - Package assembly
+   - E-delivery integration
+
+4. Delivery Tracking
+   - Queue management
+   - Delivery confirmation
+   - Acknowledgment tracking`
+            }
+        };
+
+        function showAgentPrompt(agentId) {
+            const agent = agentPrompts[agentId];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try {
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>
