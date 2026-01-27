@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordering Credit - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; transition: all 0.2s; border: 1px solid var(--border-subtle); }
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.3); }
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+        .page-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; position: sticky; top: 52px; height: calc(100vh - 52px); overflow: hidden; }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .sidebar-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+        .tab-switcher { display: flex; padding: 12px; gap: 8px; border-bottom: 1px solid var(--border-subtle); }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; background: transparent; color: var(--text-muted); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; }
+        .tab-btn:not(.active):hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .section-nav { flex: 1; overflow-y: auto; padding: 12px; }
+        .nav-group { margin-bottom: 20px; }
+        .nav-group-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; border-radius: 6px; margin-bottom: 2px; transition: all 0.2s; border-left: 3px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-left-color: var(--accent-blue); }
+        .main-content { flex: 1; overflow-y: auto; padding: 40px; max-width: 1000px; }
+        .content-section { margin-bottom: 50px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
+        .section-icon { font-size: 2rem; }
+        .section-title { font-size: 1.6rem; font-weight: 800; }
+        .flow-diagram { display: flex; flex-wrap: wrap; gap: 12px; margin: 25px 0; align-items: center; }
+        .flow-node { padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-align: center; min-width: 140px; }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: white; clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%); padding: 14px 30px; }
+        .flow-node.input { background: var(--bg-card); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; }
+        .flow-arrow { color: var(--text-muted); font-size: 1.5rem; }
+        .info-box { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.tip { border-left: 4px solid var(--accent-green); }
+        .info-box.warning { border-left: 4px solid var(--accent-amber); }
+        .info-box.critical { border-left: 4px solid var(--accent-rose); }
+        .info-box-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .field-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+        .field-table th, .field-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+        .field-table th { background: var(--bg-card); font-weight: 700; color: var(--text-primary); }
+        .field-table td { color: var(--text-secondary); }
+        .field-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; }
+        .badge.required { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .badge.optional { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-item { display: flex; gap: 16px; margin-bottom: 20px; padding: 18px; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-subtle); }
+        .step-item::before { counter-increment: step; content: counter(step); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); border-radius: 50%; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .step-content h4 { font-weight: 700; margin-bottom: 6px; }
+        .step-content p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+        .heat-tile { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .heat-tile::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-tile.critical::before { background: var(--accent-rose); }
+        .heat-tile.high::before { background: var(--accent-amber); }
+        .heat-tile.medium::before { background: var(--accent-blue); }
+        .heat-tile.low::before { background: var(--accent-green); }
+        .heat-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .heat-tile.highlighted { border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        .heat-score { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .heat-tile.critical .heat-score { color: var(--accent-rose); }
+        .heat-tile.high .heat-score { color: var(--accent-amber); }
+        .heat-tile.medium .heat-score { color: var(--accent-blue); }
+        .heat-tile.low .heat-score { color: var(--accent-green); }
+        .heat-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+        .heat-desc { font-size: 0.8rem; color: var(--text-muted); }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; margin-bottom: 20px; transition: all 0.3s; }
+        .agent-card.highlighted { border-color: var(--accent-blue); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+        .agent-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+        .agent-title { font-size: 1.2rem; font-weight: 700; }
+        .agent-type { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .agent-score { text-align: right; }
+        .agent-score-value { font-size: 2rem; font-weight: 800; }
+        .agent-score-label { font-size: 0.75rem; color: var(--text-muted); }
+        .agent-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 18px 0; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .agent-flow-step { padding: 8px 14px; background: var(--bg-secondary); border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+        .agent-flow-arrow { color: var(--text-muted); }
+        .agent-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+        .agent-metric { text-align: center; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .agent-metric-value { font-size: 1.1rem; font-weight: 700; color: var(--accent-teal); }
+        .agent-metric-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .view-prompt-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border: none; border-radius: 8px; color: white; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .view-prompt-btn:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-header-buttons { display: flex; gap: 12px; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: all 0.2s; }
+        .modal-btn.copy { background: white; color: var(--accent-purple); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+        .prompt-section { margin-bottom: 24px; }
+        .prompt-section-title { font-weight: 700; color: var(--accent-teal); margin-bottom: 12px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .prompt-content { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; white-space: pre-wrap; color: var(--text-secondary); }
+        .prompt-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .prompt-tag.type { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .prompt-tag.complexity { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .prompt-tag.priority { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        #copySuccess { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+        .quick-ref { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin: 30px 0; }
+        .quick-ref h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .quick-ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .quick-ref-item { background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px; }
+        .quick-ref-item strong { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .quick-ref-item span { font-weight: 600; color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏦 CLEAR 2.0</a>
+        <span class="separator">›</span>
+        <span class="current">📋 Ordering Credit</span>
+    </nav>
+
+    <div class="page-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Ordering Credit</div>
+                <div class="sidebar-subtitle">CLEAR 2.0 Module</div>
+            </div>
+            <div class="tab-switcher">
+                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
+                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
+            </div>
+            <nav class="section-nav" id="workflowNav">
+                <div class="nav-group">
+                    <div class="nav-group-title">Overview</div>
+                    <a href="#overview" class="nav-item active">Process Overview</a>
+                    <a href="#requirements" class="nav-item">Requirements</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">Workflow Steps</div>
+                    <a href="#authorization" class="nav-item">Authorization</a>
+                    <a href="#ordering" class="nav-item">Order Credit</a>
+                    <a href="#importing" class="nav-item">Import Liabilities</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">Reference</div>
+                    <a href="#quickref" class="nav-item">Quick Reference</a>
+                </div>
+            </nav>
+            <nav class="section-nav" id="agentsNav" style="display: none;">
+                <div class="nav-group">
+                    <div class="nav-group-title">Heat Map</div>
+                    <a href="#heatmap" class="nav-item active">Priority Overview</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">Agents</div>
+                    <a href="#agent1" class="nav-item">Auto-Import Agent</a>
+                    <a href="#agent2" class="nav-item">Credit Report Validator</a>
+                    <a href="#agent3" class="nav-item">Liability Matcher</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div id="workflowContent" class="tab-content active">
+                <section id="overview" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📋</span>
+                        <h2 class="section-title">Ordering Credit in CLEAR 2.0</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
+                        The Credit section in CLEAR 2.0 allows Loan Officers to order credit reports, view credit scores, and import liabilities directly into the loan file. Borrower authorization must be obtained before ordering credit.
+                    </p>
+                    <div class="flow-diagram">
+                        <div class="flow-node start">Start</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node input">Get Authorization</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node action">Order Credit</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node action">Review Report</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node output">Import Liabilities</div>
+                    </div>
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 Pro Tip</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Always obtain verbal or written authorization before pulling credit. This protects both the borrower and CMG from compliance issues.</p>
+                    </div>
+                </section>
+
+                <section id="requirements" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">✅</span>
+                        <h2 class="section-title">Pre-Order Requirements</h2>
+                    </div>
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Requirement</th><th>Details</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Borrower Authorization</strong></td><td>Verbal or written consent to pull credit report</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>SSN Verified</strong></td><td>Social Security Number entered and validated in URLA</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>Date of Birth</strong></td><td>Borrower DOB required for credit bureau matching</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>Current Address</strong></td><td>Full current address for identity verification</td><td><span class="badge required">Required</span></td></tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="authorization" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">✍️</span>
+                        <h2 class="section-title">Step 1: Obtain Authorization</h2>
+                    </div>
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Confirm Borrower Consent</h4>
+                                <p>Before ordering credit, ensure you have obtained borrower authorization either verbally (with documentation in notes) or in writing.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Check Credit Authorization Box</h4>
+                                <p>In CLEAR, navigate to the Credit section and ensure the authorization checkbox is marked to indicate consent has been obtained.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </section>
+
+                <section id="ordering" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📊</span>
+                        <h2 class="section-title">Step 2: Order Credit Report</h2>
+                    </div>
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Navigate to Credit Tab</h4>
+                                <p>With the loan open in CLEAR, click on the Credit tab in the top navigation bar.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Select Report Type</h4>
+                                <p>Choose the appropriate credit report type: Soft Pull (prequalification) or Hard Pull (full tri-merge for application).</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Select Borrowers</h4>
+                                <p>Select which borrowers to include in the credit pull. For joint applications with shared financials, select both borrowers for a joint report.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Click Order Credit</h4>
+                                <p>Click the Order Credit button. The system will submit the request and return results within seconds.</p>
+                            </div>
+                        </li>
+                    </ol>
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ Credit Report Types</div>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 20px;">
+                            <li><strong>Soft Pull:</strong> No impact on credit score, used for prequalification scenarios</li>
+                            <li><strong>Hard Pull:</strong> Full tri-merge report, required for formal loan application</li>
+                            <li><strong>Joint vs Individual:</strong> Joint for shared applications, Individual for privacy-preferred borrowers</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="importing" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📥</span>
+                        <h2 class="section-title">Step 3: Import Liabilities</h2>
+                    </div>
+                    <ol class="step-list">
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Review Credit Report</h4>
+                                <p>Once the credit report returns, review the score and liabilities displayed in the Credit section.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Click Import Liabilities</h4>
+                                <p>Click the "Import Liabilities" button to automatically populate the URLA liabilities section with credit report data.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Review & Match REO</h4>
+                                <p>Review imported liabilities. For mortgage accounts, link them to the appropriate Real Estate Owned (REO) entries in the URLA.</p>
+                            </div>
+                        </li>
+                        <li class="step-item">
+                            <div class="step-content">
+                                <h4>Verify Accuracy</h4>
+                                <p>Confirm all liability information is accurate. Make corrections as needed based on borrower-provided documentation.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </section>
+
+                <section id="quickref" class="content-section">
+                    <div class="quick-ref">
+                        <h3>⚡ Quick Reference</h3>
+                        <div class="quick-ref-grid">
+                            <div class="quick-ref-item"><strong>Access Point</strong><span>Credit Tab</span></div>
+                            <div class="quick-ref-item"><strong>Primary Role</strong><span>Loan Officer</span></div>
+                            <div class="quick-ref-item"><strong>Report Validity</strong><span>120 Days</span></div>
+                            <div class="quick-ref-item"><strong>Score Used</strong><span>Middle Score</span></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="agentsContent" class="tab-content">
+                <section id="heatmap" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">🎯</span>
+                        <h2 class="section-title">AI Agent Opportunity Heat Map</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Click on any tile to view the corresponding agent details and build prompt.</p>
+                    <div class="heat-map-grid">
+                        <div class="heat-tile critical" onclick="scrollToAgent('agent1')">
+                            <div class="heat-score">92</div>
+                            <div class="heat-name">Auto-Import Agent</div>
+                            <div class="heat-desc">Data Integration • Step 3</div>
+                        </div>
+                        <div class="heat-tile high" onclick="scrollToAgent('agent2')">
+                            <div class="heat-score">78</div>
+                            <div class="heat-name">Credit Report Validator</div>
+                            <div class="heat-desc">Quality Check • Step 2</div>
+                        </div>
+                        <div class="heat-tile high" onclick="scrollToAgent('agent3')">
+                            <div class="heat-score">75</div>
+                            <div class="heat-name">Liability Matcher</div>
+                            <div class="heat-desc">ML Classification • Step 3</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="agent1" class="content-section">
+                    <div class="agent-card" data-agent="agent1">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-title">Credit Auto-Import Agent</div>
+                                <div class="agent-type">Data Integration / Automation</div>
+                            </div>
+                            <div class="agent-score">
+                                <div class="agent-score-value" style="color: var(--accent-rose);">92</div>
+                                <div class="agent-score-label">Priority Score</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                            Automatically imports credit report liabilities into URLA with intelligent categorization and REO matching suggestions.
+                        </p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-step">📊 Credit Report</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">🔍 Parse Liabilities</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">🏠 Match REO</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">✓ Import URLA</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="agent-metric"><div class="agent-metric-value">8 min</div><div class="agent-metric-label">Time Saved</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">98%</div><div class="agent-metric-label">Accuracy</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">Low</div><div class="agent-metric-label">Complexity</div></div>
+                        </div>
+                        <button class="view-prompt-btn" onclick="openPromptModal('agent1')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </section>
+
+                <section id="agent2" class="content-section">
+                    <div class="agent-card" data-agent="agent2">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-title">Credit Report Validator</div>
+                                <div class="agent-type">Quality Assurance / Validation</div>
+                            </div>
+                            <div class="agent-score">
+                                <div class="agent-score-value" style="color: var(--accent-amber);">78</div>
+                                <div class="agent-score-label">Priority Score</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                            Validates credit report data against URLA entries and flags discrepancies for review before AUS submission.
+                        </p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-step">📋 URLA Data</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">🔄 Compare Credit</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">⚠️ Flag Issues</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">📝 Generate Report</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="agent-metric"><div class="agent-metric-value">5 min</div><div class="agent-metric-label">Time Saved</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">95%</div><div class="agent-metric-label">Catch Rate</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">Medium</div><div class="agent-metric-label">Complexity</div></div>
+                        </div>
+                        <button class="view-prompt-btn" onclick="openPromptModal('agent2')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </section>
+
+                <section id="agent3" class="content-section">
+                    <div class="agent-card" data-agent="agent3">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-title">Liability-to-REO Matcher</div>
+                                <div class="agent-type">ML Classification / Matching</div>
+                            </div>
+                            <div class="agent-score">
+                                <div class="agent-score-value" style="color: var(--accent-amber);">75</div>
+                                <div class="agent-score-label">Priority Score</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                            Uses ML to intelligently match mortgage liabilities from credit reports to REO entries based on address, balance, and payment patterns.
+                        </p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-step">🏠 REO Entries</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">💳 Mortgage Debts</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">🤖 ML Match</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">✓ Link Records</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="agent-metric"><div class="agent-metric-value">6 min</div><div class="agent-metric-label">Time Saved</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">92%</div><div class="agent-metric-label">Match Rate</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">Medium</div><div class="agent-metric-label">Complexity</div></div>
+                        </div>
+                        <button class="view-prompt-btn" onclick="openPromptModal('agent3')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
+                <div class="modal-header-buttons">
+                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">✕ Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section"><div class="prompt-section-title">Agent Purpose</div><div class="prompt-content" id="promptPurpose"></div></div>
+                <div class="prompt-section"><div class="prompt-section-title">Full Build Prompt</div><div class="prompt-content" id="promptFull"></div></div>
+                <div class="prompt-section"><div class="prompt-section-title">Integration Points</div><div class="prompt-content" id="promptIntegration"></div></div>
+            </div>
+        </div>
+    </div>
+    <div id="copySuccess">✓ Copied to clipboard!</div>
+
+    <script>
+        const agentPrompts = {
+            agent1: {
+                title: "Credit Auto-Import Agent",
+                type: "Data Integration",
+                complexity: "Low",
+                priority: "Critical (92)",
+                purpose: "Automatically imports credit report liabilities into URLA with intelligent categorization and REO matching suggestions.",
+                fullPrompt: `You are building a Credit Auto-Import Agent for CMG Financial's CLEAR 2.0 LOS.
+
+AGENT NAME: Credit Auto-Import Agent
+TYPE: Data Integration / Automation
+
+OBJECTIVE:
+Automatically parse credit report liability data and import into URLA with proper categorization, while suggesting REO matches for mortgage accounts.
+
+INPUT DATA SOURCES:
+1. Credit Report XML/JSON
+   - Tradelines, balances, payments, account types
+2. Existing URLA Data
+   - Current REO entries, addresses
+3. Borrower Information
+   - Names, SSN matches
+
+LIABILITY CATEGORIZATION:
+| Account Type | URLA Category | Include in DTI |
+|-------------|---------------|----------------|
+| Mortgage | Mortgage Liability | Link to REO |
+| Installment | Installment Debt | Yes |
+| Revolving | Revolving Debt | Yes |
+| Collection | Collections | Review Required |
+| Student Loan | Student Loan | Yes (IBR rules) |
+
+OUTPUT FORMAT:
+{
+  "imported_count": 12,
+  "liabilities": [
+    {
+      "creditor": "ABC Bank",
+      "type": "mortgage",
+      "balance": 245000,
+      "payment": 1450,
+      "suggested_reo_match": "123 Main St",
+      "confidence": 0.95
+    }
+  ],
+  "requires_review": ["Collection account XYZ"]
+}
+
+ERROR HANDLING:
+- Duplicate detection: Skip if liability already exists
+- Invalid data: Log and continue with valid records`,
+                integration: `CLEAR 2.0 Integration Points:
+- Input: Credit bureau response, URLA REO section
+- Output: URLA Liabilities section
+- Trigger: Credit report received
+- API: POST /api/v1/credit/auto-import`
+            },
+            agent2: {
+                title: "Credit Report Validator",
+                type: "Quality Assurance",
+                complexity: "Medium",
+                priority: "High (78)",
+                purpose: "Validates credit report data against URLA entries and flags discrepancies before AUS submission.",
+                fullPrompt: `You are building a Credit Report Validator Agent for CMG Financial's CLEAR 2.0 LOS.
+
+AGENT NAME: Credit Report Validator
+TYPE: Quality Assurance / Validation
+
+OBJECTIVE:
+Compare credit report data against URLA entries to identify discrepancies that could cause AUS findings or underwriting issues.
+
+VALIDATION CHECKS:
+1. Name matching (borrower names vs credit)
+2. SSN verification
+3. Address history alignment
+4. Liability balance discrepancies (>10%)
+5. Missing accounts on credit report
+6. Undisclosed debts detection
+
+OUTPUT FORMAT:
+{
+  "status": "pass" | "review_needed" | "fail",
+  "issues": [
+    {
+      "type": "balance_mismatch",
+      "severity": "warning",
+      "credit_value": 15000,
+      "urla_value": 12000,
+      "recommendation": "Verify current balance with borrower"
+    }
+  ]
+}`,
+                integration: `CLEAR 2.0 Integration Points:
+- Input: Credit report, URLA data
+- Output: Validation report, alerts
+- Trigger: Before AUS submission
+- API: POST /api/v1/credit/validate`
+            },
+            agent3: {
+                title: "Liability-to-REO Matcher",
+                type: "ML Classification",
+                complexity: "Medium",
+                priority: "High (75)",
+                purpose: "Uses ML to intelligently match mortgage liabilities to REO entries based on address, balance, and payment patterns.",
+                fullPrompt: `You are building a Liability-to-REO Matcher Agent for CMG Financial's CLEAR 2.0 LOS.
+
+AGENT NAME: Liability-to-REO Matcher
+TYPE: ML Classification / Pattern Matching
+
+OBJECTIVE:
+Match mortgage liabilities from credit reports to Real Estate Owned entries using multiple data points for accurate linking.
+
+MATCHING CRITERIA:
+1. Address similarity (fuzzy match)
+2. Balance within 5% of property value/loan amount
+3. Payment amount alignment
+4. Lien position indicators
+5. Account open date vs purchase date
+
+OUTPUT FORMAT:
+{
+  "matches": [
+    {
+      "liability_id": "L123",
+      "reo_id": "REO456",
+      "confidence": 0.94,
+      "match_factors": ["address_92%", "balance_98%", "payment_match"]
+    }
+  ],
+  "unmatched_liabilities": ["L789"],
+  "unmatched_reo": []
+}`,
+                integration: `CLEAR 2.0 Integration Points:
+- Input: Credit liabilities, REO entries
+- Output: Matched pairs, linking recommendations
+- Trigger: After liability import
+- API: POST /api/v1/reo/auto-match`
+            }
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Content').classList.add('active');
+            document.getElementById('workflowNav').style.display = tab === 'workflow' ? 'block' : 'none';
+            document.getElementById('agentsNav').style.display = tab === 'agents' ? 'block' : 'none';
+        }
+
+        function scrollToAgent(agentId) {
+            document.querySelectorAll('.heat-tile').forEach(tile => tile.classList.remove('highlighted'));
+            document.querySelectorAll('.agent-card').forEach(card => card.classList.remove('highlighted'));
+            event.target.closest('.heat-tile').classList.add('highlighted');
+            const agentCard = document.querySelector(`[data-agent="${agentId}"]`);
+            if (agentCard) { agentCard.classList.add('highlighted'); agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }
+
+        let currentPromptText = '';
+        function openPromptModal(agentId) {
+            const agent = agentPrompts[agentId];
+            document.getElementById('modalTitle').textContent = '✨ ' + agent.title + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = `<span class="prompt-tag type">${agent.type}</span><span class="prompt-tag complexity">${agent.complexity}</span><span class="prompt-tag priority">${agent.priority}</span>`;
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptFull').textContent = agent.fullPrompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+            currentPromptText = agent.fullPrompt;
+            document.getElementById('promptModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() { document.getElementById('promptModal').style.display = 'none'; document.body.style.overflow = ''; }
+
+        async function copyPrompt() {
+            try {
+                await navigator.clipboard.writeText(currentPromptText);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy to clipboard'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePromptModal(); });
+    </script>
+</body>
+</html>

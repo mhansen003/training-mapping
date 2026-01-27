@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUS Services - CLEAR 2.0 Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-primary: #0a0f1a; --bg-secondary: #111827; --bg-card: #1a2234; --accent-blue: #3b82f6; --accent-teal: #14b8a6; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-green: #22c55e; --accent-purple: #8b5cf6; --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b; --border-subtle: rgba(255,255,255,0.08); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid var(--border-subtle); }
+        .breadcrumb a:hover { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+        .page-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; position: sticky; top: 52px; height: calc(100vh - 52px); }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border-subtle); }
+        .sidebar-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+        .sidebar-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+        .tab-switcher { display: flex; padding: 12px; gap: 8px; border-bottom: 1px solid var(--border-subtle); }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: var(--text-muted); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; }
+        .section-nav { flex: 1; overflow-y: auto; padding: 12px; }
+        .nav-group { margin-bottom: 20px; }
+        .nav-group-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: block; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; border-radius: 6px; border-left: 3px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-left-color: var(--accent-blue); }
+        .main-content { flex: 1; overflow-y: auto; padding: 40px; max-width: 1000px; }
+        .content-section { margin-bottom: 50px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
+        .section-icon { font-size: 2rem; }
+        .section-title { font-size: 1.6rem; font-weight: 800; }
+        .flow-diagram { display: flex; flex-wrap: wrap; gap: 12px; margin: 25px 0; align-items: center; }
+        .flow-node { padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-align: center; min-width: 120px; }
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: white; clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%); padding: 14px 30px; }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; }
+        .flow-arrow { color: var(--text-muted); font-size: 1.5rem; }
+        .info-box { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.tip { border-left: 4px solid var(--accent-green); }
+        .info-box.warning { border-left: 4px solid var(--accent-amber); }
+        .info-box.critical { border-left: 4px solid var(--accent-rose); }
+        .info-box-title { font-weight: 700; margin-bottom: 8px; }
+        .field-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+        .field-table th, .field-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+        .field-table th { background: var(--bg-card); font-weight: 700; }
+        .field-table td { color: var(--text-secondary); }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 5px; font-size: 0.75rem; font-weight: 700; }
+        .badge.required { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .badge.conv { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.fha { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .badge.va { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-item { display: flex; gap: 16px; margin-bottom: 20px; padding: 18px; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-subtle); }
+        .step-item::before { counter-increment: step; content: counter(step); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); border-radius: 50%; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { font-weight: 700; margin-bottom: 6px; }
+        .step-content p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .heat-map-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+        .heat-tile { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.3s; position: relative; }
+        .heat-tile::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .heat-tile.critical::before { background: var(--accent-rose); }
+        .heat-tile.high::before { background: var(--accent-amber); }
+        .heat-tile.medium::before { background: var(--accent-blue); }
+        .heat-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .heat-score { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .heat-tile.critical .heat-score { color: var(--accent-rose); }
+        .heat-tile.high .heat-score { color: var(--accent-amber); }
+        .heat-tile.medium .heat-score { color: var(--accent-blue); }
+        .heat-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+        .heat-desc { font-size: 0.8rem; color: var(--text-muted); }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+        .agent-header { display: flex; justify-content: space-between; margin-bottom: 18px; }
+        .agent-title { font-size: 1.2rem; font-weight: 700; }
+        .agent-type { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .agent-score-value { font-size: 2rem; font-weight: 800; }
+        .agent-score-label { font-size: 0.75rem; color: var(--text-muted); }
+        .agent-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 18px 0; padding: 16px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .agent-flow-step { padding: 8px 14px; background: var(--bg-secondary); border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+        .agent-flow-arrow { color: var(--text-muted); }
+        .agent-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+        .agent-metric { text-align: center; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .agent-metric-value { font-size: 1.1rem; font-weight: 700; color: var(--accent-teal); }
+        .agent-metric-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .view-prompt-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); border: none; border-radius: 8px; color: white; font-weight: 700; cursor: pointer; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(10, 15, 26, 0.9); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal { background: var(--bg-card); border-radius: 16px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); color: white; padding: 22px 28px; display: flex; justify-content: space-between; border-radius: 16px 16px 0 0; }
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .modal-btn.copy { background: white; color: var(--accent-purple); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+        .modal-body { padding: 28px; overflow-y: auto; }
+        .prompt-section { margin-bottom: 24px; }
+        .prompt-section-title { font-weight: 700; color: var(--accent-teal); margin-bottom: 12px; text-transform: uppercase; }
+        .prompt-content { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre-wrap; color: var(--text-secondary); }
+        .prompt-tags { display: flex; gap: 8px; margin-bottom: 20px; }
+        .prompt-tag { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .prompt-tag.type { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .prompt-tag.complexity { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .prompt-tag.priority { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        #copySuccess { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-green); color: white; padding: 18px 35px; border-radius: 10px; font-weight: 700; z-index: 3000; display: none; }
+        .quick-ref { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin: 30px 0; }
+        .quick-ref h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+        .quick-ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .quick-ref-item { background: rgba(0,0,0,0.2); padding: 14px; border-radius: 8px; }
+        .quick-ref-item strong { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏦 CLEAR 2.0</a>
+        <span class="separator">›</span>
+        <span class="current">🤖 AUS Services</span>
+    </nav>
+
+    <div class="page-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">AUS Services</div>
+                <div class="sidebar-subtitle">CLEAR 2.0 Module</div>
+            </div>
+            <div class="tab-switcher">
+                <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow</button>
+                <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents</button>
+            </div>
+            <nav class="section-nav" id="workflowNav">
+                <div class="nav-group">
+                    <div class="nav-group-title">Overview</div>
+                    <a href="#overview" class="nav-item active">AUS Overview</a>
+                    <a href="#requirements" class="nav-item">Prerequisites</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">AUS Types</div>
+                    <a href="#du" class="nav-item">Desktop Underwriter (DU)</a>
+                    <a href="#lpa" class="nav-item">Loan Product Advisor</a>
+                    <a href="#du-ea" class="nav-item">DU Early Access</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">Reference</div>
+                    <a href="#quickref" class="nav-item">Quick Reference</a>
+                </div>
+            </nav>
+            <nav class="section-nav" id="agentsNav" style="display: none;">
+                <div class="nav-group">
+                    <div class="nav-group-title">Heat Map</div>
+                    <a href="#heatmap" class="nav-item active">Priority Overview</a>
+                </div>
+                <div class="nav-group">
+                    <div class="nav-group-title">Agents</div>
+                    <a href="#agent1" class="nav-item">AUS Pre-Check Agent</a>
+                    <a href="#agent2" class="nav-item">Findings Analyzer</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div id="workflowContent" class="tab-content active">
+                <section id="overview" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">🤖</span>
+                        <h2 class="section-title">AUS Services in CLEAR 2.0</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
+                        Automated Underwriting System (AUS) services in CLEAR 2.0 allow Loan Officers to submit loans to DU (Desktop Underwriter) for Fannie Mae or LPA (Loan Product Advisor) for Freddie Mac to receive automated underwriting decisions. DU Early Access (DU EA) is available for prequalification scenarios.
+                    </p>
+                    <div class="flow-diagram">
+                        <div class="flow-node start">Credit Pulled</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node action">Complete URLA</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node decision">Select AUS</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node action">Run AUS</div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-node output">Review Findings</div>
+                    </div>
+                </section>
+
+                <section id="requirements" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">✅</span>
+                        <h2 class="section-title">AUS Prerequisites</h2>
+                    </div>
+                    <table class="field-table">
+                        <thead><tr><th>Requirement</th><th>Details</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Credit Report</strong></td><td>Valid credit report within 120 days</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>URLA Complete</strong></td><td>Borrower info, property, loan terms, income, assets/liabilities</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>Product Selection</strong></td><td>Loan product must be selected and priced</td><td><span class="badge required">Required</span></td></tr>
+                            <tr><td><strong>Property Address</strong></td><td>Full property address (not TBD) for DU/LPA</td><td><span class="badge required">Required</span></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 DU EA Exception</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">DU Early Access can be run with TBD property for prequalification. Full DU/LPA requires a valid property address.</p>
+                    </div>
+                </section>
+
+                <section id="du" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">🏠</span>
+                        <h2 class="section-title">Desktop Underwriter (DU)</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">DU is Fannie Mae's automated underwriting system for conventional loans.</p>
+                    <table class="field-table">
+                        <thead><tr><th>Loan Type</th><th>Credit Required</th><th>AUS Type</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Conventional</strong></td><td>Soft Pull or Tri-Merge</td><td><span class="badge conv">DU / LPA</span></td></tr>
+                            <tr><td><strong>FHA</strong></td><td>Tri-Merge Required</td><td><span class="badge fha">DU Only</span></td></tr>
+                            <tr><td><strong>VA</strong></td><td>Tri-Merge Required</td><td><span class="badge va">LPA Only</span></td></tr>
+                        </tbody>
+                    </table>
+                    <ol class="step-list">
+                        <li class="step-item"><div class="step-content"><h4>Navigate to AUS</h4><p>Click on the DU/LPA tab in CLEAR or access via the Action Bolt dropdown.</p></div></li>
+                        <li class="step-item"><div class="step-content"><h4>Select DU</h4><p>Choose Desktop Underwriter from the AUS options.</p></div></li>
+                        <li class="step-item"><div class="step-content"><h4>Run AUS</h4><p>Click "Run AUS" to submit. Results typically return within seconds.</p></div></li>
+                        <li class="step-item"><div class="step-content"><h4>Review Findings</h4><p>Review the DU Findings report for approval status and conditions.</p></div></li>
+                    </ol>
+                </section>
+
+                <section id="lpa" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">🏦</span>
+                        <h2 class="section-title">Loan Product Advisor (LPA)</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">LPA is Freddie Mac's automated underwriting system. Use LPA for conventional loans targeting Freddie Mac delivery or for specific investor requirements.</p>
+                    <div class="info-box warning">
+                        <div class="info-box-title">⚠️ VA Loans</div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">VA loans must use LPA as DU is not available for VA loan products.</p>
+                    </div>
+                </section>
+
+                <section id="du-ea" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">⚡</span>
+                        <h2 class="section-title">DU Early Access (DU EA)</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">DU EA allows running Desktop Underwriter during prequalification with a soft pull credit report and TBD property address. This helps determine borrower eligibility before a property is identified.</p>
+                    <div class="info-box tip">
+                        <div class="info-box-title">💡 When to Use DU EA</div>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 20px;">
+                            <li>Prequalification scenarios without a property</li>
+                            <li>Early assessment of borrower qualification</li>
+                            <li>Soft pull credit only available</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="quickref" class="content-section">
+                    <div class="quick-ref">
+                        <h3>⚡ Quick Reference</h3>
+                        <div class="quick-ref-grid">
+                            <div class="quick-ref-item"><strong>Access Point</strong><span>DU/LPA Tab</span></div>
+                            <div class="quick-ref-item"><strong>Fannie Mae</strong><span>DU</span></div>
+                            <div class="quick-ref-item"><strong>Freddie Mac</strong><span>LPA</span></div>
+                            <div class="quick-ref-item"><strong>PreQual</strong><span>DU EA</span></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="agentsContent" class="tab-content">
+                <section id="heatmap" class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">🎯</span>
+                        <h2 class="section-title">AI Agent Opportunity Heat Map</h2>
+                    </div>
+                    <div class="heat-map-grid">
+                        <div class="heat-tile critical" onclick="scrollToAgent('agent1')">
+                            <div class="heat-score">90</div>
+                            <div class="heat-name">AUS Pre-Check Agent</div>
+                            <div class="heat-desc">Validation • Pre-Submit</div>
+                        </div>
+                        <div class="heat-tile high" onclick="scrollToAgent('agent2')">
+                            <div class="heat-score">85</div>
+                            <div class="heat-name">Findings Analyzer</div>
+                            <div class="heat-desc">Analysis • Post-Submit</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="agent1" class="content-section">
+                    <div class="agent-card" data-agent="agent1">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-title">AUS Pre-Check Agent</div>
+                                <div class="agent-type">Validation / Quality Gate</div>
+                            </div>
+                            <div class="agent-score">
+                                <div class="agent-score-value" style="color: var(--accent-rose);">90</div>
+                                <div class="agent-score-label">Priority Score</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                            Validates loan file completeness before AUS submission to prevent errors and improve first-pass approval rates.
+                        </p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-step">📋 URLA Data</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">✅ Check Fields</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">⚠️ Flag Issues</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">✓ Ready to Submit</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="agent-metric"><div class="agent-metric-value">10 min</div><div class="agent-metric-label">Time Saved</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">95%</div><div class="agent-metric-label">Error Prevention</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">Low</div><div class="agent-metric-label">Complexity</div></div>
+                        </div>
+                        <button class="view-prompt-btn" onclick="openPromptModal('agent1')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </section>
+
+                <section id="agent2" class="content-section">
+                    <div class="agent-card" data-agent="agent2">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-title">AUS Findings Analyzer</div>
+                                <div class="agent-type">Analysis / Recommendations</div>
+                            </div>
+                            <div class="agent-score">
+                                <div class="agent-score-value" style="color: var(--accent-amber);">85</div>
+                                <div class="agent-score-label">Priority Score</div>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                            Analyzes AUS findings and provides actionable recommendations to clear conditions and improve loan approval status.
+                        </p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-step">📊 DU/LPA Results</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">🔍 Parse Findings</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">💡 Recommendations</div>
+                            <span class="agent-flow-arrow">→</span>
+                            <div class="agent-flow-step">📝 Action Plan</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="agent-metric"><div class="agent-metric-value">15 min</div><div class="agent-metric-label">Time Saved</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">90%</div><div class="agent-metric-label">Accuracy</div></div>
+                            <div class="agent-metric"><div class="agent-metric-value">Medium</div><div class="agent-metric-label">Complexity</div></div>
+                        </div>
+                        <button class="view-prompt-btn" onclick="openPromptModal('agent2')">✨ View AI Prompt to Build This Agent</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">✨ AI Agent Build Prompt</h3>
+                <div style="display: flex; gap: 12px;">
+                    <button class="modal-btn copy" onclick="copyPrompt()">📋 Copy</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section"><div class="prompt-section-title">Purpose</div><div class="prompt-content" id="promptPurpose"></div></div>
+                <div class="prompt-section"><div class="prompt-section-title">Build Prompt</div><div class="prompt-content" id="promptFull"></div></div>
+                <div class="prompt-section"><div class="prompt-section-title">Integration</div><div class="prompt-content" id="promptIntegration"></div></div>
+            </div>
+        </div>
+    </div>
+    <div id="copySuccess">✓ Copied!</div>
+
+    <script>
+        const agentPrompts = {
+            agent1: {
+                title: "AUS Pre-Check Agent", type: "Validation", complexity: "Low", priority: "Critical (90)",
+                purpose: "Validates loan file completeness before AUS submission to prevent errors.",
+                fullPrompt: `You are building an AUS Pre-Check Agent for CMG Financial's CLEAR 2.0.
+
+AGENT NAME: AUS Pre-Check Agent
+TYPE: Validation / Quality Gate
+
+OBJECTIVE:
+Validate all required fields and data quality before AUS submission to maximize first-pass approval rates.
+
+VALIDATION CHECKS:
+1. Credit report present and valid (<120 days)
+2. Property address complete (not TBD for DU/LPA)
+3. Income documented and calculated
+4. Assets sufficient for down payment + reserves
+5. Loan product selected
+6. DTI within product limits
+7. LTV/CLTV within guidelines
+
+OUTPUT: {
+  "ready_to_submit": true/false,
+  "blocking_issues": [],
+  "warnings": [],
+  "recommendations": []
+}`,
+                integration: `Integration: URLA data, Credit section, Product guidelines`
+            },
+            agent2: {
+                title: "AUS Findings Analyzer", type: "Analysis", complexity: "Medium", priority: "High (85)",
+                purpose: "Analyzes AUS findings and provides actionable recommendations.",
+                fullPrompt: `You are building an AUS Findings Analyzer for CMG Financial's CLEAR 2.0.
+
+AGENT NAME: AUS Findings Analyzer
+TYPE: Analysis / Recommendations
+
+OBJECTIVE:
+Parse DU/LPA findings and generate clear action items to improve loan status.
+
+ANALYSIS AREAS:
+- Income documentation requirements
+- Asset verification needs
+- Property conditions
+- Credit explanations needed
+- Additional documentation requests
+
+OUTPUT: {
+  "status": "Approve/Eligible" | "Refer" | "Ineligible",
+  "conditions": [
+    { "finding": "...", "action": "...", "urgency": "high/medium/low" }
+  ],
+  "estimated_resolution": "2-3 business days"
+}`,
+                integration: `Integration: DU/LPA response XML, Condition tracking, Document checklist`
+            }
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Content').classList.add('active');
+            document.getElementById('workflowNav').style.display = tab === 'workflow' ? 'block' : 'none';
+            document.getElementById('agentsNav').style.display = tab === 'agents' ? 'block' : 'none';
+        }
+
+        function scrollToAgent(id) {
+            document.querySelector(`[data-agent="${id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        let currentPromptText = '';
+        function openPromptModal(id) {
+            const a = agentPrompts[id];
+            document.getElementById('modalTitle').textContent = '✨ ' + a.title;
+            document.getElementById('promptTags').innerHTML = `<span class="prompt-tag type">${a.type}</span><span class="prompt-tag complexity">${a.complexity}</span><span class="prompt-tag priority">${a.priority}</span>`;
+            document.getElementById('promptPurpose').textContent = a.purpose;
+            document.getElementById('promptFull').textContent = a.fullPrompt;
+            document.getElementById('promptIntegration').textContent = a.integration;
+            currentPromptText = a.fullPrompt;
+            document.getElementById('promptModal').style.display = 'flex';
+        }
+        function closePromptModal() { document.getElementById('promptModal').style.display = 'none'; }
+        async function copyPrompt() {
+            await navigator.clipboard.writeText(currentPromptText);
+            document.getElementById('copySuccess').style.display = 'block';
+            setTimeout(() => document.getElementById('copySuccess').style.display = 'none', 2000);
+        }
+        document.getElementById('promptModal').onclick = e => { if (e.target.id === 'promptModal') closePromptModal(); };
+    </script>
+</body>
+</html>
