@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redisclosures - Workflow | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-teal: #14b8a6;
+            --accent-teal-light: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-teal); font-weight: 600; }
+
+        .layout { display: flex; padding-top: 54px; }
+
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); height: calc(100vh - 54px); position: fixed; top: 54px; left: 0; overflow-y: auto; padding: 20px 0; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 15px; }
+        .sidebar-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .workflow-name { font-size: 1.1rem; font-weight: 700; }
+        .nav-section { padding: 0 12px; margin-bottom: 20px; }
+        .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: rgba(20, 184, 166, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .nav-item .step-num { width: 22px; height: 22px; background: var(--bg-card); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .nav-item.active .step-num { background: var(--accent-teal); color: white; }
+
+        .main-content { flex: 1; margin-left: 280px; padding: 30px 40px; max-width: calc(100% - 280px); }
+
+        .workflow-header { margin-bottom: 30px; }
+        .workflow-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .workflow-meta { display: flex; gap: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .workflow-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .tab-container { margin-bottom: 30px; }
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn { padding: 12px 24px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 10px; color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .tab-btn:hover { border-color: var(--accent-teal); color: var(--text-primary); }
+        .tab-btn.active { background: rgba(20, 184, 166, 0.15); border-color: var(--accent-teal); color: var(--accent-teal); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .workflow-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 30px; margin-bottom: 25px; }
+        .workflow-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .section-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+
+        .step-list { display: flex; flex-direction: column; gap: 16px; }
+        .step-item { display: flex; gap: 16px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-subtle); }
+        .step-number { width: 32px; height: 32px; background: var(--accent-teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+        .step-content p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+        .callout { background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 12px; padding: 18px 22px; margin-top: 20px; }
+        .callout-title { font-weight: 700; color: var(--accent-teal); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+        .warning-callout { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .warning-callout .callout-title { color: var(--accent-amber); }
+        .error-callout { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); }
+        .error-callout .callout-title { color: var(--accent-rose); }
+
+        .coc-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .coc-table th, .coc-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+        .coc-table th { background: rgba(0,0,0,0.2); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .coc-table td { font-size: 0.9rem; color: var(--text-secondary); }
+        .coc-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* AI Agents Panel */
+        .heat-map { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 25px; margin-bottom: 30px; }
+        .heat-map h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .heat-map-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .heat-item { padding: 12px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .heat-item:hover { transform: scale(1.05); }
+        .heat-item .score { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; }
+        .heat-high { background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.1) 100%); border: 1px solid rgba(34, 197, 94, 0.4); color: var(--accent-green); }
+        .heat-medium { background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 100%); border: 1px solid rgba(59, 130, 246, 0.4); color: var(--accent-blue); }
+
+        .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; }
+        .agent-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 25px; transition: all 0.3s; }
+        .agent-card:hover { border-color: rgba(20, 184, 166, 0.4); }
+        .agent-card.highlight { animation: highlightPulse 2s ease-out; }
+        @keyframes highlightPulse { 0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(20, 184, 166, 0); } 100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); } }
+
+        .agent-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 18px; }
+        .agent-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+        .agent-role { font-size: 0.8rem; color: var(--text-muted); }
+        .confidence-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
+        .confidence-high { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .confidence-medium { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        .agent-description { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 18px; }
+
+        .agent-triggers { margin-bottom: 18px; }
+        .agent-triggers h4 { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .trigger-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .trigger-tag { padding: 5px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary); }
+
+        .view-prompt-btn { width: 100%; padding: 12px; background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 10px; color: var(--accent-teal); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .view-prompt-btn:hover { background: rgba(20, 184, 166, 0.2); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 20px; max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; }
+        .modal-header { padding: 25px 30px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg-secondary); z-index: 10; }
+        .modal-header h2 { font-size: 1.3rem; font-weight: 700; }
+        .modal-close { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
+        .modal-close:hover { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
+        .modal-body { padding: 30px; }
+        .modal-section { margin-bottom: 25px; }
+        .modal-section:last-child { margin-bottom: 0; }
+        .modal-section h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .prompt-box { background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; }
+        .integration-list { display: flex; flex-direction: column; gap: 10px; }
+        .integration-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .integration-icon { width: 32px; height: 32px; background: rgba(20, 184, 166, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .integration-text { font-size: 0.9rem; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">📄 DocuTech</a>
+        <span class="separator">›</span>
+        <span class="current">Redisclosures</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Workflow</div>
+                <div class="workflow-name">Redisclosures (CoC)</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Sections</div>
+                <a class="nav-item active" href="#when-redisclose"><span class="step-num">1</span> When to Redisclose</a>
+                <a class="nav-item" href="#coc-reasons"><span class="step-num">2</span> CoC Reasons</a>
+                <a class="nav-item" href="#create-redisclosure"><span class="step-num">3</span> Create Redisclosure</a>
+                <a class="nav-item" href="#alt-packages"><span class="step-num">4</span> Alt Packages</a>
+                <a class="nav-item" href="#delivery"><span class="step-num">5</span> Delivery</a>
+            </nav>
+            <nav class="nav-section">
+                <div class="nav-section-title">AI Agents</div>
+                <a class="nav-item" href="#" onclick="switchTab('agents'); return false;"><span class="step-num">🤖</span> 2 Active Agents</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="workflow-header">
+                <h1>Redisclosures Workflow</h1>
+                <div class="workflow-meta">
+                    <span>📅 Updated: October 2025</span>
+                    <span>⏱️ ~12 min to complete</span>
+                    <span>👤 Processor / Closer</span>
+                </div>
+            </div>
+
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('workflow')">📋 Workflow Steps</button>
+                    <button class="tab-btn" onclick="switchTab('agents')">🤖 AI Agents (2)</button>
+                </div>
+
+                <!-- Workflow Panel -->
+                <div id="workflow-panel" class="tab-panel active">
+                    <section class="workflow-section" id="when-redisclose">
+                        <h2><span class="section-icon">🔄</span> When to Redisclose</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">A redisclosure is required when there is a Change of Circumstance (CoC) that affects the loan terms or fees disclosed on the original Loan Estimate. Common triggers include:</p>
+
+                        <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 2;">
+                            <li><strong>Rate lock or relock</strong> - Any change to the interest rate</li>
+                            <li><strong>Loan amount change</strong> - Increase or decrease in loan amount</li>
+                            <li><strong>Product change</strong> - Switching loan programs (e.g., Conv to FHA)</li>
+                            <li><strong>Property value change</strong> - New appraisal affects LTV</li>
+                            <li><strong>Fee changes</strong> - Title fees, recording fees, or other costs change</li>
+                            <li><strong>Closing date change</strong> - Impacts per diem interest and prepaid items</li>
+                        </ul>
+
+                        <div class="callout warning-callout">
+                            <div class="callout-title">⚠️ 3-Day Timing Rule</div>
+                            <p>Redisclosures must be delivered at least 3 business days before closing if they result in an APR increase of more than 0.125% (fixed) or 0.25% (ARM), or if a prepayment penalty is added. For most CoC redisclosures, same-day delivery is acceptable.</p>
+                        </div>
+                    </section>
+
+                    <section class="workflow-section" id="coc-reasons">
+                        <h2><span class="section-icon">📋</span> Change of Circumstance Reasons</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">When creating a redisclosure, you must select the appropriate CoC reason code:</p>
+
+                        <table class="coc-table">
+                            <thead>
+                                <tr>
+                                    <th>Reason Code</th>
+                                    <th>Description</th>
+                                    <th>Common Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Rate Lock</strong></td>
+                                    <td>Interest rate locked or relocked</td>
+                                    <td>Initial lock, rate extension</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Changed Circumstance</strong></td>
+                                    <td>Information changed after LE</td>
+                                    <td>Appraisal, title, credit</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Borrower Requested</strong></td>
+                                    <td>Borrower asked for change</td>
+                                    <td>Product switch, term change</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tolerance Cure</strong></td>
+                                    <td>Correcting a tolerance violation</td>
+                                    <td>Fees exceeded limits</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Interest Rate Dependent</strong></td>
+                                    <td>Charges tied to rate changed</td>
+                                    <td>Lock-related fee changes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section class="workflow-section" id="create-redisclosure">
+                        <h2><span class="section-icon">📝</span> Create Redisclosure</h2>
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h3>Update Loan Data in Byte</h3>
+                                    <p>Before creating the redisclosure, ensure all changes are entered in Byte - rate, fees, loan amount, closing date, etc. The redisclosure will pull current data.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h3>Open DocuTech</h3>
+                                    <p>In Byte, click <strong>Services → DocuTech → Redisclosure</strong>. This opens DocuTech with the redisclosure package type pre-selected.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h3>Select CoC Reason</h3>
+                                    <p>Choose the appropriate Change of Circumstance reason from the dropdown. This reason will appear on the revised Loan Estimate.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h3>Verify Fee Changes</h3>
+                                    <p>Review the fee comparison screen showing original vs. revised fees. Ensure all changes are accurate and within tolerance limits.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="callout error-callout">
+                            <div class="callout-title">🚨 Tolerance Limits</div>
+                            <p><strong>Zero Tolerance:</strong> Origination charges, points, transfer taxes cannot increase.<br>
+                            <strong>10% Cumulative:</strong> Recording fees, 3rd party services where lender selected provider.<br>
+                            <strong>Unlimited:</strong> Services borrower can shop for (if they selected different provider), prepaid interest, insurance.</p>
+                        </div>
+                    </section>
+
+                    <section class="workflow-section" id="alt-packages">
+                        <h2><span class="section-icon">📦</span> Alt Packages (Skinny Packages)</h2>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">Alt packages contain only the Loan Estimate without additional disclosures. Use when:</p>
+
+                        <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 2; margin-bottom: 20px;">
+                            <li>Quick rate lock redisclosure where only rate/fees changed</li>
+                            <li>Minor fee adjustments that don't require full package</li>
+                            <li>Time-sensitive situations where full package isn't needed</li>
+                        </ul>
+
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <h3>Select Alt Package (If Applicable)</h3>
+                                    <p>In DocuTech, instead of "Redisclosure", select <strong>"Alt Package"</strong> or <strong>"Redisclosure - LE Only"</strong>. This generates just the revised Loan Estimate.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="callout">
+                            <div class="callout-title">💡 When to Use Full vs. Alt</div>
+                            <p><strong>Full Redisclosure:</strong> Product change, significant term changes, state-specific disclosures needed.<br>
+                            <strong>Alt Package:</strong> Rate lock, minor fee adjustments, time-sensitive delivery.</p>
+                        </div>
+                    </section>
+
+                    <section class="workflow-section" id="delivery">
+                        <h2><span class="section-icon">📨</span> Delivery</h2>
+                        <div class="step-list">
+                            <div class="step-item">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <h3>Preview Documents</h3>
+                                    <p>Click <strong>"Preview"</strong> to review the revised Loan Estimate. Verify all changes are reflected correctly, especially in Section A (Loan Costs) and Section J (Total Closing Costs).</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">7</div>
+                                <div class="step-content">
+                                    <h3>Push to Byte</h3>
+                                    <p>Click <strong>"Push to Byte"</strong> to send the package for e-signing. The borrower receives an email notification with the link to review and acknowledge.</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">8</div>
+                                <div class="step-content">
+                                    <h3>Monitor & Document</h3>
+                                    <p>Track e-sign completion in Byte. Once signed, the revised LE pushes back to DocuTech. Note the CoC date and delivery date in the loan file for compliance.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- AI Agents Panel -->
+                <div id="agents-panel" class="tab-panel">
+                    <div class="heat-map">
+                        <h3>🎯 Agent Confidence Map</h3>
+                        <div class="heat-map-grid">
+                            <div class="heat-item heat-high" onclick="scrollToAgent('agent-tolerance')">
+                                <span>Tolerance Tracker</span>
+                                <span class="score">92</span>
+                            </div>
+                            <div class="heat-item heat-medium" onclick="scrollToAgent('agent-coc')">
+                                <span>CoC Reason Advisor</span>
+                                <span class="score">85</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agents-grid">
+                        <div class="agent-card" id="agent-tolerance">
+                            <div class="agent-header">
+                                <div class="agent-avatar">📊</div>
+                                <div class="agent-info">
+                                    <div class="agent-name">Tolerance Tracker</div>
+                                    <div class="agent-role">Fee Compliance Agent</div>
+                                </div>
+                                <span class="confidence-badge confidence-high">92</span>
+                            </div>
+                            <p class="agent-description">Monitors fee changes between original and revised disclosures, calculates tolerance buckets, and alerts when fees approach or exceed TRID tolerance limits.</p>
+                            <div class="agent-triggers">
+                                <h4>Activation Triggers</h4>
+                                <div class="trigger-list">
+                                    <span class="trigger-tag">Fee worksheet updated</span>
+                                    <span class="trigger-tag">Redisclosure initiated</span>
+                                    <span class="trigger-tag">Pre-closing review</span>
+                                </div>
+                            </div>
+                            <button class="view-prompt-btn" onclick="openModal('tolerance')">View Full Prompt →</button>
+                        </div>
+
+                        <div class="agent-card" id="agent-coc">
+                            <div class="agent-header">
+                                <div class="agent-avatar">🎯</div>
+                                <div class="agent-info">
+                                    <div class="agent-name">CoC Reason Advisor</div>
+                                    <div class="agent-role">Compliance Selection Agent</div>
+                                </div>
+                                <span class="confidence-badge confidence-medium">85</span>
+                            </div>
+                            <p class="agent-description">Recommends the appropriate Change of Circumstance reason code based on loan changes, ensuring proper documentation for TRID compliance.</p>
+                            <div class="agent-triggers">
+                                <h4>Activation Triggers</h4>
+                                <div class="trigger-list">
+                                    <span class="trigger-tag">Rate lock event</span>
+                                    <span class="trigger-tag">Loan terms changed</span>
+                                    <span class="trigger-tag">Redisclosure package created</span>
+                                </div>
+                            </div>
+                            <button class="view-prompt-btn" onclick="openModal('coc')">View Full Prompt →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Agent Details</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+            }
+        }
+
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) {
+                agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                agent.classList.add('highlight');
+                setTimeout(() => agent.classList.remove('highlight'), 2000);
+            }
+        }
+
+        const agentData = {
+            tolerance: {
+                title: 'Tolerance Tracker',
+                purpose: 'Prevents TRID tolerance violations by continuously monitoring fee changes and alerting users before limits are exceeded, potentially saving costly tolerance cures.',
+                prompt: `You are a Tolerance Tracker for TRID compliance.
+
+TOLERANCE BUCKETS:
+1. ZERO TOLERANCE (cannot increase):
+   - Origination charges (points, fees)
+   - Transfer taxes
+   - Fees paid to lender affiliates
+
+2. 10% CUMULATIVE TOLERANCE:
+   - Recording fees
+   - Third-party services (lender-selected)
+   - Aggregated across all items in bucket
+
+3. UNLIMITED (can increase):
+   - Prepaid interest
+   - Property insurance
+   - Services borrower shopped for (different provider)
+
+MONITORING LOGIC:
+- Compare current fees to original LE
+- Calculate cumulative variance per bucket
+- Alert thresholds: 80% (yellow), 95% (red)
+- Flag any zero-tolerance increases immediately
+
+CURE DETECTION:
+If tolerance violated at closing:
+- Calculate cure amount needed
+- Document for CD credit line
+- Alert compliance team
+
+OUTPUT: Tolerance dashboard with bucket status, variance %, and cure requirements.`,
+                integrations: [
+                    { icon: '💰', text: 'Fee worksheet in Byte for current fees' },
+                    { icon: '📋', text: 'Original LE fee baseline from DocuTech' },
+                    { icon: '📊', text: 'CD comparison for final tolerance check' }
+                ]
+            },
+            coc: {
+                title: 'CoC Reason Advisor',
+                purpose: 'Ensures proper Change of Circumstance reason selection for compliant redisclosures, reducing audit findings and rejection risk.',
+                prompt: `You are a Change of Circumstance Reason Advisor.
+
+REASON CODE LOGIC:
+Analyze loan changes and recommend appropriate CoC:
+
+1. RATE LOCK
+   Triggers: Rate locked, relocked, or extended
+   Use when: Primary change is interest rate
+
+2. CHANGED CIRCUMSTANCE
+   Triggers: New information unavailable at application
+   Examples: Appraisal value, title issues, credit update
+
+3. BORROWER REQUESTED
+   Triggers: Borrower initiated the change
+   Examples: Product switch, loan amount change
+
+4. INTEREST RATE DEPENDENT
+   Triggers: Charges that vary with rate
+   Use when: Lock affects rate-tied fees
+
+5. TOLERANCE CURE
+   Triggers: Fixing a tolerance violation
+   Use when: CD would show violation without cure
+
+DECISION TREE:
+- Did borrower request the change? → Borrower Requested
+- Was rate locked/changed? → Rate Lock
+- Did external info change? → Changed Circumstance
+- Are you curing fees? → Tolerance Cure
+
+OUTPUT: Recommended reason code with justification.`,
+                integrations: [
+                    { icon: '🔒', text: 'Lock desk events for rate changes' },
+                    { icon: '📝', text: 'Loan modification history from Byte' },
+                    { icon: '📄', text: 'DocuTech redisclosure reason field' }
+                ]
+            }
+        };
+
+        function openModal(agentKey) {
+            const agent = agentData[agentKey];
+            document.getElementById('modal-title').textContent = agent.title;
+
+            let integrationsHTML = agent.integrations.map(i => `
+                <div class="integration-item">
+                    <div class="integration-icon">${i.icon}</div>
+                    <span class="integration-text">${i.text}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="modal-section">
+                    <h3>Purpose</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.7;">${agent.purpose}</p>
+                </div>
+                <div class="modal-section">
+                    <h3>Full Prompt</h3>
+                    <div class="prompt-box">${agent.prompt}</div>
+                </div>
+                <div class="modal-section">
+                    <h3>Integration Points</h3>
+                    <div class="integration-list">${integrationsHTML}</div>
+                </div>
+            `;
+
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

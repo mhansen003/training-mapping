@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting Guide | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-teal: #14b8a6;
+            --accent-teal-light: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-teal); font-weight: 600; }
+
+        .layout { display: flex; padding-top: 54px; }
+
+        .sidebar { width: 280px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle); height: calc(100vh - 54px); position: fixed; top: 54px; left: 0; overflow-y: auto; padding: 20px 0; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 15px; }
+        .sidebar-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .workflow-name { font-size: 1.1rem; font-weight: 700; }
+        .nav-section { padding: 0 12px; margin-bottom: 20px; }
+        .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); padding: 8px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-secondary); text-decoration: none; border-radius: 8px; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: rgba(20, 184, 166, 0.1); color: var(--text-primary); }
+        .nav-item.active { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .nav-item .step-num { width: 22px; height: 22px; background: var(--bg-card); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .nav-item.active .step-num { background: var(--accent-teal); color: white; }
+
+        .main-content { flex: 1; margin-left: 280px; padding: 30px 40px; max-width: calc(100% - 280px); }
+
+        .workflow-header { margin-bottom: 30px; }
+        .workflow-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .workflow-meta { display: flex; gap: 20px; color: var(--text-muted); font-size: 0.9rem; }
+        .workflow-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .workflow-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 30px; margin-bottom: 25px; }
+        .workflow-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .section-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+
+        .issue-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+        .issue-header { padding: 18px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; }
+        .issue-header:hover { background: rgba(255,255,255,0.02); }
+        .issue-title { display: flex; align-items: center; gap: 12px; }
+        .issue-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .issue-icon.error { background: rgba(244, 63, 94, 0.2); }
+        .issue-icon.warning { background: rgba(245, 158, 11, 0.2); }
+        .issue-icon.info { background: rgba(59, 130, 246, 0.2); }
+        .issue-name { font-weight: 700; font-size: 1rem; }
+        .issue-toggle { color: var(--text-muted); font-size: 1.2rem; transition: transform 0.2s; }
+        .issue-card.expanded .issue-toggle { transform: rotate(180deg); }
+        .issue-body { padding: 0 20px 20px; display: none; }
+        .issue-card.expanded .issue-body { display: block; }
+        .issue-description { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; line-height: 1.6; }
+
+        .solution-box { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 10px; padding: 15px 18px; }
+        .solution-title { font-weight: 700; color: var(--accent-green); margin-bottom: 10px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .solution-steps { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7; }
+        .solution-steps ol { margin-left: 18px; }
+        .solution-steps li { margin-bottom: 6px; }
+
+        .callout { background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 12px; padding: 18px 22px; margin-top: 20px; }
+        .callout-title { font-weight: 700; color: var(--accent-teal); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .callout p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+        .warning-callout { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .warning-callout .callout-title { color: var(--accent-amber); }
+
+        .support-card { background: linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); border: 1px solid rgba(20, 184, 166, 0.3); border-radius: 16px; padding: 25px 30px; display: flex; align-items: center; gap: 25px; }
+        .support-icon { width: 60px; height: 60px; background: var(--accent-teal); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+        .support-info h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+        .support-info p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px; }
+        .support-email { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-teal); font-weight: 600; text-decoration: none; padding: 10px 18px; background: rgba(0,0,0,0.2); border-radius: 8px; transition: all 0.2s; }
+        .support-email:hover { background: rgba(0,0,0,0.3); }
+
+        .quick-ref { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
+        .quick-ref-item { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; }
+        .quick-ref-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: var(--accent-teal); }
+        .quick-ref-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <a href="./index.html">📄 DocuTech</a>
+        <span class="separator">›</span>
+        <span class="current">Troubleshooting Guide</span>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Reference Guide</div>
+                <div class="workflow-name">Troubleshooting</div>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-section-title">Categories</div>
+                <a class="nav-item active" href="#push-issues"><span class="step-num">1</span> Push/Sync Issues</a>
+                <a class="nav-item" href="#document-issues"><span class="step-num">2</span> Document Errors</a>
+                <a class="nav-item" href="#esign-issues"><span class="step-num">3</span> E-Sign Problems</a>
+                <a class="nav-item" href="#support"><span class="step-num">4</span> Get Support</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="workflow-header">
+                <h1>DocuTech Troubleshooting Guide</h1>
+                <div class="workflow-meta">
+                    <span>📅 Updated: October 2025</span>
+                    <span>⏱️ Quick Reference</span>
+                    <span>👤 All Roles</span>
+                </div>
+            </div>
+
+            <section class="workflow-section" id="push-issues">
+                <h2><span class="section-icon">🔄</span> Push/Sync Issues</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Common issues when pushing data between Byte and DocuTech.</p>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon error">❌</div>
+                            <span class="issue-name">Push to Byte Failed</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Documents generated in DocuTech but won't push to Byte for e-signing. May show error message or timeout.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Wait 2-3 minutes and try pushing again (temporary connectivity issue)</li>
+                                    <li>Verify the loan is still open in Byte and not locked</li>
+                                    <li>Check that borrower email addresses are valid (no typos)</li>
+                                    <li>Clear browser cache and try again</li>
+                                    <li>If persists, contact DocuTechSupport@cmgfi.com with loan number</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon error">❌</div>
+                            <span class="issue-name">Data Not Syncing from Byte</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">DocuTech shows old loan data that doesn't match current Byte information.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>In DocuTech, click <strong>Refresh</strong> or <strong>Re-Pull Data</strong> from Byte</li>
+                                    <li>Verify all changes are saved in Byte before creating package</li>
+                                    <li>Close and reopen the DocuTech session</li>
+                                    <li>Generate a new package (don't edit the old one)</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon warning">⚠️</div>
+                            <span class="issue-name">Signed Docs Not Pushing Back</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Borrower completed e-signing but documents aren't appearing back in DocuTech.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Wait 15-30 minutes for automatic sync to complete</li>
+                                    <li>Check Byte e-sign status to confirm all signatures are complete</li>
+                                    <li>In DocuTech, manually check the package status</li>
+                                    <li>If still missing after 1 hour, contact support for manual retrieval</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="document-issues">
+                <h2><span class="section-icon">📄</span> Document Errors</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Issues with document generation and content.</p>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon error">❌</div>
+                            <span class="issue-name">Missing Documents in Package</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Expected documents are not appearing in the generated package.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Review the document selection screen - ensure all needed docs are checked</li>
+                                    <li>Some documents are loan-type specific (FHA, VA, Conv) - verify product code is correct</li>
+                                    <li>State-specific documents require property state to be set correctly in Byte</li>
+                                    <li>Search the document library manually and add missing docs</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon error">❌</div>
+                            <span class="issue-name">Incorrect Data on Documents</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Documents show wrong borrower info, loan terms, or fees.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Correct the data in Byte first (DocuTech pulls from Byte)</li>
+                                    <li>Generate a new package - don't try to edit the existing one</li>
+                                    <li>Preview documents before pushing to verify corrections</li>
+                                    <li>For fee discrepancies, check both fee worksheet AND loan terms in Byte</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon warning">⚠️</div>
+                            <span class="issue-name">Document Generation Error</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">DocuTech throws an error when trying to generate documents.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Note the exact error message for troubleshooting</li>
+                                    <li>Check for missing required fields in Byte (common: SSN, DOB, property address)</li>
+                                    <li>Try a different browser or clear cache</li>
+                                    <li>If error mentions specific field, verify that field in Byte</li>
+                                    <li>Report persistent errors to DocuTechSupport with screenshot</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="esign-issues">
+                <h2><span class="section-icon">✍️</span> E-Sign Problems</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Issues with electronic signature delivery and completion.</p>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon error">❌</div>
+                            <span class="issue-name">Borrower Didn't Receive E-Sign Email</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Borrower says they never got the e-signing invitation email.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Have borrower check spam/junk folder</li>
+                                    <li>Verify email address is correct in Byte (common typos: .con vs .com)</li>
+                                    <li>In Byte e-sign status, resend the invitation</li>
+                                    <li>Try an alternate email address if available</li>
+                                    <li>Some corporate email filters block signing emails - try personal email</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon warning">⚠️</div>
+                            <span class="issue-name">E-Sign Link Not Working</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Borrower clicks the link but gets an error or can't sign.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Links expire after a set time - resend if more than 48 hours old</li>
+                                    <li>Have borrower try a different browser (Chrome works best)</li>
+                                    <li>Ensure borrower isn't on a VPN or corporate network that blocks</li>
+                                    <li>Clear browser cache and cookies, then try link again</li>
+                                    <li>If package was voided/cancelled, a new package must be sent</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header" onclick="toggleIssue(this)">
+                        <div class="issue-title">
+                            <div class="issue-icon info">ℹ️</div>
+                            <span class="issue-name">Co-Borrower Can't Sign</span>
+                        </div>
+                        <span class="issue-toggle">▼</span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-description">Primary borrower signed but co-borrower's link isn't working or wasn't sent.</p>
+                        <div class="solution-box">
+                            <div class="solution-title">✅ Solution</div>
+                            <div class="solution-steps">
+                                <ol>
+                                    <li>Verify co-borrower has a separate email address in Byte</li>
+                                    <li>Co-borrowers often sign sequentially - primary must complete first</li>
+                                    <li>Check e-sign status to see if co-borrower invitation was sent</li>
+                                    <li>Resend invitation specifically to co-borrower if needed</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workflow-section" id="support">
+                <h2><span class="section-icon">🆘</span> Get Support</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">When self-service troubleshooting doesn't resolve the issue, contact the DocuTech support team.</p>
+
+                <div class="support-card">
+                    <div class="support-icon">📧</div>
+                    <div class="support-info">
+                        <h3>DocuTech Support Team</h3>
+                        <p>For technical issues, document errors, system access problems, and escalations. Include loan number and screenshot of any error messages.</p>
+                        <a href="mailto:DocuTechSupport@cmgfi.com" class="support-email">
+                            <span>📧</span>
+                            DocuTechSupport@cmgfi.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="callout warning-callout">
+                    <div class="callout-title">⚠️ Before Contacting Support</div>
+                    <p>Please gather the following information to expedite your request:<br>
+                    • Loan number<br>
+                    • Screenshot of any error messages<br>
+                    • Description of steps taken before the error<br>
+                    • Browser and device being used<br>
+                    • Time the issue occurred</p>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 1.1rem;">Quick Reference</h3>
+                <div class="quick-ref">
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-title">Package Types</div>
+                        <div class="quick-ref-text">
+                            <strong>Initial Disclosure:</strong> First LE package<br>
+                            <strong>Redisclosure:</strong> CoC revised LE<br>
+                            <strong>Pre-Closing:</strong> CD to Title<br>
+                            <strong>Closing:</strong> Full closing docs
+                        </div>
+                    </div>
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-title">Timing Rules</div>
+                        <div class="quick-ref-text">
+                            <strong>Initial LE:</strong> 3 business days from app<br>
+                            <strong>CD:</strong> 3 business days before closing<br>
+                            <strong>Redisclosure:</strong> Same day (most)<br>
+                            <strong>APR change:</strong> New 3-day wait
+                        </div>
+                    </div>
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-title">Common Fix</div>
+                        <div class="quick-ref-text">
+                            80% of issues are resolved by:<br>
+                            1. Update data in Byte<br>
+                            2. Generate NEW package<br>
+                            3. Don't edit old package
+                        </div>
+                    </div>
+                    <div class="quick-ref-item">
+                        <div class="quick-ref-title">Browser Tips</div>
+                        <div class="quick-ref-text">
+                            <strong>Best:</strong> Chrome, Edge<br>
+                            <strong>Clear cache</strong> if issues persist<br>
+                            <strong>Disable popup blockers</strong> for DocuTech<br>
+                            <strong>Allow cookies</strong> for session
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function toggleIssue(header) {
+            const card = header.parentElement;
+            card.classList.toggle('expanded');
+        }
+
+        // Expand first issue in each section by default
+        document.querySelectorAll('.workflow-section').forEach(section => {
+            const firstCard = section.querySelector('.issue-card');
+            if (firstCard) firstCard.classList.add('expanded');
+        });
+    </script>
+</body>
+</html>

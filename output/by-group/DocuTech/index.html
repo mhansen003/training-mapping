@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuTech Training | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-teal: #14b8a6;
+            --accent-teal-light: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --accent-rose: #f43f5e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+        .breadcrumb { background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%); padding: 14px 25px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid var(--border-subtle); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; font-weight: 600; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid var(--border-subtle); transition: all 0.2s; }
+        .breadcrumb a:hover { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-teal); font-weight: 600; }
+
+        .hero { padding: 100px 40px 60px; text-align: center; background: linear-gradient(180deg, rgba(20, 184, 166, 0.08) 0%, transparent 100%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; color: var(--accent-teal); margin-bottom: 20px; }
+        .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 15px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-teal) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.15rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 30px; line-height: 1.7; }
+
+        .stats-row { display: flex; justify-content: center; gap: 40px; margin-top: 30px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--accent-teal); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+        .content { max-width: 1400px; margin: 0 auto; padding: 0 40px 60px; }
+
+        .category-section { margin-bottom: 50px; }
+        .category-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle); }
+        .category-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .category-title { font-size: 1.5rem; font-weight: 700; }
+        .category-count { background: var(--bg-card); padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+        .module-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 24px; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .module-card:hover { transform: translateY(-4px); border-color: rgba(20, 184, 166, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .module-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-teal) 0%, var(--accent-blue) 100%); opacity: 0; transition: opacity 0.3s; }
+        .module-card:hover::before { opacity: 1; }
+
+        .module-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+        .module-icon { width: 50px; height: 50px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .module-title-area { flex: 1; }
+        .module-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+        .module-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+        .module-description { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 18px; }
+
+        .module-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+        .meta-tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.75rem; color: var(--text-muted); }
+        .meta-tag.ai { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+
+        .module-link { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-teal); font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; }
+        .module-link:hover { gap: 12px; }
+
+        .status-badge { position: absolute; top: 15px; right: 15px; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .status-badge.complete { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .status-badge.in-progress { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        .info-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 30px; margin-top: 40px; }
+        .info-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .info-section p { color: var(--text-secondary); line-height: 1.7; }
+        .info-section a { color: var(--accent-teal); text-decoration: none; }
+        .info-section a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal</a>
+        <span class="separator">›</span>
+        <span class="current">📄 DocuTech</span>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">
+            <span>📄</span>
+            <span>Loan Document System</span>
+        </div>
+        <h1>DocuTech Training</h1>
+        <p>Master the First American Docutech ConformX integration for generating, e-signing, and delivering loan disclosures and closing documents through Byte.</p>
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Modules</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">6</div>
+                <div class="stat-label">AI Agents</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">~45</div>
+                <div class="stat-label">Minutes Total</div>
+            </div>
+        </div>
+    </section>
+
+    <main class="content">
+        <section class="category-section">
+            <div class="category-header">
+                <div class="category-icon">📨</div>
+                <h2 class="category-title">Disclosure Generation</h2>
+                <span class="category-count">2 modules</span>
+            </div>
+            <div class="modules-grid">
+                <article class="module-card">
+                    <span class="status-badge complete">Complete</span>
+                    <div class="module-header">
+                        <div class="module-icon">📋</div>
+                        <div class="module-title-area">
+                            <h3 class="module-title">Initial Disclosures</h3>
+                            <span class="module-subtitle">Loan Estimate Package</span>
+                        </div>
+                    </div>
+                    <p class="module-description">Generate and send initial disclosure packages including the Loan Estimate. Learn package selection, document customization, and e-signing delivery through Byte.</p>
+                    <div class="module-meta">
+                        <span class="meta-tag">⏱️ 15 min</span>
+                        <span class="meta-tag">👤 LO / PA / Processor</span>
+                        <span class="meta-tag ai">🤖 2 AI Agents</span>
+                    </div>
+                    <a href="Initial-Disclosures-Workflow.html" class="module-link">View Workflow →</a>
+                </article>
+
+                <article class="module-card">
+                    <span class="status-badge complete">Complete</span>
+                    <div class="module-header">
+                        <div class="module-icon">🔄</div>
+                        <div class="module-title-area">
+                            <h3 class="module-title">Redisclosures</h3>
+                            <span class="module-subtitle">Change of Circumstance</span>
+                        </div>
+                    </div>
+                    <p class="module-description">Handle Change of Circumstance (CoC) redisclosures including tolerance cures, Alt packages, and state-specific compliance requirements.</p>
+                    <div class="module-meta">
+                        <span class="meta-tag">⏱️ 12 min</span>
+                        <span class="meta-tag">👤 Processor / Closer</span>
+                        <span class="meta-tag ai">🤖 2 AI Agents</span>
+                    </div>
+                    <a href="Redisclosures-Workflow.html" class="module-link">View Workflow →</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="category-section">
+            <div class="category-header">
+                <div class="category-icon">📑</div>
+                <h2 class="category-title">Closing Documents</h2>
+                <span class="category-count">1 module</span>
+            </div>
+            <div class="modules-grid">
+                <article class="module-card">
+                    <span class="status-badge complete">Complete</span>
+                    <div class="module-header">
+                        <div class="module-icon">✍️</div>
+                        <div class="module-title-area">
+                            <h3 class="module-title">Closing Document Workflow</h3>
+                            <span class="module-subtitle">Pre-Closing & Final CD</span>
+                        </div>
+                    </div>
+                    <p class="module-description">Complete workflow for preparing closing documents including Pre-Closing CD delivery to Title/Escrow, Final CD generation, and document delivery coordination.</p>
+                    <div class="module-meta">
+                        <span class="meta-tag">⏱️ 12 min</span>
+                        <span class="meta-tag">👤 Processor / Closer</span>
+                        <span class="meta-tag ai">🤖 2 AI Agents</span>
+                    </div>
+                    <a href="Closing-Documents-Workflow.html" class="module-link">View Workflow →</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="category-section">
+            <div class="category-header">
+                <div class="category-icon">🛠️</div>
+                <h2 class="category-title">Support & Troubleshooting</h2>
+                <span class="category-count">1 module</span>
+            </div>
+            <div class="modules-grid">
+                <article class="module-card">
+                    <span class="status-badge complete">Complete</span>
+                    <div class="module-header">
+                        <div class="module-icon">🔧</div>
+                        <div class="module-title-area">
+                            <h3 class="module-title">Troubleshooting Guide</h3>
+                            <span class="module-subtitle">Common Issues & Solutions</span>
+                        </div>
+                    </div>
+                    <p class="module-description">Quick reference for resolving common DocuTech issues including push failures, document errors, e-signing problems, and escalation procedures.</p>
+                    <div class="module-meta">
+                        <span class="meta-tag">⏱️ 6 min</span>
+                        <span class="meta-tag">👤 All Roles</span>
+                    </div>
+                    <a href="Troubleshooting-Guide.html" class="module-link">View Guide →</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h3>💡 About DocuTech Integration</h3>
+            <p>DocuTech (First American Docutech ConformX) is CMG's loan document vendor integrated with Byte LOS. Documents are generated in DocuTech and "pushed" to Byte, where borrowers can e-sign. Signed documents "push back" to DocuTech automatically. For technical support, contact <a href="mailto:DocuTechSupport@cmgfi.com">DocuTechSupport@cmgfi.com</a>.</p>
+        </section>
+    </main>
+</body>
+</html>
