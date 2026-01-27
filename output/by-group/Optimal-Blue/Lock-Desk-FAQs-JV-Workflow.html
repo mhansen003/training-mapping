@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lock Desk FAQs for JV Partners - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.yes-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.no-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.manual-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* FAQ Styles */
+        .faq-item {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 18px 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+        }
+
+        .faq-question:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .faq-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .faq-question h4 {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .faq-toggle {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 1000px;
+        }
+
+        .faq-answer-content {
+            padding: 0 22px 22px 69px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .faq-answer-content ul {
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .faq-answer-content li {
+            margin-bottom: 8px;
+        }
+
+        .faq-answer-content a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .faq-answer-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Contact Cards */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 22px 0;
+        }
+
+        .contact-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            transition: transform 0.2s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .contact-card h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .contact-card .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .contact-card .contact-icon {
+            color: var(--accent-teal);
+        }
+
+        /* Hours Grid */
+        .hours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 22px 0;
+        }
+
+        .hours-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .hours-card h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hours-card .hours-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+
+        .hours-card .hours-item:last-child {
+            border-bottom: none;
+        }
+
+        .hours-card .hours-type {
+            color: var(--text-secondary);
+        }
+
+        .hours-card .hours-time {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Links List */
+        .links-list {
+            list-style: none;
+            margin: 18px 0;
+        }
+
+        .links-list li {
+            padding: 12px 18px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .links-list li:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .links-list a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .links-list a:hover {
+            color: var(--accent-teal);
+        }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.high::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #f97316, #eab308); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.high .heat-score { color: #22c55e; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #f97316; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.high { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Agent Card Highlight Animation */
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 70px 20px 20px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="#">Portal</a>
+        <span class="separator">></span>
+        <a href="#">Optimal Blue</a>
+        <span class="separator">></span>
+        <span class="current">Lock Desk FAQs for JV Partners</span>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Lock Desk FAQs</h2>
+            <p>Joint Venture Partners</p>
+        </div>
+
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a class="nav-item active" onclick="scrollToSection('section-1')">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Hours of Operations</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-2')">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Contact Information</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-3')">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Pricing & Rate Sheets</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-4')">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Links & Resources</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-5')">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Specialty Locks</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-6')">
+                <span class="nav-number">6</span>
+                <span class="nav-label">LO/Team Functions in OB</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-7')">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Lock Desk Requests</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-8')">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Not Handled by Lock Desk</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-9')">
+                <span class="nav-number">9</span>
+                <span class="nav-label">General FAQs</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-10')">
+                <span class="nav-number">10</span>
+                <span class="nav-label">Bonds & HFA Products</span>
+            </a>
+            <a class="nav-item" onclick="scrollToSection('section-11')">
+                <span class="nav-number">11</span>
+                <span class="nav-label">Non-Agency/Non-QM Tips</span>
+            </a>
+        </nav>
+
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a class="nav-item" onclick="scrollToAgent('agent-1')">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Lock Request Router</span>
+            </a>
+            <a class="nav-item" onclick="scrollToAgent('agent-2')">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Product Pricing Assistant</span>
+            </a>
+            <a class="nav-item" onclick="scrollToAgent('agent-3')">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Extension Calculator</span>
+            </a>
+            <a class="nav-item" onclick="scrollToAgent('agent-4')">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Bond Lock Validator</span>
+            </a>
+            <a class="nav-item" onclick="scrollToAgent('agent-5')">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Non-QM Data Validator</span>
+            </a>
+            <a class="nav-item" onclick="scrollToAgent('agent-6')">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Email Template Generator</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="window.print()">
+                <span>Print Documentation</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Workflow Tab Panel -->
+        <div class="tab-panel active" id="workflow-panel">
+            <!-- Header -->
+            <div class="header">
+                <h1>Lock Desk FAQs for Joint Venture Partners</h1>
+                <p class="subtitle">Comprehensive guide to lock desk operations, contact information, and frequently asked questions</p>
+                <div class="meta">
+                    <span class="meta-item">System: Optimal Blue</span>
+                    <span class="meta-item">Audience: JV Partners</span>
+                    <span class="meta-item">Last Updated: 2/10/2025</span>
+                    <span class="meta-item">Version: 1.0</span>
+                </div>
+            </div>
+
+            <!-- Section 1: Hours of Operations -->
+            <section class="section" id="section-1">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Hours of Operations</h2>
+                        <span>Locking hours and support availability by product type</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="hours-grid">
+                        <div class="hours-card">
+                            <h4>Locking Hours</h4>
+                            <div class="hours-item">
+                                <span class="hours-type">Agency Programs</span>
+                                <span class="hours-time">7:00am - 11:59pm PST</span>
+                            </div>
+                            <div class="hours-item">
+                                <span class="hours-type">Jumbo/Non-Agency/Near Miss Alt-A/Non-QM</span>
+                                <span class="hours-time">8:45am - 4:00pm PST</span>
+                            </div>
+                            <div class="hours-item">
+                                <span class="hours-type">Jumbo Express & Solar Express</span>
+                                <span class="hours-time">Until 3:30pm PST</span>
+                            </div>
+                            <div class="hours-item">
+                                <span class="hours-type">AIO Loans</span>
+                                <span class="hours-time">8:00am - 4:00pm PST</span>
+                            </div>
+                            <div class="hours-item">
+                                <span class="hours-type">HFA Bond</span>
+                                <span class="hours-time">8:00am - 4:00pm PST</span>
+                            </div>
+                            <div class="hours-item">
+                                <span class="hours-type">Chenoa & Buyers Choice</span>
+                                <span class="hours-time">8:30am - 1:00pm PST</span>
+                            </div>
+                        </div>
+                        <div class="hours-card">
+                            <h4>General Support Hours</h4>
+                            <div class="hours-item">
+                                <span class="hours-type">Monday - Friday</span>
+                                <span class="hours-time">7:00am - 4:00pm PST</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Preferred Communication Method</h4>
+                        <p>Email is the preferred method of communication with the Lock Desk.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Contact Information -->
+            <section class="section" id="section-2">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Contact Information</h2>
+                        <span>Phone numbers and email addresses by product type</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="contact-grid">
+                        <div class="contact-card">
+                            <h4>Joint Ventures Lock Desk</h4>
+                            <div class="contact-item">
+                                <span class="contact-icon">Phone:</span>
+                                <strong>925-983-3225</strong>
+                            </div>
+                        </div>
+                        <div class="contact-card">
+                            <h4>Non-Agency Lock Desk</h4>
+                            <div class="contact-item">
+                                <span class="contact-icon">Phone:</span>
+                                <strong>925-983-3230</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-blue); margin: 25px 0 15px 0;">Email Contacts by Product Type</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Product Type</th>
+                                <th>Email Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Agency Products, Extended Locks, General Pricing, Lock Questions, AIO Loans</td>
+                                <td><a href="mailto:jvcapmkts@cmgfi.com" style="color: var(--accent-blue);">jvcapmkts@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Bond/HFA Products</td>
+                                <td><a href="mailto:jvcapmkts@cmgfi.com" style="color: var(--accent-blue);">jvcapmkts@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Jumbo, Non-Agency, Non-QM, CMG 2nds</td>
+                                <td><a href="mailto:jvcapmkts@cmgfi.com" style="color: var(--accent-blue);">jvcapmkts@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>FHA Brokered Out Loans to Wholesale</td>
+                                <td><a href="mailto:jvcapmkts@cmgfi.com" style="color: var(--accent-blue);">jvcapmkts@cmgfi.com</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Email Subject Heading Format</h4>
+                        <p>Include the following in your email subject:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Borrower's last name and complete loan # with "J" loan # prefix</li>
+                            <li>For FHA Brokered Out, include the WPH loan # as well</li>
+                            <li>Nature of the request (Lock Extension, Program Change)</li>
+                            <li>Loan program or product type (Conventional, Jumbo, 101, Non-QM, etc.)</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Best Practice</h4>
+                        <p>The body of the email should be clear and concise, outlining the specific request in detail. If something looks off, provide screenshots and examples.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Pricing and Rate Sheets -->
+            <section class="section" id="section-3">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Pricing and Rate Sheets</h2>
+                        <span>Product types, OB availability, and support contacts</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">The table below shows product types, whether pricing/lock functions are available in Optimal Blue (OB), and the appropriate lock desk inbox for assistance.</p>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Product Type</th>
+                                <th>Price/Lock in OB?</th>
+                                <th>Lock Related Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Agency Conventional and Government</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>PLS Program</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>All-In-One (AIO)</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Jumbo/Non Agency</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Non-QM (Sharp, Horizon, Prime, Advantage, Connect, Edge, River Series)</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Near Miss & Alt-A</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Community Lending (Classic & Plus)</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>CMG 2nds or HELOCs</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Premier CES</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Med Pro Advantage</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>FHA Buyers Choice</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>All Bond Programs (including Chenoa)</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Figure</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td><span class="badge manual-badge">Determined by Figure</span></td>
+                            </tr>
+                            <tr>
+                                <td>Renovation - 203K, Choice and Homestyle</td>
+                                <td><span class="badge yes-badge">Yes</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Construction 2X Close - Agency and Jumbo</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                            <tr>
+                                <td>Jumbo Renovation</td>
+                                <td><span class="badge no-badge">No</span></td>
+                                <td>jvcapmkts@cmgfi.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Note</h4>
+                        <p>Details of how and where to lock are also validated in each product guidelines on SharePoint.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Links and Resources -->
+            <section class="section" id="section-4">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title">
+                        <h2>Links and Resources</h2>
+                        <span>Quick access to policies, procedures, and forms</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <ul class="links-list">
+                        <li><a href="#">Joint Ventures Lock Policy</a></li>
+                        <li><a href="#">Extended Rate Lock Procedure (pages 5-9)</a></li>
+                        <li><a href="#">JV Guidelines</a></li>
+                        <li><a href="#">Optimal Blue Pricing Manual</a></li>
+                        <li><a href="#">Lender Credit Procedure</a></li>
+                        <li><a href="#">Lender Credit Policy</a></li>
+                        <li><a href="#">Lender Credit Request Form</a></li>
+                        <li><a href="#">Competitive Price Match Request Form (fillable PDF)</a></li>
+                        <li><a href="#">Competitive Price Match Request Form (Microsoft Forms)</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 5: Specialty Locks -->
+            <section class="section" id="section-5">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title">
+                        <h2>Specialty Locks</h2>
+                        <span>Special lock programs and procedures</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <ul class="links-list">
+                        <li><a href="#">Lock N Shop Policy & Procedure</a></li>
+                        <li><a href="#">List & Lock Policy and Procedure</a></li>
+                        <li><a href="#">List & Lock Resources</a></li>
+                        <li><a href="#">Rate Rebound Policy & Workflow</a></li>
+                        <li><a href="#">Bond Lock Policy</a></li>
+                        <li><a href="#">HELOC/2nds Lock Request Form</a></li>
+                        <li><a href="#">Spec Lock Policy and Procedure</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 6: LO/Team Functions in OB -->
+            <section class="section" id="section-6">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title">
+                        <h2>LO's and Loan Team Functions in Optimal Blue</h2>
+                        <span>Self-service actions available within the system</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">The following requests/functions can be processed directly by LO's and Loan Teams within Optimal Blue:</p>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Locking</h4>
+                            <div class="value" style="font-size: 1.5rem;">Self-Service</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Relocking</h4>
+                            <div class="value" style="font-size: 1.5rem;">Self-Service</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Extending a Lock</h4>
+                            <div class="value" style="font-size: 1.5rem;">Self-Service</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Floating Down</h4>
+                            <div class="value" style="font-size: 1.5rem;">Self-Service</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--accent-blue); margin: 25px 0 15px 0;">Full List of Self-Service Functions</h3>
+                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 2;">
+                        <li>Locking</li>
+                        <li>Relocking</li>
+                        <li>Extending a lock</li>
+                        <li>Floating down</li>
+                        <li>Locked loan parameter changes (i.e., Loan Amount, Appraised Value, Property Type, etc.)</li>
+                        <li>Switching loan programs to and from Conventional/FHA/Jumbo</li>
+                        <li>Concession request</li>
+                        <li>Viewing pricing/rate options</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 7: Lock Desk Requests -->
+            <section class="section" id="section-7">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title">
+                        <h2>Types of Requests Processed by the Lock Desk</h2>
+                        <span>When to contact the Lock Desk for assistance</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <ul style="color: var(--text-secondary); margin-left: 20px; line-height: 2;">
+                        <li>Price quotes not available directly through the system</li>
+                        <li>Locking assistance</li>
+                        <li>Lock Extension Help</li>
+                        <li>Floatdowns not available directly through the system</li>
+                        <li>Relocks</li>
+                        <li>Temporary Buydown Selection</li>
+                        <li>Manual locks for AIO, CMG 2nds, Near Miss, Chenoa, Bonds/HFA products</li>
+                        <li>Loan parameter changes for AIO, CMG 2nds, Near Miss, Chenoa, and Bonds/HFA products</li>
+                        <li>Lock transfers</li>
+                        <li>Applying approved concessions</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 8: Not Handled by Lock Desk -->
+            <section class="section" id="section-8">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title">
+                        <h2>Requests NOT Handled by the Lock Desk</h2>
+                        <span>Routing guide for other request types</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Request Type</th>
+                                <th>Who to Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Changes on unlocked loans</td>
+                                <td>Your Processor or Processing Manager</td>
+                            </tr>
+                            <tr>
+                                <td>Updating branch, loan officer, or lead type</td>
+                                <td>Red Team - <a href="mailto:red@cmgfi.com" style="color: var(--accent-blue);">red@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Assistance with product on a scenario not fitting regular guidelines</td>
+                                <td>Retail Scenario desk or <a href="mailto:ProductHelp@cmgfi.com" style="color: var(--accent-blue);">ProductHelp@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Clear or Byte login issues</td>
+                                <td><a href="mailto:AppSupport@cmgfi.com" style="color: var(--accent-blue);">AppSupport@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Workflow and Data Entry support</td>
+                                <td><a href="mailto:salestraining@cmgfi.com" style="color: var(--accent-blue);">salestraining@cmgfi.com</a></td>
+                            </tr>
+                            <tr>
+                                <td>Adding origination fees on loans without Smartfees</td>
+                                <td>Your designated Disclosure team lead/contact</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 9: General FAQs -->
+            <section class="section" id="section-9">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title">
+                        <h2>General FAQs</h2>
+                        <span>Frequently asked questions about lock desk operations</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I have an urgent request. How do I reach a live person?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>If you have already submitted your request via email and need to follow up with the lock desk for time sensitive files, give us a call at <strong>925-983-3225</strong>.</p>
+                                <div class="warning-box" style="margin-top: 15px;">
+                                    <h4>Note</h4>
+                                    <p>If your call goes to voicemail, please leave a detailed message including loan number and nature of the request and a lock desk specialist will assist as soon as possible.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>How do I extend my lock? How much does it cost?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Lock extensions for most loans can be completed via Optimal Blue:</p>
+                                <ol style="margin: 15px 0 15px 20px;">
+                                    <li>Use the <strong>Change Request</strong> icon</li>
+                                    <li>Select the <strong>Lock Extension</strong> radio button</li>
+                                </ol>
+                                <p><strong>Cost:</strong> The cost for Agency and Jumbo lock extension is <strong>0.02 per day</strong>.</p>
+                                <p style="margin-top: 10px;">For full instructions, please see the <a href="#">Optimal Blue Pricing Manual</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Does CMG offer overnight price protection?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Yes!</strong> Please see the Joint Ventures Lock Policy link for full details.</p>
+                                <p style="margin-top: 10px;"><strong>Process:</strong></p>
+                                <ol style="margin: 10px 0 0 20px;">
+                                    <li>Notify the lock desk via email <strong>prior to 8:30AM EST</strong> to hold pricing for the previous day</li>
+                                    <li>Lock the loan in the system</li>
+                                    <li>Contact the lock desk via email to adjust the pricing to the previous day</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>How do I change loan parameters on my locked loan?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Changes to locked loans can be processed through Optimal Blue's <strong>Profile Change Request</strong> feature:</p>
+                                <ol style="margin: 15px 0 15px 20px;">
+                                    <li>Select the <strong>Change Request</strong> icon</li>
+                                    <li>Choose the <strong>'Profile Change'</strong> radio button</li>
+                                    <li>Make the necessary changes to your loan amount, appraised value, etc.</li>
+                                    <li>Select the lock icon and proceed with the changes</li>
+                                </ol>
+                                <p>For full instructions, please see the <a href="#">Optimal Blue Pricing Manual</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I need to switch my loan from Fannie to Freddie or Conv to FHA. How do I do it?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Use Optimal Blue's <strong>Profile Change Request</strong> feature:</p>
+                                <ol style="margin: 15px 0 15px 20px;">
+                                    <li>Choose the <strong>Profile Change</strong> button</li>
+                                    <li>Review the loan parameters</li>
+                                    <li>Select the appropriate <strong>Loan Type</strong></li>
+                                    <li>Hit <strong>Submit</strong> - you should see the list of eligible products and pricing</li>
+                                    <li>Hit the lock icon and proceed with the change</li>
+                                </ol>
+                                <p>For full instructions, please see the <a href="#">Optimal Blue Pricing Manual</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>My lock expired. How do I relock?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Relocks can be performed through the system by accessing OB through Byte/Clear for Agency and Jumbo products:</p>
+                                <ol style="margin: 15px 0 15px 20px;">
+                                    <li>Select the <strong>Change Request</strong> icon</li>
+                                    <li>Select the radio button to <strong>Relock</strong></li>
+                                </ol>
+                                <p>For full instructions, please see the <a href="#">Optimal Blue Pricing Manual</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I need to change my rate or view rate options from when I initially locked. Where do I go?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <ol style="margin: 0 0 15px 20px;">
+                                    <li>Launch out to OB through Byte/Clear</li>
+                                    <li>Go to the <strong>Change Request</strong> icon</li>
+                                    <li>Select <strong>Profile Change</strong> and hit submit</li>
+                                    <li>The rate stack from the original day will appear</li>
+                                    <li>If you wish to change the rate, select the new rate desired and hit the lock icon to apply changes</li>
+                                    <li>If not, just close out of the page when done</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Rates have improved since I locked. Can I float down?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Yes!</strong> Joint Ventures offers a <strong>one-time float down option</strong> on Agency loans.</p>
+                                <p style="margin-top: 10px;">Please refer to the LOCK POLICY link (page #4) for additional information.</p>
+                                <p style="margin-top: 10px;"><strong>Process:</strong></p>
+                                <ol style="margin: 10px 0 0 20px;">
+                                    <li>Access OB through Byte/Clear</li>
+                                    <li>Select the <strong>Change Request</strong> icon</li>
+                                    <li>Select the radio button to <strong>Float Down</strong></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>What is the difference between a General Lender Credit and a Net Lender Credit?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 18px; margin-bottom: 15px;">
+                                    <h5 style="color: var(--accent-blue); margin-bottom: 10px;">1. Net Lender Credit</h5>
+                                    <p>A price improvement adjustment that is typically used to lower the discount points being charged to the borrower. A net lender credit resulting in an overage (price above par) can also be used toward the borrower's closing costs.</p>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 18px;">
+                                    <h5 style="color: var(--accent-teal); margin-bottom: 10px;">2. General Lender Credit</h5>
+                                    <p>A lump sum lender credit that is itemized on the LE and CD. <strong>Important:</strong> Once disclosed to the borrower, a general lender credit cannot be reduced or removed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I cannot find this product in Optimal Blue. How do I price it?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Some products are handled manually as they are not automated in the system. Please reach out to the appropriate lock desk inbox for assistance with the following programs:</p>
+                                <ul style="margin: 15px 0 0 20px;">
+                                    <li><strong>AIO's</strong> - email jvcapmkts@cmgfi.com</li>
+                                    <li><strong>Bond/HFA products</strong> - email jvcapmkts@cmgfi.com</li>
+                                    <li><strong>Chenoa</strong> - email jvcapmkts@cmgfi.com</li>
+                                    <li><strong>CMG 2nds</strong> - email jvcapmkts@cmgfi.com</li>
+                                    <li><strong>Near Miss and Alt A</strong> - email jvcapmkts@cmgfi.com</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I would like to lock my AIO loan. How do I lock it?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <div class="exception-box">
+                                    <h4>Important Requirement</h4>
+                                    <p>AIO products must be in <strong>UW Approved status</strong> prior to locking.</p>
+                                </div>
+                                <p style="margin-top: 15px;">Once it's approved, email <a href="mailto:jvcapmkts@cmgfi.com">jvcapmkts@cmgfi.com</a> with:</p>
+                                <ul style="margin: 10px 0 0 20px;">
+                                    <li>Loan number</li>
+                                    <li>Last name of borrower</li>
+                                    <li>Desired margin</li>
+                                </ul>
+                                <p style="margin-top: 10px;">The lock desk will lock it in for you.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Bonds and HFA Products -->
+            <section class="section" id="section-10">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title">
+                        <h2>Bonds and HFA Products Helpful Tips</h2>
+                        <span>Bond lock procedures and common questions</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I have a bond lock. How do I get it locked in the system?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>If you have the commitment completed from the HFA site:</p>
+                                <ol style="margin: 15px 0 15px 20px;">
+                                    <li>Email <a href="mailto:jvcapmkts@cmgfi.com">jvcapmkts@cmgfi.com</a></li>
+                                    <li>Attach the commitment confirmation</li>
+                                    <li>Include the loan #</li>
+                                </ol>
+                                <p>The desk will lock the loan in the LOS system.</p>
+                                <p style="margin-top: 10px;">See <a href="#">The Bond/DPA Loan workflow and input guide</a> for full detail.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I need to extend my bond lock.</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Lock desk (<a href="mailto:jvcapmkts@cmgfi.com">jvcapmkts@cmgfi.com</a>) requires an <strong>updated lock commitment from the HFA</strong> showing that the lock has been extended.</p>
+                                <p style="margin-top: 10px;"><strong>Acceptable documentation:</strong></p>
+                                <ul style="margin: 10px 0 0 20px;">
+                                    <li>Lock commitment with new expiration date</li>
+                                    <li>Email from bond agency</li>
+                                    <li>Extension form approved by the agency</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Why do I not get the same lock expiration as the one on my commitment?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>CMG adds time for delivery and settlement to each lock.</p>
+                                <div class="warning-box" style="margin-top: 15px;">
+                                    <h4>Items That Tend to Delay the Locking Process on Bonds</h4>
+                                    <ul style="margin-top: 10px; margin-left: 20px;">
+                                        <li>When locking with a 1st, 2nd and 3rd loan, make sure the 2nd and 3rd are created in Byte and already synchronized</li>
+                                        <li>When making reservations on the HFA site, confirm it is for the <strong>total loan amount</strong>, not the base loan amount (account for the MIP). Provide base and total loan amount to prevent back and forth</li>
+                                        <li>Accuracy on property information: street address, city, and zip code</li>
+                                        <li>When requesting lock, attach a <strong>PDF of the actual commitment confirmation</strong> from the HFA site - not just a screenshot. There should be an actual confirmation so the Bonds Lock Desk can upload it to the file</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 11: Non-Agency/Non-QM Tips -->
+            <section class="section" id="section-11">
+                <div class="section-header">
+                    <div class="section-number">11</div>
+                    <div class="section-title">
+                        <h2>Non-Agency/Non-QM Products Helpful Tips</h2>
+                        <span>Special considerations for Jumbo and Non-QM products</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I sent an email and need to follow up as this is urgent. Who do I call?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <ul style="margin-left: 20px;">
+                                    <li><strong>JV Lock Desk:</strong> 925-983-3225</li>
+                                    <li><strong>NonAgency Lock Desk:</strong> 925-983-3230</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I can't get pricing to populate when trying to do a Non-QM loan. Any tips?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Our training team has put together informational guidance on what to enter in the system for the specific doc type for our Non QM product selections.</p>
+                                <p style="margin-top: 10px;">If you are still having issues or getting disqualifiers in Optimal Blue, please reach out to:</p>
+                                <ul style="margin: 10px 0 0 20px;">
+                                    <li>JV Lock Desk</li>
+                                    <li>NonAgency Lock Desk: <a href="mailto:NonAgencyLocks@cmgfi.com">NonAgencyLocks@cmgfi.com</a></li>
+                                </ul>
+                                <p style="margin-top: 10px;"><strong>Include a screenshot of the error</strong> and our team can assist.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>What is the cutoff for locking a Jumbo/Non Agency/Non-QM loan in the system?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>4:00pm PT</strong> (for most of our Jumbo and Non Agency products)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I just requested a lock for a Non QM CMG product. Why isn't it reflecting locked in Byte/Clear yet?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>The Non Agency Lock Desk has to review these requests as they come in to assure that all the necessary fields in the system are correctly selected.</p>
+                                <p style="margin-top: 10px;">Due to the complexity of these products and the doc type options, DSCR (if applicable), DTI, etc., we want to ensure the data that we have is accurate in all systems (Byte/OB/Clear).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I cannot get pricing, and I keep getting disqualifiers, what can I do?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <ol style="margin-left: 20px;">
+                                    <li>Find the product that you are trying to lock</li>
+                                    <li>Hit the <strong>show button</strong> to the far right of that disqualifier to see what is preventing you from getting pricing</li>
+                                    <li>Clear that disqualifier by correcting the information that is causing that hard stop</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>I cannot price this loan because the FICO, Loan amount or LTV does not fit within guidelines. How do I get pricing?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Is an exception being requested with a specific investor via the <a href="mailto:producthelp@cmgfi.com">producthelp@cmgfi.com</a> team or Underwriter?</p>
+                                <p style="margin-top: 10px;">If so, the lock desk can send you pricing manually once confirmed.</p>
+                                <div class="info-box" style="margin-top: 15px;">
+                                    <h4>Requirement</h4>
+                                    <p>Please provide evidence of written exception approval from Product help or the underwriter.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>How do I price a DSCR Foreign National with no FICO and no Social Security #?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>You would use a <strong>680 FICO</strong> to price out the loan and the <strong>Foreign National</strong> will need to be chosen in the dropdown.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Are float downs allowed on Non-Agency loans?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Chase</strong> is the only investor currently who allows a floatdown, and it will need to be requested with them first before we can allow.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Can you lock at the current market rate after a lock has been expired for 30 days?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>No.</strong> Non-Agency locks can be locked at current market after being expired for <strong>60 days</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <div class="faq-icon">Q</div>
+                            <h4>Can my loan be locked for 10 days?</h4>
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>The <strong>10-day lock option is not allowed</strong> for any Non-Agency/Jumbo products.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Agents Tab Panel -->
+        <div class="tab-panel" id="agents-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation potential analysis for Lock Desk FAQ processes</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">6</div>
+                    <div class="agent-summary-label">Identified Agents</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">72%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">45hrs</div>
+                    <div class="agent-summary-label">Est. Weekly Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Implementation Priority</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>High Automation (85-100%)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Automation (60-84%)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>Low Automation (< 60%)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Heat Map by Section</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-1')">
+                        <div class="heat-score">92%</div>
+                        <div class="heat-name">Request Routing</div>
+                        <div class="heat-desc">Automated email/request triage</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>High</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-2')">
+                        <div class="heat-score">88%</div>
+                        <div class="heat-name">Product Pricing</div>
+                        <div class="heat-desc">OB availability lookup</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>High</span></div>
+                            <div class="heat-metric">Complexity: <span>Med</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-3')">
+                        <div class="heat-score">95%</div>
+                        <div class="heat-name">Extension Calculator</div>
+                        <div class="heat-desc">Lock extension cost calc</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>Med</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-4')">
+                        <div class="heat-score">75%</div>
+                        <div class="heat-name">Bond Lock Validation</div>
+                        <div class="heat-desc">HFA commitment verification</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>Med</span></div>
+                            <div class="heat-metric">Complexity: <span>High</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-5')">
+                        <div class="heat-score">70%</div>
+                        <div class="heat-name">Non-QM Validation</div>
+                        <div class="heat-desc">Field verification for Non-QM</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>Med</span></div>
+                            <div class="heat-metric">Complexity: <span>High</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-6')">
+                        <div class="heat-score">90%</div>
+                        <div class="heat-name">Email Templates</div>
+                        <div class="heat-desc">Auto-generate lock desk emails</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Volume: <span>High</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Cards -->
+            <h2 style="color: var(--text-primary); margin: 35px 0 25px 0; font-size: 1.5rem;">Proposed AI Agents</h2>
+            <div class="agent-grid">
+                <div class="agent-card" id="agent-1">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">R</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Lock Request Router</div>
+                            <div class="agent-type">Classification Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Automatically categorizes incoming lock desk requests by product type, urgency, and required action. Routes to appropriate inbox or self-service workflow based on request analysis.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">92%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">15hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">4wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-2">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">P</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Product Pricing Assistant</div>
+                            <div class="agent-type">Information Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Provides instant answers about which products are available in Optimal Blue vs manual processing. Guides users to correct pricing resources and lock desk contacts based on product type.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">88%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">10hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">2wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-3">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">E</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Extension Calculator</div>
+                            <div class="agent-type">Calculation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Calculates lock extension costs (0.02/day for Agency and Jumbo) and provides step-by-step guidance for self-service extension processing through Optimal Blue Change Request feature.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">95%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">8hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">1wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-4">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">B</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Bond Lock Validator</div>
+                            <div class="agent-type">Validation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Pre-validates bond lock requests by checking HFA commitment completeness, verifying loan amounts match (base vs total with MIP), and ensuring all required documents are attached before submission.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">75%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">6hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">6wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-5">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">N</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Non-QM Data Validator</div>
+                            <div class="agent-type">Validation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Validates Non-QM loan data entry fields before lock submission. Checks doc type selections, DSCR calculations, DTI values, and identifies potential disqualifiers before they cause pricing errors.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">70%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">5hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">8wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card" id="agent-6">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">T</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Email Template Generator</div>
+                            <div class="agent-type">Content Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">
+                            Generates properly formatted lock desk email requests with correct subject line format (borrower name, J loan #, request type, product type) and structured body content based on request type.
+                        </p>
+                        <div class="agent-stats">
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">90%</div>
+                                <div class="agent-stat-label">Confidence</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">6hr</div>
+                                <div class="agent-stat-label">Weekly Save</div>
+                            </div>
+                            <div class="agent-stat">
+                                <div class="agent-stat-value">2wk</div>
+                                <div class="agent-stat-label">Deploy Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Scroll spy fix with isScrolling flag
+        let isScrolling = false;
+
+        function scrollToSection(id) {
+            isScrolling = true;
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Update active nav item
+            document.querySelectorAll('#workflow-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[onclick="scrollToSection('${id}')"]`)?.classList.add('active');
+            setTimeout(() => { isScrolling = false; }, 1000);
+        }
+
+        function scrollToAgent(id) {
+            isScrolling = true;
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.classList.add('highlight');
+                setTimeout(() => element.classList.remove('highlight'), 2000);
+            }
+            setTimeout(() => { isScrolling = false; }, 1000);
+        }
+
+        // Scroll spy for workflow sections
+        window.addEventListener('scroll', () => {
+            if (isScrolling) return;
+
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+            let currentSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 150) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick')?.includes(currentSection)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Tab switching
+        function switchTab(tab) {
+            const workflowPanel = document.getElementById('workflow-panel');
+            const agentsPanel = document.getElementById('agents-panel');
+            const workflowNav = document.getElementById('workflow-nav');
+            const agentsNav = document.getElementById('agents-nav');
+            const tabs = document.querySelectorAll('.sidebar-tab');
+
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                workflowPanel.classList.add('active');
+                agentsPanel.classList.remove('active');
+                workflowNav.style.display = 'block';
+                agentsNav.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                workflowPanel.classList.remove('active');
+                agentsPanel.classList.add('active');
+                workflowNav.style.display = 'none';
+                agentsNav.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        // FAQ toggle
+        function toggleFaq(element) {
+            const faqItem = element.closest('.faq-item');
+            faqItem.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Manual - Optimal Blue | CMG Training</title>
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --bg-card-hover: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-green: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+            --border-color: #374151;
+            --border-light: #4b5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-badge {
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .doc-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .doc-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tabs */
+        .tab-container {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .tabs {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+            background: var(--bg-card);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--bg-card);
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 65px;
+            z-index: 999;
+        }
+
+        .breadcrumb-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--accent-blue);
+        }
+
+        .breadcrumb .separator {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb .current {
+            color: var(--accent-amber);
+            font-weight: 500;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            max-width: 1800px;
+            margin: 0 auto;
+            min-height: calc(100vh - 180px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 120px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+            border-left-color: var(--accent-blue);
+        }
+
+        .nav-item .nav-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.75rem;
+            margin-right: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-item.active .nav-number {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section Styling */
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-content {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content strong {
+            color: var(--text-primary);
+        }
+
+        /* Subsection */
+        .subsection {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .subsection-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        /* Steps */
+        .steps {
+            margin: 1.5rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Tips and Warnings */
+        .tip-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .tip-box .icon {
+            font-size: 1.25rem;
+        }
+
+        .tip-box .tip-content {
+            flex: 1;
+        }
+
+        .tip-box .tip-label {
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 0.25rem;
+        }
+
+        .warning-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid var(--accent-rose);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .warning-box .icon {
+            font-size: 1.25rem;
+        }
+
+        .warning-box .warning-content {
+            flex: 1;
+        }
+
+        .warning-box .warning-label {
+            font-weight: 600;
+            color: var(--accent-rose);
+            margin-bottom: 0.25rem;
+        }
+
+        .note-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .note-box .icon {
+            font-size: 1.25rem;
+        }
+
+        .note-box .note-content {
+            flex: 1;
+        }
+
+        .note-box .note-label {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: var(--accent-blue);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: var(--bg-card);
+        }
+
+        /* Document Links */
+        .doc-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .doc-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        /* Flow Diagram */
+        .flow-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+
+        .flow-step {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 150px;
+            position: relative;
+        }
+
+        .flow-step-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .flow-step-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* AI Agents Tab */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .agent-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .agent-type {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+
+        .agent-type.high {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+
+        .agent-type.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-amber);
+        }
+
+        .agent-type.low {
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--accent-rose);
+        }
+
+        .agent-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .agent-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .confidence-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .confidence-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .confidence-fill.high {
+            background: var(--accent-green);
+        }
+
+        .confidence-fill.medium {
+            background: var(--accent-amber);
+        }
+
+        .confidence-fill.low {
+            background: var(--accent-rose);
+        }
+
+        /* Heat Map */
+        .heatmap-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .heatmap-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .heatmap-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+
+        .heatmap-item:hover {
+            transform: translateX(5px);
+        }
+
+        .heatmap-item.high {
+            border-left-color: var(--accent-green);
+        }
+
+        .heatmap-item.medium {
+            border-left-color: var(--accent-amber);
+        }
+
+        .heatmap-item.low {
+            border-left-color: var(--accent-rose);
+        }
+
+        .heatmap-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .heatmap-item-score {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Code/Field Reference */
+        .field-ref {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-teal);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .header, .breadcrumb, .tab-container, .sidebar {
+                display: none;
+            }
+
+            .content {
+                padding: 0;
+            }
+
+            .section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-text">CMG Training</span>
+                <span class="logo-badge">Optimal Blue</span>
+            </div>
+            <div class="doc-info">
+                <span>Updated: January 9, 2026</span>
+                <span>Version: 2.1</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tab-container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="workflow" onclick="switchTab('workflow')">
+                <span>&#128203;</span> Workflow
+            </button>
+            <button class="tab-btn" data-tab="agents" onclick="switchTab('agents')">
+                <span>&#129302;</span> AI Agents
+            </button>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <div class="breadcrumb-content">
+            <a href="#">Portal</a>
+            <span class="separator">&#8250;</span>
+            <a href="#">Optimal Blue</a>
+            <span class="separator">&#8250;</span>
+            <span class="current">Pricing Manual</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Sections</div>
+            <a class="nav-item active" data-section="section-1" onclick="scrollToSection('section-1')">
+                <span class="nav-number">1</span>Accessing Pricing
+            </a>
+            <a class="nav-item" data-section="section-2" onclick="scrollToSection('section-2')">
+                <span class="nav-number">2</span>Multiple Scenarios
+            </a>
+            <a class="nav-item" data-section="section-3" onclick="scrollToSection('section-3')">
+                <span class="nav-number">3</span>Search Results
+            </a>
+            <a class="nav-item" data-section="section-4" onclick="scrollToSection('section-4')">
+                <span class="nav-number">4</span>Rate Stack & Details
+            </a>
+            <a class="nav-item" data-section="section-5" onclick="scrollToSection('section-5')">
+                <span class="nav-number">5</span>Originator Assistant
+            </a>
+            <a class="nav-item" data-section="section-6" onclick="scrollToSection('section-6')">
+                <span class="nav-number">6</span>Locking the Loan
+            </a>
+            <a class="nav-item" data-section="section-7" onclick="scrollToSection('section-7')">
+                <span class="nav-number">7</span>Float (Save Without Lock)
+            </a>
+            <a class="nav-item" data-section="section-8" onclick="scrollToSection('section-8')">
+                <span class="nav-number">8</span>Lock with Concession
+            </a>
+            <a class="nav-item" data-section="section-9" onclick="scrollToSection('section-9')">
+                <span class="nav-number">9</span>Lock Confirmation
+            </a>
+            <a class="nav-item" data-section="section-10" onclick="scrollToSection('section-10')">
+                <span class="nav-number">10</span>Profile Change
+            </a>
+            <a class="nav-item" data-section="section-11" onclick="scrollToSection('section-11')">
+                <span class="nav-number">11</span>Price Concession
+            </a>
+            <a class="nav-item" data-section="section-12" onclick="scrollToSection('section-12')">
+                <span class="nav-number">12</span>Lock Extension
+            </a>
+            <a class="nav-item" data-section="section-13" onclick="scrollToSection('section-13')">
+                <span class="nav-number">13</span>Float Down
+            </a>
+            <a class="nav-item" data-section="section-14" onclick="scrollToSection('section-14')">
+                <span class="nav-number">14</span>Re-lock
+            </a>
+            <a class="nav-item" data-section="section-15" onclick="scrollToSection('section-15')">
+                <span class="nav-number">15</span>Extended Rate Lock
+            </a>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Workflow Tab -->
+            <div class="tab-content active" id="workflow-tab">
+
+                <!-- Section 1: Accessing Pricing -->
+                <section class="section" id="section-1">
+                    <div class="section-header">
+                        <div class="section-number">1</div>
+                        <h2 class="section-title">Accessing Pricing - Clear & Byte</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Optimal Blue is CMG's pricing engine, accessible through both Clear and Byte LOS systems. Understanding the different access methods and their implications is critical for accurate pricing and loan management.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Accessing Pricing from Clear</h3>
+                            <div class="steps">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Click the Pricing Shortcut</div>
+                                        <div class="step-description">Navigate to the loan and click the <strong>Pricing</strong> shortcut in the Clear interface. This opens Optimal Blue with two tabs: <span class="field-ref">Pricing</span> (default) and <span class="field-ref">What if Pricing</span>.</div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Choose Your Mode</div>
+                                        <div class="step-description">
+                                            <strong>Pricing Tab:</strong> Default mode with all functions. Click <strong>Search</strong> for full pricing capabilities.<br>
+                                            <strong>What if Pricing:</strong> Access Loan Scenario and Add Scenario functions. Changes in scenarios do NOT flow back to the loan.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Click Search</div>
+                                        <div class="step-description">For full pricing functions, click the <strong>Search</strong> button. Optimal Blue opens and displays Eligible and Ineligible Products and Programs.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Accessing Pricing from Byte</h3>
+                            <div class="steps">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Open Pricing and Lock Request</div>
+                                        <div class="step-description">In Byte, navigate to the <strong>Pricing and Lock Request</strong> form. Two tabs are available: <span class="field-ref">What if as Loan Officer</span> and <span class="field-ref">Submit as Loan Officer</span>.</div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Choose Submission Type</div>
+                                        <div class="step-description">
+                                            <strong>What if as Loan Officer:</strong> Access all scenario functions without risk of data flowing back to the loan.<br>
+                                            <strong>Submit as Loan Officer:</strong> For full functions and all loan options.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <div class="step-title">Submit for Pricing</div>
+                                        <div class="step-description">Leave on <strong>Pricing</strong>, then click <strong>Submit</strong> to view full pricing results. Loan information auto-populates in the Optimal Blue search window.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <div class="icon">&#9888;</div>
+                            <div class="warning-content">
+                                <div class="warning-label">Critical: Data Flow Warning</div>
+                                <div>Any changes needed to loan parameters on unlocked loans should be made in the Clear/Byte file itself, <strong>NOT</strong> on the OB Search page. Data changed in the loan fields in OB <strong>DO</strong> push back to the loan.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Multiple Scenarios -->
+                <section class="section" id="section-2">
+                    <div class="section-header">
+                        <div class="section-number">2</div>
+                        <h2 class="section-title">Pricing Multiple Scenarios Simultaneously</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Optimal Blue allows you to compare multiple loan scenarios side-by-side, helping borrowers understand their options and make informed decisions.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Add Scenario</div>
+                                    <div class="step-description">Click <strong>+ Add Scenario</strong> prior to pressing the Submit button on the OB input screen. You can create multiple scenarios for comparison.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Name Each Scenario</div>
+                                    <div class="step-description">Give each scenario a descriptive name (e.g., "Purchase 5% Down", "Purchase 10% Down", "Conventional 5% Down") to better identify it in search results.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Configure Loan Information</div>
+                                    <div class="step-description">For each scenario, configure the loan parameters:
+                                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                            <li>Lien Position (First Lien, Second Lien)</li>
+                                            <li>Loan Type (Conventional, FHA, VA, etc.)</li>
+                                            <li>Base Loan Amount</li>
+                                            <li>Appraised Value</li>
+                                            <li>Subordinate Financing (if applicable)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Submit Search</div>
+                                    <div class="step-description">Click <strong>Search</strong> to view pricing results for all scenarios. Results are displayed with scenario names, making comparison easy.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <div class="icon">&#128161;</div>
+                            <div class="tip-content">
+                                <div class="tip-label">Best Practice</div>
+                                <div>Use descriptive scenario names that include the key differentiator (down payment %, loan type, etc.) to quickly identify options in the results screen. The "Include Scenarios" dropdown allows filtering results by specific scenarios.</div>
+                            </div>
+                        </div>
+
+                        <p>The search results will display each scenario's eligible products with columns for Rate, Price, Discount/Rebate, Lock Days, and P&I payment.</p>
+                    </div>
+                </section>
+
+                <!-- Section 3: Search Results -->
+                <section class="section" id="section-3">
+                    <div class="section-header">
+                        <div class="section-number">3</div>
+                        <h2 class="section-title">Search Results Screen</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>The Search Results screen displays all eligible and ineligible loan programs based on the loan criteria entered.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Understanding the Results</h3>
+                            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                                <li><strong>Eligible Products:</strong> Displayed below the blue banner, showing all programs the loan qualifies for</li>
+                                <li><strong>Ineligible Products:</strong> Appear below the list of eligible products</li>
+                                <li><strong>Disqualifiers Column:</strong> Review this column to understand why a product is marked ineligible</li>
+                            </ul>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Eligible Products Screen Columns</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Product Name</strong></td>
+                                        <td>Click to display rate options, lock periods, price adjustments, and advisories</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Rate</strong></td>
+                                        <td>Interest rate for the product</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Price</strong></td>
+                                        <td>Price as a percentage of the loan amount</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Discount/Rebate</strong></td>
+                                        <td>Points charged or credit received (negative = credit)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Lock Days</strong></td>
+                                        <td>Number of days the rate is locked</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>P&I</strong></td>
+                                        <td>Principal and Interest payment amount</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Ineligible Products</div>
+                                    <div class="step-description">If a product is marked as ineligible, review the <strong>Disqualifiers</strong> column to understand why.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Correct Loan Criteria</div>
+                                    <div class="step-description">Click the <strong>Product Search</strong> icon (pencil) to review and correct loan criteria, OR return to the Clear URLA screen to make corrections in the loan file.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Re-run Search</div>
+                                    <div class="step-description">After making changes, re-run the <strong>Search</strong> for qualifying products.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box">
+                            <div class="icon">&#128221;</div>
+                            <div class="note-content">
+                                <div class="note-label">Important Note</div>
+                                <div>Search results changes in fields in OB do NOT automatically update the file when the loan is locked, except when performed as a <strong>Profile Change</strong> on a locked loan.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Rate Stack & Details -->
+                <section class="section" id="section-4">
+                    <div class="section-header">
+                        <div class="section-number">4</div>
+                        <h2 class="section-title">Rate Stack & Product Details</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>After selecting a product, you can view the complete rate stack with all available interest rates and detailed pricing information.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select a Product</div>
+                                    <div class="step-description">Click on a product name to open the rate stack and view all available interest rates. The rate stack shows Rate, Price, P&I, MI (Mortgage Insurance), and Discount/Rebate for each rate option.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Lock Period</div>
+                                    <div class="step-description">Choose your lock period from the available options (All, 21, 30, 45, 60 days). Different lock periods may have different pricing.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Rate Details</div>
+                                    <div class="step-description">Click the <strong>"i" icon</strong> for the desired interest rate. Product and Pricing details are displayed, along with an example payment schedule including estimated Mortgage Insurance quote if applicable.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Rate Details Panel</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Rate</td>
+                                        <td>Interest rate (e.g., 7.125%)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Price</td>
+                                        <td>Price as percentage (e.g., 100.137)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount/Rebate</td>
+                                        <td>Points charged or credit (e.g., -0.137% / ($616))</td>
+                                    </tr>
+                                    <tr>
+                                        <td>P&I</td>
+                                        <td>Monthly Principal & Interest payment</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lock Period</td>
+                                        <td>Number of days rate is guaranteed</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Base Loan Amount</td>
+                                        <td>Original loan amount</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Loan Amount</td>
+                                        <td>Final loan amount including financed fees</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Prepaid Finance Charge</td>
+                                        <td>Prepaid interest and finance charges</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">PMI Quote Tool</h3>
+                            <p>Click the <strong>MI icon</strong> for the target interest rate to get a general PMI quote based on current OB field information from designated PMI vendors.</p>
+                        </div>
+
+                        <div class="warning-box">
+                            <div class="icon">&#9888;</div>
+                            <div class="warning-content">
+                                <div class="warning-label">PMI Quote Requirement</div>
+                                <div>To achieve a <strong>full and correct quote exact to the loan</strong>, the user must run <span class="field-ref">GET PMI</span> in Clear within the loan, or <span class="field-ref">PMI Get quote</span> in Byte within the loan, for a bona fide quote. Obtaining the loan is also the only way to populate the PMI factor field and enable auto-quote flow to Clear docs, as required and by design.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 5: Originator Assistant -->
+                <section class="section" id="section-5">
+                    <div class="section-header">
+                        <div class="section-number">5</div>
+                        <h2 class="section-title">Originator Assistant</h2>
+                    </div>
+                    <div class="section-content">
+                        <p><strong>Originator Assistant</strong> is an intelligent tool that analyzes the best-priced product and provides suggestions for borrowers to obtain better loan terms.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">How It Works</h3>
+                            <p>Originator Assistant examines the following parameters within specific ranges and shows the effect on Rate, Price, and Discount/Rebate:</p>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Analysis Range</th>
+                                        <th>Impact Shown</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>LTV (Loan-to-Value)</td>
+                                        <td>+/- 5%</td>
+                                        <td>Rate, Price, Discount/Rebate</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Loan Amount</td>
+                                        <td>Various thresholds</td>
+                                        <td>Rate, Price, Discount/Rebate</td>
+                                    </tr>
+                                    <tr>
+                                        <td>FICO Score</td>
+                                        <td>+/- 10 points</td>
+                                        <td>Rate, Price, Discount/Rebate</td>
+                                    </tr>
+                                    <tr>
+                                        <td>DTI (Debt-to-Income)</td>
+                                        <td>+/- 5%</td>
+                                        <td>Rate, Price, Discount/Rebate</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Access Originator Assistant</div>
+                                    <div class="step-description">Click the <strong>Originator Assistant</strong> tab on the search results screen. It automatically analyzes the best-priced product (first product returned).</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Alternative Products</div>
+                                    <div class="step-description">Use the dropdown menu to select alternative products to analyze opportunities to improve pricing.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Scenarios</div>
+                                    <div class="step-description">Review the comparison table showing the Current scenario versus Proposed Changes with their impact on Rate, Price, Discount/Rebate, Lock Days, and P&I.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <div class="icon">&#128161;</div>
+                            <div class="tip-content">
+                                <div class="tip-label">Pro Tip</div>
+                                <div>Use Originator Assistant to identify if small changes (like a $50 increase in loan amount or 10-point credit score improvement) could significantly improve the borrower's pricing.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 6: Locking the Loan -->
+                <section class="section" id="section-6">
+                    <div class="section-header">
+                        <div class="section-number">6</div>
+                        <h2 class="section-title">Locking the Loan</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Once you've selected the desired rate and product, follow these steps to lock the loan.</p>
+
+                        <div class="flow-container">
+                            <div class="flow-step">
+                                <div class="flow-step-title">Select Rate</div>
+                                <div class="flow-step-desc">Choose from rate stack</div>
+                            </div>
+                            <div class="flow-arrow">&#8594;</div>
+                            <div class="flow-step">
+                                <div class="flow-step-title">Click Lock Form</div>
+                                <div class="flow-step-desc">Proceed to Lock Form</div>
+                            </div>
+                            <div class="flow-arrow">&#8594;</div>
+                            <div class="flow-step">
+                                <div class="flow-step-title">Enter Email</div>
+                                <div class="flow-step-desc">Lock Contact Email</div>
+                            </div>
+                            <div class="flow-arrow">&#8594;</div>
+                            <div class="flow-step">
+                                <div class="flow-step-title">Request Lock</div>
+                                <div class="flow-step-desc">Submit lock request</div>
+                            </div>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Proceed to Lock Form</div>
+                                    <div class="step-description">From the Rate Details panel, click <strong>Proceed to Lock Form</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Enter Lock Contact Email</div>
+                                    <div class="step-description">Enter the Lock Contact Email into the field. Add additional email addresses by separating them with a semicolon (;).</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Product Information</div>
+                                    <div class="step-description">Verify the Product Information section displays the correct Search Timestamp, Product Name, Product Code, Lock (Expiration), Rate, Price, and Discount/Rebate.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Request Lock</div>
+                                    <div class="step-description">Click <strong>Request Lock</strong> to lock the rate. For lock with concession, click the down arrow and select <strong>Request Lock With Concession</strong>.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box">
+                            <div class="icon">&#128221;</div>
+                            <div class="note-content">
+                                <div class="note-label">Lock Form Information</div>
+                                <div>The Lock Form displays: OB Loan Number, OB Status, LOS Loan Number, LOS Status, Originator, Loan Notes, and provides buttons for Modify Search, Update LOS, and Request Lock.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 7: Float -->
+                <section class="section" id="section-7">
+                    <div class="section-header">
+                        <div class="section-number">7</div>
+                        <h2 class="section-title">Save the Loan (Float) Without Locking</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>If you want to save the pricing information to the LOS without locking the interest rate, use the Update LOS function.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Navigate to Lock Form</div>
+                                    <div class="step-description">After selecting your desired rate and product, proceed to the Lock Form.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Click Update LOS</div>
+                                    <div class="step-description">Click <strong>Update LOS</strong> to update the LOS without locking or floating the interest rate. This saves the product and pricing information to the loan file.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <div class="icon">&#128161;</div>
+                            <div class="tip-content">
+                                <div class="tip-label">When to Float</div>
+                                <div>Use the float option when:
+                                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                        <li>The borrower wants to wait for potentially better rates</li>
+                                        <li>You need to save current pricing for comparison later</li>
+                                        <li>The loan is not yet ready for lock (pending conditions)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 8: Lock with Concession -->
+                <section class="section" id="section-8">
+                    <div class="section-header">
+                        <div class="section-number">8</div>
+                        <h2 class="section-title">Request Lock with Concession</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Price concessions allow for price improvements or competitive matching. Understanding the difference between Net LC and General LC is critical.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Types of Lender Credits</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Net LC</strong></td>
+                                        <td>Price-improvement adjustment typically used to reduce discount points charged to borrower. Can also be used toward closing costs if resulting in price above par.</td>
+                                        <td>Reducing borrower costs without disclosure as a specific credit</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>General LC</strong></td>
+                                        <td>Lump-sum credit itemized on the LE and CD. <strong>Once disclosed, cannot be reduced or removed.</strong></td>
+                                        <td>When a specific credit amount must be disclosed to borrower</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Access Concession Request</div>
+                                    <div class="step-description">Click the dropdown next to <strong>Request Lock</strong>, then click <strong>Request Lock with Concession</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Price Concession Reason</div>
+                                    <div class="step-description">Select the appropriate reason from the dropdown (e.g., Price Match with Competition, Lock Extension, etc.).</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Enter Concession Amount</div>
+                                    <div class="step-description">Enter either:
+                                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                            <li><strong>Price Concession Amount:</strong> Dollar or Percentage amount of desired concession</li>
+                                            <li><strong>Desired Price with Concession:</strong> Enter the desired Final price to calculate the required concession amount</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Upload Supporting Documents</div>
+                                    <div class="step-description">Click <strong>Add files to upload</strong> to attach Supporting Documents. For Competitive Price Match options, the <strong>Competitive Price Match Request Form (fillable PDF)</strong> is required.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Add Comments</div>
+                                    <div class="step-description">Enter comments to the approver regarding the justification for the price concession and/or comments for the lock desk (net vs general LC, etc.).</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-title">Submit Request</div>
+                                    <div class="step-description">Click <strong>Submit</strong> to send the concession request for approval.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="#" class="doc-btn">
+                            <span>&#128196;</span> Competitive Price Match Request Form (PDF)
+                        </a>
+
+                        <div class="warning-box">
+                            <div class="icon">&#9888;</div>
+                            <div class="warning-content">
+                                <div class="warning-label">General LC Warning</div>
+                                <div>Once a General Lender Credit is disclosed to the borrower on the LE and CD, it <strong>cannot be reduced or removed</strong>. Use carefully and only when appropriate.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 9: Lock Confirmation -->
+                <section class="section" id="section-9">
+                    <div class="section-header">
+                        <div class="section-number">9</div>
+                        <h2 class="section-title">Lock Confirmation</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>When the pricing information is successfully pushed to Byte/Clear from Optimal Blue, a confirmation message appears.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Confirmation Message</div>
+                                    <div class="step-description">You will see the message: "Your price concession has been submitted and your lock request has been accepted. Optimal Blue has successfully pushed the data to the LOS."</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Click OK</div>
+                                    <div class="step-description">Click <strong>OK</strong> to acknowledge the confirmation.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Refresh to View Lock Data</div>
+                                    <div class="step-description">Click <strong>Refresh</strong> to see the lock data populate into Clear/Byte. The rate/lock information is now shown in the LOS.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <div class="icon">&#128161;</div>
+                            <div class="tip-content">
+                                <div class="tip-label">Verification</div>
+                                <div>Always verify the lock data has populated correctly in Clear/Byte after receiving the confirmation message. Check the rate, price, lock period, and expiration date.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 10: Profile Change -->
+                <section class="section" id="section-10">
+                    <div class="section-header">
+                        <div class="section-number">10</div>
+                        <h2 class="section-title">Post-Lock Changes - Profile Change</h2>
+                    </div>
+                    <div class="section-content">
+                        <p><strong>Profile Changes</strong> are used to modify locked loans, particularly fields that may affect pricing or product eligibility. This includes loan program changes such as moving from FHA to Conventional or vice versa.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Available Change Request Options</h3>
+                            <ul style="margin-left: 1.5rem;">
+                                <li><strong>Lock Extension</strong> - Extend the lock period</li>
+                                <li><strong>Profile Change</strong> - Modify locked loan fields</li>
+                                <li><strong>Price Concession</strong> - Request pricing adjustment</li>
+                                <li><strong>Float Down</strong> - Take advantage of improved market rates</li>
+                                <li><strong>Relock</strong> - Re-lock an expired rate lock</li>
+                            </ul>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Click Profile Change</div>
+                                    <div class="step-description">In Clear, click <strong>Profile Change</strong> on the Pricing Screen. The Change Request menu will appear.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Make Desired Changes</div>
+                                    <div class="step-description">Make the desired changes on the OB Search screen:
+                                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                            <li>Loan Amount</li>
+                                            <li>Property Type</li>
+                                            <li>Appraised Value</li>
+                                            <li>Product/Program</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Submit for Updated Pricing</div>
+                                    <div class="step-description">When satisfied that the terms are correct, click <strong>Submit</strong>. Optimal Blue displays updated pricing considering any updates made.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select New Interest Rate</div>
+                                    <div class="step-description">Select the desired interest rate from the note stack and click <strong>Select</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Change Summary</div>
+                                    <div class="step-description">Optimal Blue provides a summary of the changes, side by side with the original loan structure, to compare and verify accuracy. Review the Change Request Details showing original values vs. changed values.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-title">Re-commit the Loan</div>
+                                    <div class="step-description">Click <strong>Submit</strong> at the top of the page to re-commit the loan with the changes.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box">
+                            <div class="icon">&#128221;</div>
+                            <div class="note-content">
+                                <div class="note-label">Change Summary Details</div>
+                                <div>The summary shows: LTV, CLTV, HCLTV, Base Loan Amount, Total Loan Amount, APOR, Price, Start/Par Price, Start/Par Rate, P&I, and any Adjustment Reasons with their impact on Points, Rate, and Margin.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 11: Price Concession -->
+                <section class="section" id="section-11">
+                    <div class="section-header">
+                        <div class="section-number">11</div>
+                        <h2 class="section-title">Price Concession (Post-Lock)</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Price concessions on locked loans follow a specific approval workflow. An email is automatically sent to the appropriate approver.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Price Concession</div>
+                                    <div class="step-description">From the Change Request menu, select <strong>Price Concession</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select First Lien</div>
+                                    <div class="step-description">Select <strong>First Lien</strong> as the lien position.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Complete Required Fields</div>
+                                    <div class="step-description">
+                                        <ul style="margin-left: 1.5rem;">
+                                            <li><strong>Price Concession Reason:</strong> Select from dropdown (Net LC or General LC)</li>
+                                            <li><strong>Price Concession Amount:</strong> Dollar or Percentage amount</li>
+                                            <li><strong>OR Desired Price with Concession:</strong> Enter desired final price</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Upload Supporting Documents</div>
+                                    <div class="step-description">Click <strong>Upload Files</strong> to attach supporting documents. The <strong>Competitive Price Match Request Form (fillable PDF)</strong> is required for price match requests.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Enter Justification Comments</div>
+                                    <div class="step-description">Enter comments to the approver regarding the justification for the price concession.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-title">Submit Request</div>
+                                    <div class="step-description">Click <strong>Submit Request</strong>. An email is automatically generated and sent to the approver with appropriate authority.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box">
+                            <div class="icon">&#128161;</div>
+                            <div class="tip-content">
+                                <div class="tip-label">Approval Notification</div>
+                                <div>The Loan Officer will receive an email once the price concession is approved and applied in the system. The Concession Activity panel shows Total Applied and Denied Requests history.</div>
+                            </div>
+                        </div>
+
+                        <a href="#" class="doc-btn">
+                            <span>&#128196;</span> Competitive Price Match Request Form (PDF)
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Section 12: Lock Extension -->
+                <section class="section" id="section-12">
+                    <div class="section-header">
+                        <div class="section-number">12</div>
+                        <h2 class="section-title">Lock Extension</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Lock extensions allow you to extend the rate lock period when more time is needed to close the loan.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Lock Extension</div>
+                                    <div class="step-description">From within the pricing screen, select <strong>Lock Extension</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Enter Extension Days</div>
+                                    <div class="step-description">Enter the desired number of days to extend the lock (e.g., 4 days).</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Extension Details</div>
+                                    <div class="step-description">The system displays:
+                                        <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                                            <li><strong>Calculated Cost:</strong> The cost of the extension (e.g., -0.08)</li>
+                                            <li><strong>Current Value vs. With Extension:</strong> Comparison of Price, Lock Days, Lock Expiration, and Discount/Rebate</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Apply Extension</div>
+                                    <div class="step-description">Click <strong>Apply</strong> to execute the lock extension, or <strong>Cancel</strong> to abort.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box">
+                            <div class="icon">&#128221;</div>
+                            <div class="note-content">
+                                <div class="note-label">Extension Impact Example</div>
+                                <div>A 4-day extension might change: Price from 100.403 to 100.323, Lock from 30 to 34 days, Lock Expiration from 6/5/25 to 6/9/25, and Discount/Rebate from ($1,914.25) / -0.403% to ($1,534.25) / -0.323%.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 13: Float Down -->
+                <section class="section" id="section-13">
+                    <div class="section-header">
+                        <div class="section-number">13</div>
+                        <h2 class="section-title">Float Down</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Float Down allows borrowers to take advantage of improved market rates after locking, subject to policy requirements.</p>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Float Down</div>
+                                    <div class="step-description">From within the Pricing Screen, select <strong>Float Down</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Click Single Lock Period Tab</div>
+                                    <div class="step-description">Click the <strong>Single Lock Period</strong> tab to view available rates.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Expand Note Stack</div>
+                                    <div class="step-description">Click the program name to expand the note stack and view all available rates.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select New Rate</div>
+                                    <div class="step-description">Click <strong>Select</strong> for the desired rate. OB displays a review page showing change details.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review and Confirm</div>
+                                    <div class="step-description">Review the Change Request Details comparing original values to changed values. Verify the float-down benefits the borrower.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <div class="icon">&#9888;</div>
+                            <div class="warning-content">
+                                <div class="warning-label">Policy Compliance Required</div>
+                                <div>Consult the <strong>Retail Lending Lock Desk Policy</strong> to confirm the float-down meets policy requirements. <strong>Optimal Blue does not evaluate</strong> whether a float down is valid or "worth it" to the customer. It includes the float-down fee in the pricing.</div>
+                            </div>
+                        </div>
+
+                        <a href="#" class="doc-btn">
+                            <span>&#128196;</span> Retail Lending Lock Desk Policy
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Section 14: Re-lock -->
+                <section class="section" id="section-14">
+                    <div class="section-header">
+                        <div class="section-number">14</div>
+                        <h2 class="section-title">Re-lock (Expired Lock)</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Re-lock is used when a rate lock has expired and needs to be re-established. Re-locked loans use worst-case pricing and include relock fees.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Relock Fee Schedule</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Lock Term (Days)</th>
+                                        <th>Relock Fee</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>10 days</td>
+                                        <td>0.000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>21 days</td>
+                                        <td>0.125</td>
+                                    </tr>
+                                    <tr>
+                                        <td>30 days</td>
+                                        <td>0.250</td>
+                                    </tr>
+                                    <tr>
+                                        <td>45 days</td>
+                                        <td>0.375</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Relock</div>
+                                    <div class="step-description">On a loan with an expired rate lock, select <strong>Relock</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select First Lien</div>
+                                    <div class="step-description">Select <strong>First Lien</strong> as the lien position.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Click Select Rate and Price</div>
+                                    <div class="step-description">Click <strong>Select Rate and Price</strong> to view available options.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Select Interest Rate</div>
+                                    <div class="step-description">Select the desired interest rate from the note stack and click the <strong>Lock icon</strong>.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Review Comparison Summary</div>
+                                    <div class="step-description">Optimal Blue provides a summary comparing changes side by side with the Original Lock. OB identifies original locked pricing vs. current pricing and shows that pricing plus any applicable relock fees.</div>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-title">Request Lock</div>
+                                    <div class="step-description">Click <strong>Request Lock</strong> to submit the relock request.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="warning-box">
+                            <div class="icon">&#9888;</div>
+                            <div class="warning-content">
+                                <div class="warning-label">Worst-Case Pricing</div>
+                                <div>Re-locked loans are based on <strong>worst-case pricing</strong> between the original lock date and current market rates. Final pricing includes all prior extension and/or relock fees. The original lock term will be used to determine pricing.</div>
+                            </div>
+                        </div>
+
+                        <a href="#" class="doc-btn">
+                            <span>&#128196;</span> Retail Lending Lock Desk Policy
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Section 15: Extended Rate Lock -->
+                <section class="section" id="section-15">
+                    <div class="section-header">
+                        <div class="section-number">15</div>
+                        <h2 class="section-title">Extended Rate Lock</h2>
+                    </div>
+                    <div class="section-content">
+                        <p>Extended Rate Locks require specific field entry in the LOS when pricing is completed. This applies to both Clear and Byte systems.</p>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Clear Field Entry</h3>
+                            <p>Navigate to: <span class="field-ref">Clear > Loan > URLA > Loan Features section</span></p>
+                            <p>Locate and complete the <strong>Extended Rate Lock - OB</strong> field with the appropriate selection.</p>
+                        </div>
+
+                        <div class="subsection">
+                            <h3 class="subsection-title">Byte Field Entry</h3>
+                            <p>Navigate to: <span class="field-ref">Byte > Loan > Pricing and Lock screen</span></p>
+                            <p>Locate and complete the <strong>Extended Rate Lock - OB</strong> dropdown field with the appropriate selection.</p>
+                        </div>
+
+                        <a href="#" class="doc-btn">
+                            <span>&#128196;</span> Extended Rate Lock Fee Procedure
+                        </a>
+
+                        <div class="note-box">
+                            <div class="icon">&#128221;</div>
+                            <div class="note-content">
+                                <div class="note-label">Additional Fields (Byte)</div>
+                                <div>The Byte Pricing and Lock screen also contains fields for: Lock and Shop Lock Term, Clear To Close date, Rolldown Applied, MH Advantage, Corporate Concession, Calculate Discount, Draw Amount, Total Loan Amount (1XC), Builder Wire Received, and Builder Wire Amount.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- AI Agents Tab -->
+            <div class="tab-content" id="agents-tab">
+
+                <!-- Heat Map -->
+                <div class="heatmap-container">
+                    <h2 class="heatmap-title">Automation Opportunity Heat Map</h2>
+                    <div class="heatmap-grid">
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Accessing Pricing</div>
+                            <div class="heatmap-item-score">85% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Multiple Scenarios</div>
+                            <div class="heatmap-item-score">90% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Search Results Analysis</div>
+                            <div class="heatmap-item-score">95% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Rate Stack Selection</div>
+                            <div class="heatmap-item-score">80% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Originator Assistant</div>
+                            <div class="heatmap-item-score">92% Automatable</div>
+                        </div>
+                        <div class="heatmap-item medium">
+                            <div class="heatmap-item-title">Locking the Loan</div>
+                            <div class="heatmap-item-score">65% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Float (Save Without Lock)</div>
+                            <div class="heatmap-item-score">88% Automatable</div>
+                        </div>
+                        <div class="heatmap-item low">
+                            <div class="heatmap-item-title">Lock with Concession</div>
+                            <div class="heatmap-item-score">40% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Lock Confirmation</div>
+                            <div class="heatmap-item-score">95% Automatable</div>
+                        </div>
+                        <div class="heatmap-item medium">
+                            <div class="heatmap-item-title">Profile Change</div>
+                            <div class="heatmap-item-score">60% Automatable</div>
+                        </div>
+                        <div class="heatmap-item low">
+                            <div class="heatmap-item-title">Price Concession</div>
+                            <div class="heatmap-item-score">35% Automatable</div>
+                        </div>
+                        <div class="heatmap-item medium">
+                            <div class="heatmap-item-title">Lock Extension</div>
+                            <div class="heatmap-item-score">70% Automatable</div>
+                        </div>
+                        <div class="heatmap-item medium">
+                            <div class="heatmap-item-title">Float Down</div>
+                            <div class="heatmap-item-score">55% Automatable</div>
+                        </div>
+                        <div class="heatmap-item medium">
+                            <div class="heatmap-item-title">Re-lock</div>
+                            <div class="heatmap-item-score">50% Automatable</div>
+                        </div>
+                        <div class="heatmap-item high">
+                            <div class="heatmap-item-title">Extended Rate Lock</div>
+                            <div class="heatmap-item-score">85% Automatable</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Cards -->
+                <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary);">AI Agent Recommendations</h2>
+
+                <div class="agents-grid">
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Pricing Navigator Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Automatically opens Optimal Blue from Clear/Byte, navigates to the correct pricing screen, and initiates product searches. Handles both Pricing and What-If modes based on loan status.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 85%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">85%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Scenario Comparison Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Creates and manages multiple loan scenarios simultaneously. Auto-generates descriptive names, configures loan parameters, and presents side-by-side comparisons for borrower review.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 90%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">90%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Eligibility Analyzer Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Analyzes search results to identify eligible and ineligible products. Automatically reviews disqualifiers and suggests corrections to loan criteria to maximize product eligibility.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 95%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">95%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Rate Optimization Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Leverages Originator Assistant data to identify optimal pricing opportunities. Analyzes LTV, FICO, DTI, and Loan Amount thresholds to recommend pricing improvements.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 92%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">92%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Lock Request Agent</div>
+                            <span class="agent-type medium">Medium Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Prepares lock form with pre-populated email contacts and validates product information. Requires human confirmation before final lock submission for compliance.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill medium" style="width: 65%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-amber);">65%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Concession Request Agent</div>
+                            <span class="agent-type low">Low Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Assists with price concession requests by pre-filling forms and validating documentation requirements. Requires human judgment for justification and approval routing.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill low" style="width: 40%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-rose);">40%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Lock Verification Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Monitors lock confirmations and automatically verifies data has populated correctly in Clear/Byte. Alerts users to any discrepancies between OB and LOS data.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 95%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">95%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Profile Change Agent</div>
+                            <span class="agent-type medium">Medium Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Manages post-lock profile changes by preparing change summaries and highlighting pricing impacts. Requires human review for final approval of changes.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill medium" style="width: 60%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-amber);">60%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Lock Extension Calculator</div>
+                            <span class="agent-type medium">Medium Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Calculates optimal extension days and costs. Provides cost-benefit analysis comparing extension fees vs. relock fees to recommend the most economical option.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill medium" style="width: 70%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-amber);">70%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Float Down Advisor Agent</div>
+                            <span class="agent-type medium">Medium Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Monitors market rates and evaluates float-down eligibility per Lock Desk Policy. Alerts LOs when favorable float-down opportunities arise and validates policy compliance.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill medium" style="width: 55%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-amber);">55%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Relock Processor Agent</div>
+                            <span class="agent-type medium">Medium Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Handles expired lock reprocessing by calculating worst-case pricing and applicable relock fees. Generates comparison summaries between original and new lock terms.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill medium" style="width: 50%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-amber);">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">PMI Quote Agent</div>
+                            <span class="agent-type high">High Automation</span>
+                        </div>
+                        <div class="agent-description">
+                            Automatically triggers PMI quotes from designated vendors. Compares quotes across vendors and identifies the most competitive option for the borrower's profile.
+                        </div>
+                        <div class="agent-meta">
+                            <div class="confidence-score">
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Confidence:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill high" style="width: 88%;"></div>
+                                </div>
+                                <span style="font-size: 0.8rem; color: var(--accent-green);">88%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Scroll-spy fix with isScrolling flag
+        let isScrolling = false;
+        let scrollTimeout;
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Scroll to section with isScrolling flag
+        function scrollToSection(sectionId) {
+            isScrolling = true;
+
+            // Clear any existing timeout
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const headerOffset = 130;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+
+                // Update active nav item immediately
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            }
+
+            // Reset isScrolling after 1000ms
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 1000);
+        }
+
+        // Scroll spy
+        window.addEventListener('scroll', () => {
+            if (isScrolling) return;
+
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                const sectionHeight = section.offsetHeight;
+
+                if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === currentSection) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set first nav item as active if visible
+            const firstSection = document.getElementById('section-1');
+            if (firstSection) {
+                const rect = firstSection.getBoundingClientRect();
+                if (rect.top < window.innerHeight) {
+                    document.querySelector('[data-section="section-1"]').classList.add('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
