@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hazard Insurance Review Checklist - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Checklist Styles */
+        .checklist-container {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 18px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .checklist-item:last-child { border-bottom: none; }
+
+        .checklist-box {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-blue);
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .checklist-text { color: var(--text-secondary); line-height: 1.5; }
+        .checklist-text strong { color: var(--text-primary); }
+
+        /* Mortgagee Clause Box */
+        .mortgagee-clause {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 18px 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .mortgagee-clause h4 { color: var(--accent-blue); margin-bottom: 15px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .mortgagee-clause p { color: var(--text-primary); line-height: 1.8; margin: 0; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Hazard Insurance Review Checklist</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Hazard Insurance</h2>
+            <p>Processor Review Checklist</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Binder Verification</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">HO3 Dwelling Coverage</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">HO6 Dwelling Coverage</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Update Byte - Parties</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Update Byte - Doc Prep</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Homeowners/Hazard Insurance Review Checklist</h1>
+                <p class="subtitle">Complete verification guide for processors reviewing hazard insurance binders and policies</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Processor</span>
+                    <span class="meta-item">Doc ID: RET281</span>
+                    <span class="meta-item">Updated: April 7, 2021</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Binder Verification -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Binder Verification</h2><span>Verify all required elements on the insurance binder</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Receive Binder</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Dates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Verify Loan Info</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Check Coverage</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Verify Mortgagee</div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-container">
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Effective Date:</strong> Binder effective date is on or before funding date by no more than 7 calendar days</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Expiration Date:</strong> No less than 12 months from note date. <em>For Refinances:</em> No less than 90 days and collect invoice</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Loan Number:</strong> Full CMG loan number is listed on the binder</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Property Address:</strong> Property address including zip code matches Subject Property address listed in Byte</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Insured Names:</strong> All title holders are listed as insured and with correct spelling of their names</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Deductible:</strong> Equal to or less than 5% of dwelling coverage. <em>Bond Loans:</em> Check guidelines for dwelling coverage requirements</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Annual Premium:</strong> Listed premium matches the amount in Byte. If not, update Byte and alert Underwriter</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Mortgagee Clause:</strong> Mortgagee Clause is correct (see below)</div>
+                        </div>
+                    </div>
+
+                    <div class="mortgagee-clause">
+                        <h4>Required Mortgagee Clause</h4>
+                        <p>CMG Mortgage, Inc<br>
+                        ISAOA/ATIMA<br>
+                        3160 Crow Canyon Rd, Ste 400<br>
+                        San Ramon, California 94583</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Verification Item</th>
+                                <th>Requirement</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Effective Date</strong></td>
+                                <td>On or before funding date (max 7 calendar days)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Expiration Date - Purchase</strong></td>
+                                <td>At least 12 months from note date</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Expiration Date - Refinance</strong></td>
+                                <td>At least 90 days from note date + invoice</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Deductible Maximum</strong></td>
+                                <td>5% of dwelling coverage</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Premium Discrepancy Alert</h4>
+                        <p>If the annual premium on the binder does NOT match the amount in Byte, you must:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Update the premium amount in Byte</li>
+                            <li>Alert the Underwriter of the change</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: HO3 Dwelling Coverage -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>HO3 Dwelling Coverage Requirements</h2><span>Standard homeowners policy coverage verification</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review HO3 Policy</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Coverage Sufficient?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed to Byte Entry</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Request Additional Coverage</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>HO3 Policy Coverage Options</h4>
+                        <p>HO3 Dwelling Coverage must meet <strong>ONE</strong> of the following scenarios to be acceptable:</p>
+                    </div>
+
+                    <div class="checklist-container">
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Option 1:</strong> Dwelling coverage is equal to or greater than the loan amount</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Option 2:</strong> Dwelling coverage has 100% replacement cost coverage</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Option 3:</strong> Dwelling coverage plus replacement cost coverage is equal to or greater than the loan amount</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Option 4:</strong> Insurance company provided a replacement cost estimator that supports the coverage amount</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Coverage Scenario</th>
+                                <th>Calculation</th>
+                                <th>Documentation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dwelling >= Loan Amount</strong></td>
+                                <td>Coverage Amount >= Loan Amount</td>
+                                <td>Binder shows coverage amount</td>
+                            </tr>
+                            <tr>
+                                <td><strong>100% Replacement Cost</strong></td>
+                                <td>Policy indicates 100% RCV</td>
+                                <td>Binder/policy states RCV</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dwelling + RCV >= Loan</strong></td>
+                                <td>Combined total >= Loan Amount</td>
+                                <td>Both amounts documented</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RCE Supported</strong></td>
+                                <td>Per insurance company estimator</td>
+                                <td>RCE document required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Coverage Verification Best Practice</h4>
+                        <p>Always verify coverage against the loan amount first. If dwelling coverage is less than the loan amount, check for replacement cost coverage or request a Replacement Cost Estimator (RCE) from the insurance company.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: HO6 Dwelling Coverage -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>HO6 Dwelling Coverage Requirements</h2><span>Condo/townhome policy coverage verification with escalation steps</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review HO6 Policy</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">100% RCV Indicated?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Acceptable Coverage</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Follow Escalation Steps</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>HO6 Policy Coverage Requirement</h4>
+                        <p>HO6 Dwelling Coverage must have <strong>100% replacement cost coverage</strong> OR provide full policy for Underwriter review.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>HO6 Replacement Cost Escalation Steps</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">If the HO6 policy does not indicate replacement cost, follow these steps in order:</p>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Reach out to the insurance agent to request replacement cost reflected on the policy. If they cannot note/reflect this, then proceed to Step 2.</li>
+                            <li><strong>Step 2:</strong> Ask for a Replacement Cost Estimator to confirm sufficient coverage. If they cannot provide one, then proceed to Step 3.</li>
+                            <li><strong>Step 3:</strong> Ask the Agent: <em>"Is there anything in the policy that ensures the material used to restore the unit is of like kind and quality?"</em> If YES, it has functionally equivalent coverage and can be documented in the loan file. If NO, proceed to Step 4.</li>
+                            <li><strong>Step 4:</strong> Ask the agent for a copy of the full policy and review it to see if it indicates replacement cost OR if there is anything in the policy that ensures the material used to restore the unit is of like kind and quality.</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Escalation Step</th>
+                                <th>Action</th>
+                                <th>Acceptable Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Step 1</strong></td>
+                                <td>Request RCV noted on policy</td>
+                                <td>Agent updates binder with RCV</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Step 2</strong></td>
+                                <td>Request Replacement Cost Estimator</td>
+                                <td>RCE document provided</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Step 3</strong></td>
+                                <td>Ask about "like kind and quality" provision</td>
+                                <td>Verbal/written confirmation documented</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Step 4</strong></td>
+                                <td>Obtain full policy for review</td>
+                                <td>UW reviews and approves</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>HO6 Coverage Documentation</h4>
+                        <p>If using Step 3 (like kind and quality confirmation), be sure to document the agent's response in the loan file. This serves as proof of functionally equivalent coverage.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Update Byte - Parties Screen -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Update Byte - Parties Screen</h2><span>Enter insurance company and policy information in Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Navigate to Parties</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Enter General Tab Info</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Enter Additional Info Tab</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Save Changes</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>General Tab Fields</h3>
+                        <div class="checklist-container" style="background: transparent; border: none; padding: 0;">
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Company Name:</strong> Name of insurance company</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Agent Name:</strong> Insurance agent's name</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Full Address:</strong> Complete mailing address of insurance company/agent</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Phone Number:</strong> Contact phone number</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Fax:</strong> Fax number (if available)</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Email Address:</strong> Email contact (if available)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Additional Info Tab Fields</h3>
+                        <div class="checklist-container" style="background: transparent; border: none; padding: 0;">
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Policy Number:</strong> Insurance policy number from binder</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Effective Date:</strong> Policy effective date</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Renewal Date:</strong> Policy renewal/expiration date</div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box">&#9744;</div>
+                                <div class="checklist-text"><strong>Coverage Amount:</strong> Dwelling coverage amount</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Tab</th>
+                                <th>Field</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>General</td>
+                                <td><strong>Company Name</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>General</td>
+                                <td><strong>Agent Name</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>General</td>
+                                <td><strong>Full Address</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>General</td>
+                                <td><strong>Phone Number</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>General</td>
+                                <td><strong>Fax / Email</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge optional-badge">At Least One</span></td>
+                            </tr>
+                            <tr>
+                                <td>Additional Info</td>
+                                <td><strong>Policy Number</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Additional Info</td>
+                                <td><strong>Effective Date</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Additional Info</td>
+                                <td><strong>Renewal Date</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td>Additional Info</td>
+                                <td><strong>Coverage Amount</strong></td>
+                                <td>Insurance Binder</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: Update Byte - Doc Prep Screen -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Update Byte - Doc Prep Screen</h2><span>Handle contact information exceptions in Doc Prep</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Contact Info</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Fax or Email Available?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Complete - No Action Needed</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node action">Check Exception Box</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Doc Prep Screen Requirement</h4>
+                        <p>If the insurance contact information does not contain at least a fax OR email, you must check the <strong>"Email and fax are not available"</strong> box at the bottom of the Doc Prep screen in the Hazard section.</p>
+                    </div>
+
+                    <div class="checklist-container">
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Navigate to Doc Prep Screen:</strong> Access the loan file Doc Prep section</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Locate Hazard Section:</strong> Scroll to the Hazard insurance section at the bottom</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-box">&#9744;</div>
+                            <div class="checklist-text"><strong>Check Exception Box:</strong> If no fax/email available, check "Email and fax are not available"</div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Additional Resources</h4>
+                        <p>For more detailed information on hazard insurance review procedures, refer to the <strong>Hazard Insurance Review Job Aid</strong> available in the CMG training portal.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Hazard Insurance Quick Reference</h3>
+                <pre>
+HAZARD INSURANCE CHECKLIST SUMMARY
+===================================
+
+BINDER VERIFICATION
+-------------------
+[ ] Effective date: On/before funding (max 7 days)
+[ ] Expiration: 12+ months (Purchase) / 90+ days + invoice (Refi)
+[ ] Full CMG loan number on binder
+[ ] Property address matches Byte (include zip code)
+[ ] All title holders listed with correct name spelling
+[ ] Deductible <= 5% of dwelling coverage
+[ ] Annual premium matches Byte (update + alert UW if different)
+[ ] Mortgagee clause is correct
+
+MORTGAGEE CLAUSE
+----------------
+CMG Mortgage, Inc
+ISAOA/ATIMA
+3160 Crow Canyon Rd, Ste 400
+San Ramon, California 94583
+
+HO3 DWELLING COVERAGE (One of these scenarios):
+-----------------------------------------------
+[ ] Dwelling >= Loan Amount
+[ ] 100% Replacement Cost Coverage
+[ ] Dwelling + RCV >= Loan Amount
+[ ] Insurance RCE supports coverage amount
+
+HO6 DWELLING COVERAGE
+---------------------
+[ ] 100% Replacement Cost Coverage
+   -OR-
+[ ] Full policy provided for UW review
+
+HO6 ESCALATION STEPS (if no RCV shown):
+----------------------------------------
+1. Request agent add RCV to policy
+2. Request Replacement Cost Estimator
+3. Ask: "Like kind and quality" provision?
+4. Request full policy for review
+
+BYTE ENTRY - PARTIES SCREEN
+---------------------------
+General Tab:
+[ ] Company Name
+[ ] Agent Name
+[ ] Full Address
+[ ] Phone Number
+[ ] Fax
+[ ] Email Address
+
+Additional Info Tab:
+[ ] Policy Number
+[ ] Effective Date
+[ ] Renewal Date
+[ ] Coverage Amount
+
+BYTE ENTRY - DOC PREP SCREEN
+----------------------------
+[ ] If no fax/email: Check "Email and fax are not available"
+
+BOND LOANS
+----------
+- Check specific guidelines for dwelling coverage requirements
+- May have different deductible requirements
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Hazard Insurance Review process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">78%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-bindervalidator')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Binder Validator Agent</div>
+                        <div class="heat-desc">Auto-extract and validate all binder fields against Byte data</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>6 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-coveragecalc')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Coverage Calculator</div>
+                        <div class="heat-desc">Auto-calculate HO3/HO6 coverage compliance against loan amount</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-byteautofill')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Byte Auto-Fill Agent</div>
+                        <div class="heat-desc">Auto-populate Parties and Doc Prep screens from binder</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-mortgageeverify')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">Mortgagee Clause Verifier</div>
+                        <div class="heat-desc">OCR and validate mortgagee clause against required format</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>1 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Binder Validator Agent -->
+                    <div class="agent-card" id="agent-bindervalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">B</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Binder Validator Agent</div>
+                                <div class="agent-type">Document Processing / OCR</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically extracts data from insurance binder PDFs using OCR, then validates all fields against Byte loan data including effective dates, property address, insured names, deductible limits, and premium amounts. Flags discrepancies for processor review.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Upload Binder</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">OCR Extract</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Cross-Check Byte</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Issues</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">6 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('bindervalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Coverage Calculator Agent -->
+                    <div class="agent-card" id="agent-coveragecalc">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Coverage Calculator Agent</div>
+                                <div class="agent-type">Data Validation / Calculation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically calculates whether HO3 or HO6 dwelling coverage meets requirements by comparing against loan amount. Determines which of the four HO3 scenarios applies and validates HO6 replacement cost coverage. Alerts if coverage is insufficient.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Get Loan Amount</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Get Coverage</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Evaluate Scenarios</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Pass/Fail</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('coveragecalc')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Byte Auto-Fill Agent -->
+                    <div class="agent-card" id="agent-byteautofill">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">A</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Byte Auto-Fill Agent</div>
+                                <div class="agent-type">Data Entry / RPA</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically populates the Byte Parties Screen (General Tab and Additional Info Tab) with insurance company information extracted from the binder. Also handles Doc Prep screen exceptions for missing fax/email contacts.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Map to Fields</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Populate Byte</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Verify Entry</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('byteautofill')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mortgagee Clause Verifier Agent -->
+                    <div class="agent-card" id="agent-mortgageeverify">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">M</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Mortgagee Clause Verifier</div>
+                                <div class="agent-type">Text Validation / OCR</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Uses OCR to extract the mortgagee clause from the insurance binder and performs character-by-character comparison against the required CMG mortgagee clause format. Detects common errors like missing ISAOA/ATIMA, wrong address, or misspellings.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">OCR Clause</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Text</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Errors</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">1 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('mortgageeverify')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Hazard Insurance Review - Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy Markdown</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Hazard Insurance Review Checklist
+## Document ID: RET281 | Updated: April 7, 2021
+
+## Overview
+This checklist provides processors with step-by-step guidance for reviewing homeowners/hazard insurance binders and policies to ensure compliance with CMG requirements.
+
+## Binder Verification Checklist
+- [ ] Effective date on/before funding date (max 7 calendar days)
+- [ ] Expiration: 12+ months (Purchase) / 90+ days + invoice (Refi)
+- [ ] Full CMG loan number listed
+- [ ] Property address matches Byte (include zip code)
+- [ ] All title holders listed as insured with correct spelling
+- [ ] Deductible <= 5% of dwelling coverage
+- [ ] Annual premium matches Byte amount
+- [ ] Mortgagee clause is correct
+
+## Required Mortgagee Clause
+CMG Mortgage, Inc
+ISAOA/ATIMA
+3160 Crow Canyon Rd, Ste 400
+San Ramon, California 94583
+
+## HO3 Dwelling Coverage (One scenario required)
+1. Dwelling coverage >= Loan amount
+2. 100% Replacement Cost Coverage
+3. Dwelling + RCV >= Loan amount
+4. Insurance RCE supports coverage amount
+
+## HO6 Dwelling Coverage
+- 100% Replacement Cost Coverage required
+- OR full policy for UW review
+
+### HO6 Escalation Steps
+1. Request agent add RCV to policy
+2. Request Replacement Cost Estimator
+3. Ask about "like kind and quality" provision
+4. Request full policy for review
+
+## Byte Entry - Parties Screen
+### General Tab
+- Company Name
+- Agent Name
+- Full Address
+- Phone Number
+- Fax
+- Email Address
+
+### Additional Info Tab
+- Policy Number
+- Effective Date
+- Renewal Date
+- Coverage Amount
+
+## Byte Entry - Doc Prep Screen
+- If no fax/email available: Check "Email and fax are not available"
+
+## Additional Resources
+- Hazard Insurance Review Job Aid
+- Bond Loan specific guidelines</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            bindervalidator: {
+                name: 'Binder Validator Agent',
+                tags: ['Document Processing', 'OCR', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically extracts data from insurance binder PDFs using OCR technology, then validates all fields against the corresponding Byte loan data. It checks effective dates, expiration dates, property addresses, insured names, deductible limits, premium amounts, and mortgagee clause accuracy, flagging any discrepancies for processor review.`,
+                prompt: `You are building a Document Processing Agent for CMG Financial's Hazard Insurance Review process.
+
+AGENT NAME: Binder Validator Agent
+TYPE: Document Processing / OCR Validation
+
+OBJECTIVE:
+Create an agent that automatically extracts and validates all fields from insurance binder documents against loan data in Byte LOS.
+
+INPUT DATA:
+- Insurance binder PDF document
+- Loan number for Byte data lookup
+
+OCR EXTRACTION TARGETS:
+1. Policy effective date
+2. Policy expiration date
+3. Loan number on binder
+4. Property address (street, city, state, zip)
+5. Insured names (all title holders)
+6. Dwelling coverage amount
+7. Deductible amount
+8. Annual premium
+9. Mortgagee clause (full text)
+10. Insurance company name
+11. Agent name and contact info
+
+VALIDATION RULES:
+{
+  "effective_date": {
+    "rule": "Must be on or before funding date",
+    "max_days_before": 7
+  },
+  "expiration_date": {
+    "purchase_min_months": 12,
+    "refi_min_days": 90
+  },
+  "deductible": {
+    "max_percent_of_dwelling": 5
+  },
+  "property_address": {
+    "fuzzy_match_threshold": 0.95,
+    "zip_code_required": true
+  },
+  "insured_names": {
+    "all_title_holders_required": true,
+    "spelling_tolerance": "exact"
+  }
+}
+
+OUTPUT FORMAT:
+{
+  "validation_status": "PASS" | "FAIL" | "REVIEW_REQUIRED",
+  "extracted_data": { ... },
+  "discrepancies": [
+    {
+      "field": "premium",
+      "binder_value": "1,850.00",
+      "byte_value": "1,750.00",
+      "action_required": "Update Byte and alert UW"
+    }
+  ],
+  "confidence_scores": { ... }
+}`,
+                integration: `INTEGRATION POINTS:
+1. OCR Service
+   - Azure Document Intelligence or AWS Textract
+   - Custom model trained on insurance binders
+   - Confidence threshold: 85%
+
+2. Byte LOS API
+   - Read loan data for comparison
+   - Read subject property address
+   - Read title holder names
+   - Read funding date / note date
+
+3. Validation Engine
+   - Date calculations (7-day rule, 12-month rule)
+   - Address fuzzy matching
+   - Name matching with variations
+   - Deductible percentage calculation
+
+4. Output
+   - Structured validation report
+   - Exception queue for FAIL/REVIEW items
+   - Audit trail for compliance`
+            },
+            coveragecalc: {
+                name: 'Coverage Calculator Agent',
+                tags: ['Data Validation', 'Calculation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically calculates whether HO3 or HO6 dwelling coverage meets CMG requirements. For HO3 policies, it evaluates all four acceptable scenarios (dwelling >= loan, 100% RCV, dwelling + RCV >= loan, or RCE supported). For HO6 policies, it validates 100% replacement cost coverage and triggers the escalation workflow if not indicated.`,
+                prompt: `You are building a Data Validation Agent for CMG Financial's Hazard Insurance Review process.
+
+AGENT NAME: Coverage Calculator Agent
+TYPE: Data Validation / Calculation Engine
+
+OBJECTIVE:
+Automatically determine if dwelling coverage meets requirements based on policy type (HO3 or HO6) and applicable scenarios.
+
+INPUT DATA:
+- Policy type (HO3 or HO6)
+- Loan amount
+- Dwelling coverage amount
+- Replacement cost coverage indicator (Y/N)
+- Replacement cost percentage (if applicable)
+- RCE document available (Y/N)
+
+HO3 EVALUATION LOGIC:
+function evaluateHO3Coverage(data) {
+  const scenarios = {
+    scenario1: data.dwelling_coverage >= data.loan_amount,
+    scenario2: data.replacement_cost_100_percent === true,
+    scenario3: (data.dwelling_coverage + data.replacement_cost_value) >= data.loan_amount,
+    scenario4: data.rce_document_supports_coverage === true
+  };
+
+  return {
+    passes: Object.values(scenarios).some(v => v === true),
+    passing_scenario: Object.entries(scenarios).find(([k, v]) => v)?.[0],
+    all_scenarios: scenarios
+  };
+}
+
+HO6 EVALUATION LOGIC:
+function evaluateHO6Coverage(data) {
+  if (data.replacement_cost_100_percent === true) {
+    return { passes: true, reason: "100% RCV indicated" };
+  }
+
+  return {
+    passes: false,
+    reason: "100% RCV not indicated",
+    escalation_required: true,
+    escalation_steps: [
+      "Request agent add RCV to policy",
+      "Request Replacement Cost Estimator",
+      "Ask about like kind and quality provision",
+      "Request full policy for UW review"
+    ]
+  };
+}
+
+OUTPUT FORMAT:
+{
+  "policy_type": "HO3",
+  "coverage_status": "PASS" | "FAIL" | "ESCALATION_REQUIRED",
+  "loan_amount": 450000,
+  "dwelling_coverage": 425000,
+  "passing_scenario": "scenario2",
+  "scenario_details": {
+    "scenario1": { "status": false, "calculation": "425000 < 450000" },
+    "scenario2": { "status": true, "reason": "100% RCV indicated" },
+    "scenario3": { "status": false, "calculation": "N/A - no separate RCV value" },
+    "scenario4": { "status": false, "reason": "No RCE document" }
+  },
+  "recommendation": "Coverage acceptable via Scenario 2 - 100% Replacement Cost"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS API
+   - Pull loan amount from loan file
+   - Pull extracted binder data
+   - Write coverage validation result
+
+2. Binder Validator Agent
+   - Receive extracted coverage data
+   - Receive RCV indicator
+   - Receive policy type
+
+3. Escalation Workflow
+   - Trigger HO6 escalation steps
+   - Track escalation progress
+   - Log agent responses
+
+4. Reporting
+   - Coverage compliance dashboard
+   - Exception report for manual review
+   - Trend analysis for coverage issues`
+            },
+            byteautofill: {
+                name: 'Byte Auto-Fill Agent',
+                tags: ['Data Entry', 'RPA', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically populates the Byte Parties Screen (General Tab and Additional Info Tab) with insurance company information extracted from the binder. It maps OCR-extracted fields to the correct Byte fields, handles Doc Prep screen exceptions when fax/email is unavailable, and provides a verification step before saving.`,
+                prompt: `You are building a Data Entry Agent for CMG Financial's Hazard Insurance Review process.
+
+AGENT NAME: Byte Auto-Fill Agent
+TYPE: RPA / Data Entry Automation
+
+OBJECTIVE:
+Automatically populate Byte LOS screens with insurance information extracted from binders, reducing manual data entry time and errors.
+
+INPUT DATA (from Binder Validator):
+{
+  "insurance_company": "State Farm Insurance",
+  "agent_name": "John Smith",
+  "address": {
+    "street": "123 Insurance Lane",
+    "city": "Sacramento",
+    "state": "CA",
+    "zip": "95814"
+  },
+  "phone": "(916) 555-1234",
+  "fax": "(916) 555-1235",
+  "email": "john.smith@statefarm.com",
+  "policy_number": "12-AB-C456-7",
+  "effective_date": "2026-02-01",
+  "renewal_date": "2027-02-01",
+  "coverage_amount": 450000
+}
+
+BYTE FIELD MAPPING:
+Parties Screen - General Tab:
+- Company Name -> insurance_company
+- Agent Name -> agent_name
+- Address -> address.street + city + state + zip
+- Phone Number -> phone
+- Fax -> fax (may be null)
+- Email -> email (may be null)
+
+Parties Screen - Additional Info Tab:
+- Policy Number -> policy_number
+- Effective Date -> effective_date
+- Renewal Date -> renewal_date
+- Coverage Amount -> coverage_amount
+
+Doc Prep Screen Logic:
+if (fax === null && email === null) {
+  check_box("Email and fax are not available");
+}
+
+AUTOMATION FLOW:
+1. Navigate to Parties screen
+2. Select Hazard Insurance party type
+3. Populate General Tab fields
+4. Navigate to Additional Info Tab
+5. Populate Additional Info fields
+6. Check for fax/email presence
+7. If neither present, navigate to Doc Prep
+8. Check exception box
+9. Present summary for processor verification
+10. Save on confirmation`,
+                integration: `INTEGRATION POINTS:
+1. Binder Validator Agent
+   - Receive extracted and validated data
+   - Receive confidence scores for each field
+
+2. Byte LOS Interface
+   - RPA integration (UI automation) or
+   - Direct API integration if available
+   - Field-level validation before entry
+
+3. Verification UI
+   - Show side-by-side comparison
+   - Highlight low-confidence fields
+   - Allow manual corrections
+   - Require processor confirmation
+
+4. Audit Logging
+   - Log all auto-filled values
+   - Track processor overrides
+   - Generate data entry audit trail`
+            },
+            mortgageeverify: {
+                name: 'Mortgagee Clause Verifier',
+                tags: ['Text Validation', 'OCR', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent uses OCR to extract the mortgagee clause from insurance binders and performs intelligent text comparison against the required CMG mortgagee clause format. It detects common errors including missing ISAOA/ATIMA designation, incorrect address, suite number variations, and company name misspellings, providing specific correction guidance.`,
+                prompt: `You are building a Text Validation Agent for CMG Financial's Hazard Insurance Review process.
+
+AGENT NAME: Mortgagee Clause Verifier
+TYPE: OCR / Text Comparison
+
+OBJECTIVE:
+Extract and validate the mortgagee clause from insurance binders against the required CMG format, detecting common errors and variations.
+
+REQUIRED MORTGAGEE CLAUSE:
+CMG Mortgage, Inc
+ISAOA/ATIMA
+3160 Crow Canyon Rd, Ste 400
+San Ramon, California 94583
+
+VALIDATION COMPONENTS:
+{
+  "company_name": {
+    "required": "CMG Mortgage, Inc",
+    "acceptable_variations": ["CMG Mortgage Inc", "CMG Mortgage, Inc."],
+    "unacceptable": ["CMG Financial", "CMG Mortgage LLC"]
+  },
+  "designation": {
+    "required": "ISAOA/ATIMA",
+    "acceptable_variations": ["ISAOA / ATIMA", "ISAOA ATIMA"],
+    "must_include_both": true
+  },
+  "address": {
+    "street": "3160 Crow Canyon Rd",
+    "suite": "Ste 400",
+    "suite_variations": ["Suite 400", "#400", "Ste. 400"],
+    "city_state_zip": "San Ramon, California 94583",
+    "state_variations": ["CA", "California"]
+  }
+}
+
+COMMON ERRORS TO DETECT:
+1. Missing ISAOA/ATIMA designation
+2. Old/incorrect address
+3. Wrong suite number
+4. "CMG Financial" instead of "CMG Mortgage, Inc"
+5. Missing comma after "Inc"
+6. Wrong zip code
+7. Abbreviated vs full state name mismatch
+
+COMPARISON ALGORITHM:
+function validateMortgageeClause(extractedText) {
+  const normalized = normalizeText(extractedText);
+  const required = normalizeText(REQUIRED_CLAUSE);
+
+  const results = {
+    company_name: fuzzyMatch(extractCompanyName(normalized), "CMG Mortgage, Inc", 0.90),
+    designation: containsBoth(normalized, "ISAOA", "ATIMA"),
+    street_address: fuzzyMatch(extractStreet(normalized), "3160 Crow Canyon Rd", 0.85),
+    suite: extractSuite(normalized) === "400",
+    city: fuzzyMatch(extractCity(normalized), "San Ramon", 0.90),
+    state: ["CA", "California"].includes(extractState(normalized)),
+    zip: extractZip(normalized) === "94583"
+  };
+
+  return {
+    overall_match: Object.values(results).every(v => v === true),
+    component_results: results,
+    corrections_needed: Object.entries(results)
+      .filter(([k, v]) => !v)
+      .map(([k]) => CORRECTION_GUIDANCE[k])
+  };
+}`,
+                integration: `INTEGRATION POINTS:
+1. OCR Service
+   - Extract mortgagee clause region
+   - High-accuracy text recognition
+   - Handle multi-line formatting
+
+2. Text Normalization
+   - Remove extra whitespace
+   - Standardize punctuation
+   - Handle line breaks
+
+3. Fuzzy Matching Library
+   - Levenshtein distance
+   - Token-based similarity
+   - Configurable thresholds
+
+4. Correction Guidance
+   - Specific error messages
+   - Template for correction request
+   - Auto-generate email to agent`
+            }
+        };
+
+        function showAgentPrompt(agentId) {
+            const agent = agentPrompts[agentId];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const purpose = document.getElementById('promptPurpose').textContent;
+            const prompt = document.getElementById('promptContent').textContent;
+            const integration = document.getElementById('promptIntegration').textContent;
+            const fullText = `PURPOSE:\n${purpose}\n\nBUILD PROMPT:\n${prompt}\n\nINTEGRATION:\n${integration}`;
+
+            try {
+                await navigator.clipboard.writeText(fullText);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>
