@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Ops Lender Credit NFIRC - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.auto-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Credit Type Cards */
+        .credit-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .credit-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .credit-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .credit-card-header h4 { font-size: 1.05rem; }
+        .credit-card-body { padding: 22px; }
+        .credit-card ul { list-style: none; padding: 0; }
+        .credit-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .credit-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Ops Lender Credit NFIRC</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Ops Lender Credit NFIRC</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active">
+                <span class="nav-number">0</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-1" class="nav-item">
+                <span class="nav-number">1</span>
+                <span class="nav-label">BorrowSmart</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">HomeFundIt</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">RefiNow/RefiPossible</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Energy Plus</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Lender Credit Other</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Multiple Credits</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Ops Lender Credit NFIRC Field</h1>
+                <p class="subtitle">Comprehensive Guide to Managing Lender Credits in Byte</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Underwriter / Disclosure Coordinator</span>
+                    <span class="meta-item">Updated: July 21, 2022</span>
+                    <span class="meta-item">Duration: 5-10 min per credit type</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output/Result</span></div>
+            </div>
+
+            <!-- Section 0: Overview -->
+            <section id="section-0" class="section">
+                <div class="section-header">
+                    <div class="section-number">0</div>
+                    <div class="section-title"><h2>NFIRC Field Overview</h2><span>Understanding the cumulative lender credit system</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>What is the Ops Lender Credit NFIRC Field?</h4>
+                        <p>The Ops Lender Credit NFIRC field in Byte is used for several different credits and displays at the top of the Loan Estimate Page 2 and Closing Disc Page 2 Screens. When data is entered throughout Byte, it <strong>automatically populates</strong> in the NFIRC field.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card"><h4>Credit Types</h4><div class="value">5</div><div class="label">Different credit programs</div></div>
+                        <div class="summary-card"><h4>Auto-Calculated</h4><div class="value">Yes</div><div class="label">Cumulative total</div></div>
+                        <div class="summary-card"><h4>Feeds To</h4><div class="value">Section J</div><div class="label">LE/CD documents</div></div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Credit Type</th><th>Entry Method</th><th>Eligibility</th><th>Amount</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">BorrowSmart</strong></td><td><span class="badge auto-badge">Auto</span></td><td>Freddie Mac HomePossible + AMI requirements</td><td>Varies by AMI tier</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">HomeFundIt</strong></td><td><span class="badge auto-badge">Auto</span></td><td>Crowd funding/rebate program participants</td><td>Per program</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">RefiNow/RefiPossible</strong></td><td><span class="badge required-badge">Manual</span></td><td>Refinance with appraisal</td><td>$500</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Energy Plus</strong></td><td><span class="badge auto-badge">Auto</span></td><td>Fannie Mae Energy Plus eligible</td><td>$500</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Lender Credit - Other</strong></td><td><span class="badge required-badge">Manual</span></td><td>Other scenarios (note required)</td><td>Varies</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Key Principle</h4>
+                        <p>The Ops Lender Credit NFIRC field is a <strong>cumulative total</strong> of any Lender Credits showing on the right side of the screen (if applicable). Individual credits are itemized on the right; the total displays on the left.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: BorrowSmart -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>BorrowSmart Credit</h2><span>Freddie Mac HomePossible with AMI requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Eligibility Requirements</h4>
+                        <p>BorrowSmart is a credit provided to Borrowers if they are using the <strong>Freddie Mac HomePossible Product</strong> and meet the <strong>Area Medium Income (AMI) requirements</strong>. The BorrowSmart indicator must be checked for reporting.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">BorrowSmart Entry Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open BorrowSmart Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Select AMI Eligibility</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node output">Credit Auto-Populates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open LE Page 2/CD Page 2</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Verify in NFIRC Field</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>AMI Eligibility Tiers</h3>
+                        <div class="tree-node level-1"><span class="tree-label">Income <= 50% AMI</span></div>
+                        <div class="tree-node">Property in BorrowSmart state + purchase + Home Possible</div>
+                        <div class="tree-node level-1"><span class="tree-label">Income 50.01% - 80% AMI</span></div>
+                        <div class="tree-node">Property in BorrowSmart state + purchase + Home Possible</div>
+                        <div class="tree-node level-1"><span class="tree-label">Income > 80% - 100% AMI</span></div>
+                        <div class="tree-node">Property in BorrowSmart state + primary residence + purchase + LPA (property in rural High Needs Census Tract OR subject property is manufactured home + LTV 95%)</div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Step</th><th>Action</th><th>Screen/Location</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong style="color: var(--text-primary);">Open BorrowSmart Screen</strong></td><td>All Screens > BorrowSmart</td><td>Underwriter responsibility</td></tr>
+                            <tr><td>2</td><td><strong style="color: var(--text-primary);">Select AMI Eligibility</strong></td><td>Freddie Mac BorrowSmart Assistance Eligibility dropdown</td><td>Choose appropriate income tier</td></tr>
+                            <tr><td>3</td><td><strong style="color: var(--text-primary);">Verify Credit Display</strong></td><td>Loan Estimate Page 2/Closing Disc Page 2</td><td>Credit shows in Lender Credit - BorrowSmart field</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Important: Reporting Requirement</h4>
+                        <p>The <strong>BorrowSmart indicator must be checked</strong> for proper reporting. Failure to check this indicator may result in compliance issues.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: HomeFundIt -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>HomeFundIt Credit</h2><span>Crowd funding and rebate program</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Program Description</h4>
+                        <p>HomeFundIt is a credit provided to Borrowers if they are using the HomeFundIt <strong>crowd funding, social sharing and/or rebate program</strong>. If Borrowers qualify, the amount of the lender credit is displayed in the Lender Contribution Added to Ops Lender Credit NFIRC field in the HomeFundIt Screen.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">HomeFundIt Entry Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Borrower Enrolled in HomeFundIt?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Open HomeFundIt Screen</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node exception">Not Applicable</div>
+                            </div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node output">Lender Contribution Populates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open LE Page 2/CD Page 2</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Verify in NFIRC Field</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Step</th><th>Action</th><th>Result</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong style="color: var(--text-primary);">Confirm HomeFundIt enrollment</strong></td><td>Verify borrower participated in crowd funding/rebate program</td></tr>
+                            <tr><td>2</td><td><strong style="color: var(--text-primary);">Check HomeFundIt Screen</strong></td><td>Lender Contribution Added to Ops Lender Credit NFIRC field populated</td></tr>
+                            <tr><td>3</td><td><strong style="color: var(--text-primary);">Open LE Page 2/CD Page 2</strong></td><td>Credit auto-added to Lender Credit - HomeFundIt field</td></tr>
+                            <tr><td>4</td><td><strong style="color: var(--text-primary);">Verify cumulative total</strong></td><td>Ops Lender Credit NFIRC shows total of all credits</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Automatic Population</h4>
+                        <p>The HomeFundIt Lender Contribution is <strong>automatically added</strong> to the Lender Credit - HomeFundIt field when the Lender Contribution Added to Ops Lender Credit NFIRC field is populated in the HomeFundIt Screen.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: RefiNow/RefiPossible -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>RefiNow/RefiPossible Appraisal Credit</h2><span>$500 credit for qualifying refinances</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Credit Description</h4>
+                        <p>RefiNow and RefiPossible loans offer a <strong>$500 credit</strong> when an appraisal is obtained on a refinance transaction using those programs meeting certain requirements.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">RefiNow/RefiPossible Entry Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">RefiNow or RefiPossible Loan?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES + Appraisal</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Open LE Page 2/CD Page 2</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node exception">Not Applicable</div>
+                            </div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Enter $500 in RefiNow/RefiPossible Field</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Credit Added to NFIRC Total</div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Manual Entry Required</h4>
+                        <p>Unlike BorrowSmart and HomeFundIt, the RefiNow/RefiPossible Appraisal Credit requires <strong>manual entry</strong> of $500 to the Lender Credit - RefiNow/RefiPossible Appraisal Credit field.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Field</th><th>Location</th><th>Entry Type</th><th>Amount</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">Lender Credit - RefiNow/RefiPossible Appraisal Credit</strong></td><td>LE Page 2/CD Page 2 Screen (right side)</td><td><span class="badge required-badge">Manual</span></td><td>$500.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 4: Energy Plus -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Fannie Mae Energy Plus Credit</h2><span>$500 credit with $250 escrow holdback</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Program Description</h4>
+                        <p>Fannie Mae offers a <strong>$500 credit</strong> when the borrower qualifies for an eligible purchase or refinance transaction using the Fannie Mae Energy Plus program.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Energy Plus Entry Flow (3-Step Process)</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open Conditions Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Check Energy Plus Loan Box</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Open ULDD Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Add Special Feature Code 375</div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Loan Moves to Clear to Close</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">$500 Credit Auto-Added</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Step</th><th>Screen</th><th>Action</th><th>Result</th></tr></thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong style="color: var(--text-primary);">Conditions Screen</strong></td><td>Check "Energy Plus Loan" box after initial review</td><td>Adds $250 Escrow Holdback Fee to LE/CD Page 2</td></tr>
+                            <tr><td>2</td><td><strong style="color: var(--text-primary);">ULDD Screen</strong></td><td>Add Investor Feature Code 375</td><td>Required for investor reporting</td></tr>
+                            <tr><td>3</td><td><strong style="color: var(--text-primary);">LE Page 2/CD Page 2</strong></td><td>Move loan to Clear to Close</td><td>$500 credit auto-added to Lender Credit - Energy Plus Loan</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Automatic Additions</h4>
+                        <p>Checking the Energy Plus Loan box automatically adds a <strong>$250 Escrow Holdback Fee</strong> in the Loan Estimate Page 2/Closing Disc Page 2 Screen. The $500 credit is added when the loan moves to Clear to Close.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Underwriter Responsibility</h4>
+                        <p>The Energy Plus Loan checkbox should be checked by the <strong>Underwriter after initial review</strong>. This is not a task for the Disclosure Coordinator.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Lender Credit Other -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Lender Credit - Other</h2><span>Catch-all for non-standard credits</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>When to Use</h4>
+                        <p>Lender Credit - Other can be used for any other scenarios not outlined in this job aid. A note is <strong>REQUIRED</strong> when adding.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Lender Credit Other Entry Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Standard Credit Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">NO - Use Other</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Open LE Page 2/CD Page 2</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Use Appropriate Credit Field</div>
+                            </div>
+                        </div>
+                        <div class="flow-row"><span class="flow-arrow down">|</span></div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Enter Amount in Lender Credit - Other</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Add Required Note</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Credit Added to NFIRC</div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical Warnings</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>A note is <strong>REQUIRED</strong> when adding a Lender Credit - Other</li>
+                            <li>This field is <strong>NOT intended to bypass pricing concessions</strong> and should not be used as such</li>
+                            <li>Improper use may result in compliance issues</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Multiple Credits -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Multiple Credits Scenario</h2><span>Combining credits in one transaction</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Combination Credits</h4>
+                        <p>Loans can have a <strong>combination of credits</strong>. For example, utilizing BorrowSmart, HomeFundIt and an appraisal credit in one transaction.</p>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Multiple Credits Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node input">BorrowSmart: $1,000</div>
+                            <span class="flow-arrow">+</span>
+                            <div class="flow-node input">RefiNow/RefiPossible: $500</div>
+                            <span class="flow-arrow">=</span>
+                            <div class="flow-node output">NFIRC Total: $1,500</div>
+                        </div>
+                    </div>
+
+                    <div class="credit-comparison">
+                        <div class="credit-card">
+                            <div class="credit-card-header"><h4>Right Side: Itemized Credits</h4></div>
+                            <div class="credit-card-body">
+                                <ul>
+                                    <li><span class="check-icon">$</span> Lender Credit - BorrowSmart: $1,000.00</li>
+                                    <li><span class="check-icon">$</span> Lender Credit - HomeFundIt: $0.00</li>
+                                    <li><span class="check-icon">$</span> Lender Credit - Energy Plus Loan: $0.00</li>
+                                    <li><span class="check-icon">$</span> Lender Credit - RefiNow/RefiPossible: $500.00</li>
+                                    <li><span class="check-icon">$</span> Lender Credit - Other: $0.00</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="credit-card">
+                            <div class="credit-card-header"><h4>Left Side: Cumulative Total</h4></div>
+                            <div class="credit-card-body">
+                                <ul>
+                                    <li><span class="check-icon">$</span> <strong>Ops Lender Credit NFIRC: $1,500.00</strong></li>
+                                </ul>
+                                <div style="margin-top: 15px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">This cumulative total feeds directly to <strong style="color: var(--accent-blue);">Section J</strong> on the Loan Estimate and Closing Disclosure.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>How It Displays on Documents</h4>
+                        <p>The system <strong>itemizes</strong> the credits on the right and takes the <strong>cumulative total</strong> in the Ops Lender Credit NFIRC to display in Section J on the Loan Estimate/Closing Disclosure.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead><tr><th>Document</th><th>Section</th><th>Display Format</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">Loan Estimate</strong></td><td>J. Total Closing Costs</td><td>Shows as "Lender Credits" with negative value (e.g., -$1,500)</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Closing Disclosure</strong></td><td>J. Total Closing Costs (Borrower-Paid)</td><td>Shows as "Lender Credits" with negative value (e.g., -$1,500.00)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+LOCATION: Loan Estimate Page 2/Closing Disc Page 2 Screen
+
+CREDIT TYPES & ENTRY METHODS:
+===============================
+BorrowSmart          | AUTO  | BorrowSmart Screen > Select AMI Eligibility
+HomeFundIt           | AUTO  | HomeFundIt Screen > Lender Contribution populated
+RefiNow/RefiPossible | MANUAL| LE/CD Page 2 > Enter $500
+Energy Plus          | AUTO  | Conditions Screen > Check box + ULDD Code 375
+Lender Credit Other  | MANUAL| LE/CD Page 2 > Enter amount + NOTE REQUIRED
+
+KEY PRINCIPLE:
+=============
+Ops Lender Credit NFIRC = CUMULATIVE TOTAL of all itemized credits
+This total feeds to Section J on Loan Estimate and Closing Disclosure
+
+RESPONSIBILITIES:
+================
+- Underwriter: BorrowSmart Screen, Energy Plus checkbox
+- Disclosure Coordinator: Verify credits display correctly
+
+WARNINGS:
+=========
+- BorrowSmart indicator MUST be checked for reporting
+- Lender Credit Other requires a note - NOT for bypassing pricing
+- Energy Plus adds $250 Escrow Holdback Fee automatically
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Ops Lender Credit NFIRC Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">7 Process Steps Analyzed</span>
+                    <span class="meta-item">4 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 35% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">35%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">80%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-eligibility')" title="Click to view agent details">
+                        <div class="heat-score">92</div>
+                        <div class="heat-name">Credit Eligibility Checker</div>
+                        <div class="heat-desc">Auto-detect eligible credit programs</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>1-4</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-validation')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">NFIRC Validation Agent</div>
+                        <div class="heat-desc">Verify cumulative totals match itemized</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-compliance')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Compliance Monitor</div>
+                        <div class="heat-desc">Flag missing notes and indicators</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>5</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-disclosure')" title="Click to view agent details">
+                        <div class="heat-score">58</div>
+                        <div class="heat-name">Disclosure Sync Agent</div>
+                        <div class="heat-desc">Auto-update Section J on documents</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Credit Eligibility Checker -->
+                <div class="agent-card" id="agent-eligibility">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">E</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Credit Eligibility Checker Agent</div>
+                            <div class="agent-type">Rules Engine Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically analyzes loan data to identify which lender credits the borrower qualifies for. Scans for BorrowSmart AMI eligibility, HomeFundIt enrollment, Energy Plus qualification, and RefiNow/RefiPossible criteria.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Loan Data</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check Eligibility Rules</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Flag Eligible Credits</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Notify UW</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">98%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('eligibility')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: NFIRC Validation -->
+                <div class="agent-card" id="agent-validation">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">V</div>
+                        <div class="agent-info">
+                            <div class="agent-name">NFIRC Validation Agent</div>
+                            <div class="agent-type">Data Integrity Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Validates that the Ops Lender Credit NFIRC cumulative total correctly matches the sum of all itemized credits. Catches discrepancies before disclosure generation.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Read Itemized Credits</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Calculate Sum</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Compare to NFIRC</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Alert if Mismatch</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('validation')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Compliance Monitor -->
+                <div class="agent-card" id="agent-compliance">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">C</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Compliance Monitor Agent</div>
+                            <div class="agent-type">Audit Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors for compliance issues such as missing BorrowSmart indicators, Lender Credit Other entries without required notes, and improper use of credit fields for pricing concessions.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Credit Fields</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check Required Notes</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Verify Indicators</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Generate Flags</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">3min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Catch Rate</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('compliance')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Disclosure Sync -->
+                <div class="agent-card" id="agent-disclosure">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">D</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Disclosure Sync Agent</div>
+                            <div class="agent-type">Document Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Ensures Section J on Loan Estimate and Closing Disclosure accurately reflects the NFIRC total. Triggers re-disclosure when credit amounts change.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Monitor NFIRC Changes</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Compare to Section J</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Flag Discrepancy</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Queue Re-disclosure</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">4min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Real-time</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('disclosure')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Ops Lender Credit NFIRC - Workflow Markdown</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Ops Lender Credit NFIRC Field - Byte Workflow
+
+## Overview
+The Ops Lender Credit NFIRC field in Byte is used for several different credits and displays at the top of the Loan Estimate Page 2 and Closing Disc Page 2 Screens.
+
+## Credit Types
+
+### 1. BorrowSmart
+- **Eligibility:** Freddie Mac HomePossible + AMI requirements
+- **Entry:** Automatic (BorrowSmart Screen > Select AMI)
+- **Note:** BorrowSmart indicator must be checked for reporting
+
+### 2. HomeFundIt
+- **Eligibility:** Crowd funding/rebate program participants
+- **Entry:** Automatic (HomeFundIt Screen)
+
+### 3. RefiNow/RefiPossible
+- **Eligibility:** Refinance with appraisal
+- **Amount:** $500
+- **Entry:** Manual (LE/CD Page 2)
+
+### 4. Fannie Mae Energy Plus
+- **Eligibility:** Energy Plus program qualified
+- **Amount:** $500
+- **Entry:** Automatic at Clear to Close
+- **Steps:**
+  1. Check Energy Plus Loan box (Conditions Screen)
+  2. Add Feature Code 375 (ULDD Screen)
+- **Note:** Also adds $250 Escrow Holdback Fee
+
+### 5. Lender Credit - Other
+- **Entry:** Manual
+- **Requirement:** Note is REQUIRED
+- **Warning:** Not for bypassing pricing concessions
+
+## Key Principle
+Ops Lender Credit NFIRC = Cumulative total of all itemized credits
+Feeds to Section J on Loan Estimate and Closing Disclosure
+
+## Document: Updated July 21, 2022</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll-spy with click debounce
+        let isScrolling = false;
+        let scrollTimeout = null;
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.sidebar-tab').forEach(tab => tab.classList.remove('active'));
+            if (tabName === 'workflow') {
+                document.querySelector('.sidebar-tab:first-child').classList.add('active');
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+            }
+
+            // Update panels
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(tabName + '-panel').classList.add('active');
+
+            // Update nav visibility
+            document.getElementById('workflow-nav').style.display = tabName === 'workflow' ? 'block' : 'none';
+            document.getElementById('agents-nav').style.display = tabName === 'agents' ? 'block' : 'none';
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy for workflow navigation
+        function updateScrollSpy() {
+            if (isScrolling) return;
+
+            const sections = document.querySelectorAll('.section, .quick-ref');
+            const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+            let currentSection = '';
+            const scrollPos = window.scrollY + 150;
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPos) {
+                    currentSection = section.id;
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + currentSection) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // Nav click handler with debounce
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                isScrolling = true;
+
+                // Clear existing timeout
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // Update active state immediately
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Scroll to section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateScrollSpy);
+
+        // Agent heat map click - scroll to agent card
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                // Remove any existing highlights
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                // Scroll to the agent card
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Add highlight animation
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                // Remove highlight after animation
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Modal functions
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                const content = document.getElementById('docContent').textContent;
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy.');
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            eligibility: {
+                name: 'Credit Eligibility Checker Agent',
+                tags: ['Rules Engine', 'Eligibility', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically analyzes loan data to identify which lender credits the borrower qualifies for, including BorrowSmart, HomeFundIt, Energy Plus, and RefiNow/RefiPossible programs.`,
+                prompt: `You are building a Rules Engine Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Credit Eligibility Checker Agent
+TYPE: Rules Engine / Eligibility Detection
+
+OBJECTIVE:
+Create an agent that scans loan data and automatically identifies all lender credits the borrower may be eligible for based on program requirements.
+
+ELIGIBILITY RULES:
+
+1. BORROWSMART CREDIT
+   IF product = "Freddie Mac HomePossible"
+   AND income_pct_ami IN ['<=50%', '50.01%-80%', '>80%-100%']
+   AND property_state IN borrowsmart_eligible_states
+   AND (
+     (income_pct_ami <= 80% AND purpose = 'Purchase')
+     OR (income_pct_ami > 80% AND census_tract = 'High Needs' OR property = 'Manufactured')
+   )
+   THEN flag: "BorrowSmart Eligible"
+
+2. HOMEFUNDIT CREDIT
+   IF borrower.homefundit_enrolled = true
+   AND homefundit_contribution > 0
+   THEN flag: "HomeFundIt Credit Available"
+
+3. ENERGY PLUS CREDIT
+   IF investor = "Fannie Mae"
+   AND property.energy_efficient = true
+   AND (purpose = 'Purchase' OR purpose = 'Refinance')
+   THEN flag: "Energy Plus Eligible - $500 credit"
+
+4. REFINOW/REFIPOSSIBLE CREDIT
+   IF purpose = 'Refinance'
+   AND program IN ['RefiNow', 'RefiPossible']
+   AND appraisal.obtained = true
+   THEN flag: "RefiNow/RefiPossible Appraisal Credit - $500"
+
+OUTPUT FORMAT:
+{
+  "eligible_credits": [
+    { "type": "BorrowSmart", "amount": 1500, "auto_populate": true },
+    { "type": "RefiNow/RefiPossible", "amount": 500, "auto_populate": false, "action_required": "Manual entry in LE Page 2" }
+  ],
+  "not_eligible": [
+    { "type": "Energy Plus", "reason": "Not Fannie Mae investor" }
+  ],
+  "total_potential_credits": 2000
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Database
+   - Read loan, borrower, property, and program data
+   - Check investor feature codes
+   - Verify HomeFundIt enrollment status
+
+2. BorrowSmart State Eligibility Table
+   - Maintain list of eligible states
+   - Check census tract data for High Needs designation
+
+3. Notification System
+   - Alert Underwriter of eligible credits
+   - Display in Byte dashboard or alerts screen
+
+TRIGGER:
+- On loan creation
+- On product/program change
+- On property data update
+- Manual request by user`
+            },
+            validation: {
+                name: 'NFIRC Validation Agent',
+                tags: ['Data Integrity', 'Validation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent validates that the Ops Lender Credit NFIRC cumulative total correctly matches the sum of all itemized credits, catching discrepancies before disclosure generation.`,
+                prompt: `You are building a Data Integrity Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: NFIRC Validation Agent
+TYPE: Data Integrity / Calculation Validation
+
+OBJECTIVE:
+Create an agent that continuously validates the NFIRC cumulative total matches the sum of all individual lender credit fields.
+
+VALIDATION LOGIC:
+
+EXPECTED_NFIRC = SUM(
+  lender_credit_borrowsmart,
+  lender_credit_homefundit,
+  lender_credit_energy_plus,
+  lender_credit_refinow_refipossible,
+  lender_credit_other
+)
+
+IF ops_lender_credit_nfirc != EXPECTED_NFIRC THEN
+  ALERT: "NFIRC Mismatch Detected"
+  details: {
+    current_nfirc: ops_lender_credit_nfirc,
+    calculated_sum: EXPECTED_NFIRC,
+    difference: ABS(ops_lender_credit_nfirc - EXPECTED_NFIRC),
+    breakdown: {
+      borrowsmart: value,
+      homefundit: value,
+      energy_plus: value,
+      refinow_refipossible: value,
+      other: value
+    }
+  }
+
+ALERT SEVERITY:
+- Difference < $1: Warning (possible rounding)
+- Difference >= $1: Error (requires correction)
+
+OUTPUT:
+{
+  "validation_status": "PASS" | "FAIL",
+  "nfirc_value": 1500.00,
+  "calculated_sum": 1500.00,
+  "items": [...],
+  "discrepancy": 0.00,
+  "action_required": null | "Recalculate NFIRC total"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Field Monitor
+   - Watch all lender credit fields for changes
+   - Trigger validation on any credit field update
+
+2. Pre-Disclosure Hook
+   - Validate before generating Loan Estimate
+   - Block disclosure if validation fails
+
+3. Audit Log
+   - Record all validation results
+   - Track discrepancy patterns for root cause analysis
+
+TRIGGER:
+- On any lender credit field change
+- Before disclosure generation
+- On loan status change to "Ready for Disclosure"`
+            },
+            compliance: {
+                name: 'Compliance Monitor Agent',
+                tags: ['Audit', 'Compliance', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent monitors for compliance issues such as missing BorrowSmart indicators, Lender Credit Other entries without required notes, and improper use of credit fields.`,
+                prompt: `You are building a Compliance Audit Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Compliance Monitor Agent
+TYPE: Audit / Compliance Checking
+
+OBJECTIVE:
+Create an agent that monitors lender credit entries for compliance issues and flags violations before they cause problems.
+
+COMPLIANCE RULES:
+
+1. BORROWSMART INDICATOR CHECK
+   IF lender_credit_borrowsmart > 0
+   AND borrowsmart_indicator_checked = false
+   THEN flag: "COMPLIANCE VIOLATION: BorrowSmart indicator not checked"
+   severity: HIGH
+   action: "Check BorrowSmart indicator for proper reporting"
+
+2. LENDER CREDIT OTHER NOTE REQUIREMENT
+   IF lender_credit_other > 0
+   AND lender_credit_other_note IS NULL OR EMPTY
+   THEN flag: "COMPLIANCE VIOLATION: Missing required note for Lender Credit Other"
+   severity: HIGH
+   action: "Add explanatory note for Lender Credit Other entry"
+
+3. PRICING CONCESSION DETECTION
+   IF lender_credit_other > 0
+   AND note CONTAINS ("pricing", "concession", "rate", "discount")
+   AND NOT approved_pricing_exception
+   THEN flag: "POTENTIAL VIOLATION: Lender Credit Other may be bypassing pricing"
+   severity: MEDIUM
+   action: "Review if credit should use different field or needs approval"
+
+4. ENERGY PLUS ESCROW HOLDBACK
+   IF energy_plus_loan_checked = true
+   AND escrow_holdback_fee != 250
+   THEN flag: "DATA INTEGRITY: Energy Plus should have $250 escrow holdback"
+   severity: MEDIUM
+
+OUTPUT:
+{
+  "compliance_status": "CLEAN" | "VIOLATIONS_FOUND",
+  "violations": [
+    {
+      "rule": "BORROWSMART_INDICATOR",
+      "severity": "HIGH",
+      "field": "borrowsmart_indicator",
+      "message": "...",
+      "recommended_action": "..."
+    }
+  ],
+  "warnings": [...],
+  "loan_id": "...",
+  "checked_at": "timestamp"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Field Monitoring
+   - Watch lender credit and indicator fields
+   - Parse note content for keyword detection
+
+2. Alert System
+   - High severity: Block loan progression
+   - Medium severity: Warning notification
+   - Low severity: Logged for review
+
+3. Compliance Dashboard
+   - Aggregate violation statistics
+   - Track resolution time
+   - Identify training needs
+
+TRIGGER:
+- On lender credit field change
+- On loan submission
+- Nightly batch audit of active loans`
+            },
+            disclosure: {
+                name: 'Disclosure Sync Agent',
+                tags: ['Document Sync', 'Real-time', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent ensures Section J on Loan Estimate and Closing Disclosure accurately reflects the NFIRC total and triggers re-disclosure when credit amounts change.`,
+                prompt: `You are building a Document Sync Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Disclosure Sync Agent
+TYPE: Document Synchronization / Change Detection
+
+OBJECTIVE:
+Create an agent that monitors NFIRC changes and ensures Section J on disclosures stays synchronized, flagging when re-disclosure may be required.
+
+SYNC LOGIC:
+
+1. DETECT NFIRC CHANGE
+   ON UPDATE ops_lender_credit_nfirc:
+     previous_value = get_previous_nfirc()
+     current_value = get_current_nfirc()
+     change_amount = current_value - previous_value
+
+2. CHECK DISCLOSURE TOLERANCE
+   IF ABS(change_amount) > tolerance_threshold:
+     - LE tolerance: $100 (may trigger TRID re-disclosure)
+     - CD tolerance: Any change after COE
+
+3. COMPARE TO SECTION J
+   le_section_j_credits = get_le_section_j_lender_credits()
+   cd_section_j_credits = get_cd_section_j_lender_credits()
+
+   IF le_section_j_credits != current_value:
+     flag: "LE Section J out of sync"
+     action: "Re-generate Loan Estimate"
+
+4. RE-DISCLOSURE TRIGGER CHECK
+   IF disclosure_already_sent = true
+   AND change_amount != 0:
+     flag: "Credit change after disclosure - evaluate re-disclosure"
+     IF change_amount > 0:
+       note: "Credit increased - may benefit borrower"
+     ELSE:
+       note: "Credit decreased - re-disclosure likely required"
+
+OUTPUT:
+{
+  "sync_status": "IN_SYNC" | "OUT_OF_SYNC",
+  "nfirc_current": 1500.00,
+  "le_section_j": 1500.00,
+  "cd_section_j": 1500.00,
+  "change_detected": {
+    "amount": 500.00,
+    "previous": 1000.00,
+    "timestamp": "..."
+  },
+  "re_disclosure_required": true | false,
+  "actions": [
+    "Update Loan Estimate Section J",
+    "Notify Disclosure Coordinator"
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte NFIRC Field Monitor
+   - Real-time change detection
+   - Track change history with timestamps
+
+2. Disclosure Document System
+   - Read Section J values from generated docs
+   - Queue re-disclosure tasks
+
+3. TRID Compliance Engine
+   - Apply tolerance rules
+   - Determine re-disclosure requirements
+
+4. Notification System
+   - Alert Disclosure Coordinator
+   - Include change details and recommended action
+
+TRIGGER:
+- On NFIRC field change
+- On disclosure generation
+- On loan status change`
+            }
+        };
+
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = `# ${agent.name}\n\n## Purpose\n${agent.purpose}\n\n## Build Prompt\n${agent.prompt}\n\n## Integration Points\n${agent.integration}`;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        // Close modals on escape or outside click
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDocModal();
+                closePromptModal();
+            }
+        });
+
+        document.getElementById('docModal').addEventListener('click', (e) => {
+            if (e.target.id === 'docModal') closeDocModal();
+        });
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateScrollSpy();
+        });
+    </script>
+</body>
+</html>
