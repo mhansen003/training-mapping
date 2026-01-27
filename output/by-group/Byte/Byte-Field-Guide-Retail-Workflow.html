@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Field Guide (Retail) - Field Location Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+        .sidebar-nav-panel { display: none; }
+        .sidebar-nav-panel.active { display: block; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Search Box */
+        .search-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .search-container h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .filter-select {
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .search-stats {
+            margin-top: 15px;
+            padding: 12px 18px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .search-stats strong { color: var(--accent-blue); }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+        .field-table tr.highlight { background: rgba(59, 130, 246, 0.15); }
+        .field-table tr.hidden { display: none; }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.screen-badge { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .badge.section-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .badge.field-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        /* Info Boxes */
+        .tip-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-left: 4px solid var(--accent-green);
+        }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+        .tip-box ul { margin-left: 20px; margin-top: 10px; }
+        .tip-box li { margin-bottom: 8px; }
+
+        .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-left: 4px solid var(--accent-blue);
+        }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p { color: var(--text-secondary); }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; }
+
+        .screen-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .screen-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .screen-card h4 {
+            color: var(--accent-teal);
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .screen-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .screen-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .screen-card li:last-child { border-bottom: none; }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #facc15); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #facc15, #a3e635); }
+        .heat-item.low::before { background: linear-gradient(90deg, #a3e635, #4ade80); }
+
+        .heat-score {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #facc15; }
+        .heat-item.low .heat-score { color: #4ade80; }
+
+        .heat-name { font-weight: 700; color: var(--text-primary); margin-bottom: 6px; font-size: 1rem; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 12px; flex-wrap: wrap; }
+        .heat-metric {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Agent Cards */
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+            transition: box-shadow 0.3s;
+        }
+
+        .agent-card.highlighted {
+            box-shadow: 0 0 0 2px var(--accent-purple), 0 10px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .agent-card-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .agent-card-title { display: flex; align-items: center; gap: 15px; }
+
+        .agent-icon {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .agent-name h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .agent-name span { font-size: 0.9rem; color: var(--text-muted); }
+
+        .agent-score {
+            background: rgba(0,0,0,0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .agent-score .score-value { font-size: 1.8rem; font-weight: 800; }
+        .agent-score .score-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-score.critical .score-value { color: #ef4444; }
+        .agent-score.high .score-value { color: #f97316; }
+        .agent-score.medium .score-value { color: #facc15; }
+        .agent-score.low .score-value { color: #4ade80; }
+
+        .agent-card-body { padding: 25px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow h4 { color: var(--accent-purple); margin-bottom: 18px; font-size: 1rem; }
+
+        .flow-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 140px;
+        }
+
+        .flow-arrow { color: var(--accent-purple); font-size: 1.5rem; }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agent-metric {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .agent-metric .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-teal);
+            margin-bottom: 5px;
+        }
+
+        .agent-metric .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .prompt-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .prompt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(139, 92, 246, 0.2) 100%);
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal-header h3 { font-size: 1.3rem; color: var(--text-primary); }
+
+        .modal-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
+
+        .modal-body { padding: 30px; }
+
+        .modal-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .modal-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .modal-section { margin-bottom: 25px; }
+        .modal-section h4 { color: var(--accent-blue); margin-bottom: 12px; font-size: 1rem; }
+        .modal-section p { color: var(--text-secondary); line-height: 1.7; }
+
+        .modal-code {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 70px 20px 20px 20px; }
+            .agent-metrics { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <a href="./index.html">🏦 Byte</a>
+        <span class="separator">›</span>
+        <span class="current">📊 Field Guide (Retail)</span>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Field Guide</h2>
+            <p>55+ field mappings</p>
+        </div>
+
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">📋 Reference</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">🤖 AI Agents</button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div id="workflow-nav" class="sidebar-nav-panel active">
+                <a class="nav-item active" href="#overview"><span class="nav-number">0</span><span class="nav-label">Overview</span></a>
+                <a class="nav-item" href="#borrower"><span class="nav-number">1</span><span class="nav-label">Borrower Info</span></a>
+                <a class="nav-item" href="#appraisal"><span class="nav-number">2</span><span class="nav-label">Appraisal</span></a>
+                <a class="nav-item" href="#loan"><span class="nav-number">3</span><span class="nav-label">Loan Info</span></a>
+                <a class="nav-item" href="#property"><span class="nav-number">4</span><span class="nav-label">Property</span></a>
+                <a class="nav-item" href="#transaction"><span class="nav-number">5</span><span class="nav-label">Transaction</span></a>
+                <a class="nav-item" href="#dates"><span class="nav-number">6</span><span class="nav-label">Critical Dates</span></a>
+                <a class="nav-item" href="#disclosure"><span class="nav-number">7</span><span class="nav-label">Disclosure</span></a>
+                <a class="nav-item" href="#insurance"><span class="nav-number">8</span><span class="nav-label">Insurance</span></a>
+                <a class="nav-item" href="#title"><span class="nav-number">9</span><span class="nav-label">Title & Closing</span></a>
+                <a class="nav-item" href="#quick-ref"><span class="nav-number">⚡</span><span class="nav-label">Quick Reference</span></a>
+            </div>
+            <div id="agents-nav" class="sidebar-nav-panel">
+                <a class="nav-item" href="#agent-1"><span class="nav-number">🔴</span><span class="nav-label">Field Lookup Agent</span></a>
+                <a class="nav-item" href="#agent-2"><span class="nav-number">🟠</span><span class="nav-label">Data Sync Validator</span></a>
+                <a class="nav-item" href="#agent-3"><span class="nav-number">🟡</span><span class="nav-label">Screen Navigator</span></a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openMarkdownModal()">📄 View Markdown</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <!-- WORKFLOW TAB -->
+        <div id="workflow-panel" class="tab-panel active">
+            <div class="header" id="overview">
+                <h1>Byte Field Guide (Retail)</h1>
+                <p class="subtitle">Field Location Reference - Find any data field across Byte screens</p>
+                <div class="meta">
+                    <span class="meta-item">🖥️ Byte</span>
+                    <span class="meta-item">👤 Retail Division</span>
+                    <span class="meta-item">📊 55+ Fields</span>
+                    <span class="meta-item">📅 Updated: 10/28/2022</span>
+                </div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>Total Fields</h4>
+                    <div class="value">55+</div>
+                    <div class="label">Mapped Locations</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Byte Screens</h4>
+                    <div class="value">15+</div>
+                    <div class="label">Screen References</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Categories</h4>
+                    <div class="value">12</div>
+                    <div class="label">Field Groups</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Multi-Location</h4>
+                    <div class="value">30+</div>
+                    <div class="label">Fields in 2+ Places</div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-container">
+                <h3>🔍 Search Field Locations</h3>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="fieldSearch" placeholder="Search for a field (e.g., Interest Rate, LTV, PITI...)" onkeyup="filterFields()">
+                    <select class="filter-select" id="screenFilter" onchange="filterFields()">
+                        <option value="">All Screens</option>
+                        <option value="Overview Panel">Overview Panel</option>
+                        <option value="Home Screen">Home Screen</option>
+                        <option value="URLA Borrower Info">URLA Borrower Info</option>
+                        <option value="URLA Lender Loan Info">URLA Lender Loan Info</option>
+                        <option value="Loan Estimate">Loan Estimate</option>
+                        <option value="Closing">Closing</option>
+                        <option value="Doc Prep">Doc Prep</option>
+                        <option value="Appraisal Info">Appraisal Info</option>
+                        <option value="1008 Transmittal">1008 Transmittal</option>
+                        <option value="Application Summary">Application Summary</option>
+                    </select>
+                </div>
+                <div class="search-stats" id="searchStats">
+                    Showing <strong>all</strong> fields. Type to search or filter by screen.
+                </div>
+            </div>
+
+            <!-- Borrower Information -->
+            <section class="section" id="borrower">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title">
+                        <h2>Borrower Information Fields</h2>
+                        <span>Personal data, assets, liabilities, declarations</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="akas credit aliases" data-screen="Closing">
+                                <td><strong>AKAs</strong></td>
+                                <td><span class="badge screen-badge">Closing</span></td>
+                                <td>AKAs</td>
+                                <td><span class="badge field-badge">AKAs - Credit Aliases</span></td>
+                            </tr>
+                            <tr data-field="akas alternative names" data-screen="URLA Borrower Info">
+                                <td><strong>AKAs</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Personal Information</td>
+                                <td><span class="badge field-badge">Alternative Names</span></td>
+                            </tr>
+                            <tr data-field="assets" data-screen="URLA Borrower Info">
+                                <td><strong>Assets</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Assets</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="borrower contact information" data-screen="URLA Borrower Info">
+                                <td><strong>Borrower Contact Info</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Personal Information</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="declarations" data-screen="URLA Borrower Info">
+                                <td><strong>Declarations</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Declarations</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="income employment" data-screen="URLA Borrower Info">
+                                <td><strong>Income</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Employment and Income</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="liabilities" data-screen="URLA Borrower Info">
+                                <td><strong>Liabilities</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Liabilities</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Appraisal Information -->
+            <section class="section" id="appraisal">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title">
+                        <h2>Appraisal Information Fields</h2>
+                        <span>Appraisal dates, values, appraiser details</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="appraisal ordered date" data-screen="Appraisal Info">
+                                <td><strong>Appraisal Ordered Date</strong></td>
+                                <td><span class="badge screen-badge">Appraisal Info</span></td>
+                                <td>Appraisal Info 1</td>
+                                <td><span class="badge field-badge">Appraisal Ordered</span></td>
+                            </tr>
+                            <tr data-field="appraisal ordered date" data-screen="Processing Log">
+                                <td><strong>Appraisal Ordered Date</strong></td>
+                                <td><span class="badge screen-badge">Processing Log</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Appraisal Ordered</span></td>
+                            </tr>
+                            <tr data-field="appraisal received date" data-screen="Appraisal Info">
+                                <td><strong>Appraisal Received Date</strong></td>
+                                <td><span class="badge screen-badge">Appraisal Info</span></td>
+                                <td>Appraisal Info 1</td>
+                                <td><span class="badge field-badge">Appraisal Received</span></td>
+                            </tr>
+                            <tr data-field="appraised value" data-screen="1008 Transmittal">
+                                <td><strong>Appraised Value</strong></td>
+                                <td><span class="badge screen-badge">1008 Transmittal</span></td>
+                                <td>I. Borrower and Property Information</td>
+                                <td><span class="badge field-badge">Appr Value</span></td>
+                            </tr>
+                            <tr data-field="appraiser company amc" data-screen="Parties Screen">
+                                <td><strong>Appraiser</strong></td>
+                                <td><span class="badge screen-badge">Parties Screen</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Appraiser</span></td>
+                            </tr>
+                            <tr data-field="appraiser company amc" data-screen="Appraisal Info">
+                                <td><strong>Appraiser</strong></td>
+                                <td><span class="badge screen-badge">Appraisal Info</span></td>
+                                <td>Appraisal 1</td>
+                                <td><span class="badge field-badge">Company</span></td>
+                            </tr>
+                            <tr data-field="appraiser company amc" data-screen="Loan Estimate Page 2">
+                                <td><strong>Appraiser</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>Appraisal Info</td>
+                                <td><span class="badge field-badge">AMC</span></td>
+                            </tr>
+                            <tr data-field="hvcc appraisal disclosure delivered" data-screen="Appraisal Info">
+                                <td><strong>HVCC/Appraisal Disclosure Date</strong></td>
+                                <td><span class="badge screen-badge">Appraisal Info</span></td>
+                                <td>Appraisal Info 1</td>
+                                <td><span class="badge field-badge">Appraisal Delivered</span></td>
+                            </tr>
+                            <tr data-field="year built property age" data-screen="Appraisal Info">
+                                <td><strong>Year Built</strong></td>
+                                <td><span class="badge screen-badge">Appraisal Info</span></td>
+                                <td>Property Age Information</td>
+                                <td><span class="badge field-badge">Year Built</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Loan Information -->
+            <section class="section" id="loan">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title">
+                        <h2>Loan Information Fields</h2>
+                        <span>Rate, amount, purpose, status, LTV</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="interest rate note" data-screen="Overview Panel">
+                                <td><strong>Interest Rate</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Loan</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="interest rate note" data-screen="Loan Estimate Page 1">
+                                <td><strong>Interest Rate</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 1</span></td>
+                                <td>Loan Type</td>
+                                <td><span class="badge field-badge">Interest Rate</span></td>
+                            </tr>
+                            <tr data-field="interest rate note" data-screen="URLA Lender Loan Info">
+                                <td><strong>Interest Rate</strong></td>
+                                <td><span class="badge screen-badge">URLA Lender Loan Info</span></td>
+                                <td>Mortgage Loan Information</td>
+                                <td><span class="badge field-badge">Int Rate</span></td>
+                            </tr>
+                            <tr data-field="interest rate note" data-screen="Application Summary">
+                                <td><strong>Interest Rate</strong></td>
+                                <td><span class="badge screen-badge">Application Summary</span></td>
+                                <td>Loan Info</td>
+                                <td><span class="badge field-badge">Note Rate</span></td>
+                            </tr>
+                            <tr data-field="loan amount base mip ff" data-screen="Overview Panel">
+                                <td><strong>Loan Amount</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Loan</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="loan amount base mip ff" data-screen="URLA Borrower Info">
+                                <td><strong>Loan Amount</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Loan and Property Information</td>
+                                <td><span class="badge field-badge">Base Loan or Loan W/MIP/FF</span></td>
+                            </tr>
+                            <tr data-field="loan purpose type" data-screen="Overview Panel">
+                                <td><strong>Loan Purpose</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Loan Type</span></td>
+                            </tr>
+                            <tr data-field="loan purpose type" data-screen="URLA Borrower Info">
+                                <td><strong>Loan Purpose</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Loan and Property Information</td>
+                                <td><span class="badge field-badge">Purpose of Loan</span></td>
+                            </tr>
+                            <tr data-field="loan status" data-screen="Overview Panel">
+                                <td><strong>Loan Status</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>General</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="loan status" data-screen="Status Screen/Panel">
+                                <td><strong>Loan Status</strong></td>
+                                <td><span class="badge screen-badge">Status Screen/Panel</span></td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="ltv loan to value" data-screen="Overview Panel">
+                                <td><strong>Loan to Value (LTV)</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Loan</td>
+                                <td><span class="badge field-badge">LTV</span></td>
+                            </tr>
+                            <tr data-field="ltv loan to value" data-screen="Application Summary">
+                                <td><strong>Loan to Value (LTV)</strong></td>
+                                <td><span class="badge screen-badge">Application Summary</span></td>
+                                <td>Loan Info</td>
+                                <td><span class="badge field-badge">LTV</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Property Information -->
+            <section class="section" id="property">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title">
+                        <h2>Property Information Fields</h2>
+                        <span>Address, type, occupancy, parcel, flood</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="property address" data-screen="URLA Borrower Info">
+                                <td><strong>Property Address</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Loan and Property Information</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="property type" data-screen="Overview Panel">
+                                <td><strong>Property Type</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Loan</td>
+                                <td><span class="badge field-badge">Prop Type</span></td>
+                            </tr>
+                            <tr data-field="property type" data-screen="Home Screen">
+                                <td><strong>Property Type</strong></td>
+                                <td><span class="badge screen-badge">Home Screen</span></td>
+                                <td>Subject Property Info</td>
+                                <td><span class="badge field-badge">Property Type</span></td>
+                            </tr>
+                            <tr data-field="occupancy" data-screen="Overview Panel">
+                                <td><strong>Occupancy</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Occupancy</span></td>
+                            </tr>
+                            <tr data-field="parcel number" data-screen="Home Screen">
+                                <td><strong>Parcel Number</strong></td>
+                                <td><span class="badge screen-badge">Home Screen</span></td>
+                                <td>Subject Property Info</td>
+                                <td><span class="badge field-badge">Parcel No</span></td>
+                            </tr>
+                            <tr data-field="parcel number" data-screen="Loan Estimate Page 1">
+                                <td><strong>Parcel Number</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 1</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Parcel No</span></td>
+                            </tr>
+                            <tr data-field="parcel number" data-screen="Closing">
+                                <td><strong>Parcel Number</strong></td>
+                                <td><span class="badge screen-badge">Closing</span></td>
+                                <td>Title</td>
+                                <td><span class="badge field-badge">Parcel No</span></td>
+                            </tr>
+                            <tr data-field="flood zone nfip" data-screen="Doc Prep">
+                                <td><strong>Flood Zone</strong></td>
+                                <td><span class="badge screen-badge">Doc Prep</span></td>
+                                <td>Flood Cert > B. NFIP Data</td>
+                                <td><span class="badge field-badge">Flood Zone</span></td>
+                            </tr>
+                            <tr data-field="flood zone nfip" data-screen="Closing">
+                                <td><strong>Flood Zone</strong></td>
+                                <td><span class="badge screen-badge">Closing</span></td>
+                                <td>Flood > B. NFIP Data</td>
+                                <td><span class="badge field-badge">Flood Zone</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Transaction Details -->
+            <section class="section" id="transaction">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title">
+                        <h2>Transaction Details Fields</h2>
+                        <span>Cash to/from borrower, earnest money, seller credit</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="cash from to borrower" data-screen="URLA Lender Loan Info">
+                                <td><strong>Cash from/to Borrower</strong></td>
+                                <td><span class="badge screen-badge">URLA Lender Loan Info</span></td>
+                                <td>Details of Transaction</td>
+                                <td><span class="badge field-badge">Cash from/to Borrower</span></td>
+                            </tr>
+                            <tr data-field="cash from to borrower" data-screen="Overview Panel">
+                                <td><strong>Cash from/to Borrower</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Cash from/to Borrower</span></td>
+                            </tr>
+                            <tr data-field="cash from to borrower" data-screen="Closing Disclosure Page 3">
+                                <td><strong>Cash from/to Borrower</strong></td>
+                                <td><span class="badge screen-badge">Closing Disclosure Page 3</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Cash from/to Borrower</span></td>
+                            </tr>
+                            <tr data-field="earnest money deposit" data-screen="URLA Borrower Info">
+                                <td><strong>Earnest Money Deposit</strong></td>
+                                <td><span class="badge screen-badge">URLA Borrower Info</span></td>
+                                <td>Assets</td>
+                                <td><span class="badge field-badge">Earnest $</span></td>
+                            </tr>
+                            <tr data-field="earnest money deposit" data-screen="Application Summary">
+                                <td><strong>Earnest Money Deposit</strong></td>
+                                <td><span class="badge screen-badge">Application Summary</span></td>
+                                <td>Details of Transaction</td>
+                                <td><span class="badge field-badge">Earnest Money</span></td>
+                            </tr>
+                            <tr data-field="seller credit" data-screen="Closing Disc Page 3">
+                                <td><strong>Seller Credit</strong></td>
+                                <td><span class="badge screen-badge">Closing Disc Page 3</span></td>
+                                <td>Section L</td>
+                                <td><span class="badge field-badge">Seller Credit</span></td>
+                            </tr>
+                            <tr data-field="seller credit" data-screen="Loan Estimate Page 2">
+                                <td><strong>Seller Credit</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>Details of Transaction</td>
+                                <td><span class="badge field-badge">Seller Credit</span></td>
+                            </tr>
+                            <tr data-field="secondary financing other" data-screen="Home Screen">
+                                <td><strong>Secondary Financing</strong></td>
+                                <td><span class="badge screen-badge">Home Screen</span></td>
+                                <td>Loan Info</td>
+                                <td><span class="badge field-badge">Other Financing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Critical Dates -->
+            <section class="section" id="dates">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title">
+                        <h2>Critical Dates Fields</h2>
+                        <span>Closing, payment, lock expiration dates</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="earliest closing date" data-screen="Overview Panel">
+                                <td><strong>Earliest Closing Date</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Details hyperlink</td>
+                                <td><span class="badge field-badge">Earliest Closing Date</span></td>
+                            </tr>
+                            <tr data-field="earliest closing date" data-screen="Loan Estimate Page 1">
+                                <td><strong>Earliest Closing Date</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 1</span></td>
+                                <td>Disclosure History</td>
+                                <td><span class="badge field-badge">Earliest Closing</span></td>
+                            </tr>
+                            <tr data-field="first payment date" data-screen="Loan Estimate Page 2">
+                                <td><strong>First Payment Date</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>Critical Dates</td>
+                                <td><span class="badge field-badge">First Payment Date</span></td>
+                            </tr>
+                            <tr data-field="first payment date" data-screen="Closing Disc Page 2">
+                                <td><strong>First Payment Date</strong></td>
+                                <td><span class="badge screen-badge">Closing Disc Page 2</span></td>
+                                <td>Critical Dates</td>
+                                <td><span class="badge field-badge">First Payment Date</span></td>
+                            </tr>
+                            <tr data-field="first payment date" data-screen="Doc Prep">
+                                <td><strong>First Payment Date</strong></td>
+                                <td><span class="badge screen-badge">Doc Prep</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">First Payment Date</span></td>
+                            </tr>
+                            <tr data-field="note date doc" data-screen="MERS">
+                                <td><strong>Note Date</strong></td>
+                                <td><span class="badge screen-badge">MERS</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Note Date</span></td>
+                            </tr>
+                            <tr data-field="note date doc" data-screen="Funding Review">
+                                <td><strong>Note Date</strong></td>
+                                <td><span class="badge screen-badge">Funding Review</span></td>
+                                <td>Important Dates</td>
+                                <td><span class="badge field-badge">Note/Doc Date</span></td>
+                            </tr>
+                            <tr data-field="rate lock expiration" data-screen="Home Screen">
+                                <td><strong>Rate Lock Expiration</strong></td>
+                                <td><span class="badge screen-badge">Home Screen</span></td>
+                                <td>Registration and Lock Info</td>
+                                <td><span class="badge field-badge">Lock Exp. Date</span></td>
+                            </tr>
+                            <tr data-field="rate lock expiration" data-screen="Overview Panel">
+                                <td><strong>Rate Lock Expiration</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Lock Expiration</span></td>
+                            </tr>
+                            <tr data-field="underwriting expiration" data-screen="Status Screen/Panel">
+                                <td><strong>Underwriting Expiration</strong></td>
+                                <td><span class="badge screen-badge">Status Screen/Panel</span></td>
+                                <td>Important Dates</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Disclosure & Compliance -->
+            <section class="section" id="disclosure">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title">
+                        <h2>Disclosure & Compliance Fields</h2>
+                        <span>LE disclosures, CoC, program changes</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="borrower added after le initial disclosure" data-screen="Loan Estimate Page 2">
+                                <td><strong>Borrower Added After LE</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>Disclosure Communication</td>
+                                <td><span class="badge field-badge">Was a borrower added after Initial Disclosure</span></td>
+                            </tr>
+                            <tr data-field="coc change of circumstance cd" data-screen="Doc Prep">
+                                <td><strong>CoC Request on CD</strong></td>
+                                <td><span class="badge screen-badge">Doc Prep</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">CoC Requested on CD</span></td>
+                            </tr>
+                            <tr data-field="coc change of circumstance cd" data-screen="Changed Circumstance">
+                                <td><strong>CoC Request on CD</strong></td>
+                                <td><span class="badge screen-badge">Changed Circumstance</span></td>
+                                <td>Chance of Circumstance</td>
+                                <td><span class="badge field-badge">CoC Requested on CD</span></td>
+                            </tr>
+                            <tr data-field="program change after initial disclosure" data-screen="Loan Estimate Page 2">
+                                <td><strong>Did Program Change</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>Disclosure Communication</td>
+                                <td><span class="badge field-badge">Did Program Change after Initial Disclosure</span></td>
+                            </tr>
+                            <tr data-field="log disclosure le received" data-screen="Loan Estimate Page 1">
+                                <td><strong>Log Disclosure of LE</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 1</span></td>
+                                <td>Disclosure History</td>
+                                <td><span class="badge field-badge">Edit Disclosure Log Entry > Received Date</span></td>
+                            </tr>
+                            <tr data-field="log disclosure le received" data-screen="Overview Panel">
+                                <td><strong>Log Disclosure of LE</strong></td>
+                                <td><span class="badge screen-badge">Overview Panel</span></td>
+                                <td>Details hyperlink > Disclosure History</td>
+                                <td><span class="badge field-badge">Edit Disclosure Log Entry > Received Date</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Insurance & Escrow -->
+            <section class="section" id="insurance">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title">
+                        <h2>Insurance & Escrow Fields</h2>
+                        <span>Homeowner's insurance, hazard, escrow</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="homeowners insurance hazard" data-screen="1008 Transmittal">
+                                <td><strong>Homeowner's Insurance</strong></td>
+                                <td><span class="badge screen-badge">1008 Transmittal</span></td>
+                                <td>III. Underwriting Information</td>
+                                <td><span class="badge field-badge">Hazard Insurance</span></td>
+                            </tr>
+                            <tr data-field="homeowners insurance hazard escrow" data-screen="Closing Disclosure Page 2">
+                                <td><strong>Homeowner's Insurance</strong></td>
+                                <td><span class="badge screen-badge">Closing Disclosure Page 2</span></td>
+                                <td>G. Initial Escrow Payment at Closing</td>
+                                <td><span class="badge field-badge">Hazard Insurance</span></td>
+                            </tr>
+                            <tr data-field="homeowners insurance hazard escrow" data-screen="Loan Estimate Page 2">
+                                <td><strong>Homeowner's Insurance</strong></td>
+                                <td><span class="badge screen-badge">Loan Estimate Page 2</span></td>
+                                <td>G. Initial Escrow Payment at Closing</td>
+                                <td><span class="badge field-badge">Hazard Insurance</span></td>
+                            </tr>
+                            <tr data-field="homeowners insurance" data-screen="URLA Lender Loan Info">
+                                <td><strong>Homeowner's Insurance</strong></td>
+                                <td><span class="badge screen-badge">URLA Lender Loan Info</span></td>
+                                <td>Proposed Monthly Payment for Property</td>
+                                <td><span class="badge field-badge">Homeowner's Insurance</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Title & Closing -->
+            <section class="section" id="title">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title">
+                        <h2>Title & Closing Fields</h2>
+                        <span>Vesting, endorsements, title report, wire amount</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table searchable">
+                        <thead>
+                            <tr>
+                                <th>Data Field</th>
+                                <th>Byte Screen</th>
+                                <th>Section</th>
+                                <th>Field Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-field="endorsements alta title" data-screen="Closing">
+                                <td><strong>Endorsements</strong></td>
+                                <td><span class="badge screen-badge">Closing</span></td>
+                                <td>Title</td>
+                                <td><span class="badge field-badge">ALTA Endorsements</span></td>
+                            </tr>
+                            <tr data-field="title vesting" data-screen="Retail CD Request">
+                                <td><strong>Title Vesting</strong></td>
+                                <td><span class="badge screen-badge">Retail CD Request</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">Vesting Description</span></td>
+                            </tr>
+                            <tr data-field="title vesting" data-screen="Closing">
+                                <td><strong>Title Vesting</strong></td>
+                                <td><span class="badge screen-badge">Closing</span></td>
+                                <td>General</td>
+                                <td><span class="badge field-badge">Vesting</span></td>
+                            </tr>
+                            <tr data-field="title vesting" data-screen="URLA Lender Loan Info">
+                                <td><strong>Title Vesting</strong></td>
+                                <td><span class="badge screen-badge">URLA Lender Loan Info</span></td>
+                                <td>Title Information</td>
+                                <td>-</td>
+                            </tr>
+                            <tr data-field="title report date" data-screen="Doc Prep">
+                                <td><strong>Title Report Date</strong></td>
+                                <td><span class="badge screen-badge">Doc Prep</span></td>
+                                <td>Title Company</td>
+                                <td><span class="badge field-badge">Title Report Date</span></td>
+                            </tr>
+                            <tr data-field="cpl expiration closing protection letter" data-screen="Doc Prep">
+                                <td><strong>CPL Expiration Date</strong></td>
+                                <td><span class="badge screen-badge">Doc Prep</span></td>
+                                <td>-</td>
+                                <td><span class="badge field-badge">CPL Expiration Date</span></td>
+                            </tr>
+                            <tr data-field="wire amount funding" data-screen="Funding">
+                                <td><strong>Wire Amount</strong></td>
+                                <td><span class="badge screen-badge">Funding</span></td>
+                                <td>Funding Wire Calculations</td>
+                                <td><span class="badge field-badge">Actual Wire Amount</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div class="quick-ref" id="quick-ref">
+                <h3>⚡ Quick Reference by Screen</h3>
+                <div class="screen-cards">
+                    <div class="screen-card">
+                        <h4>🏠 Home Screen</h4>
+                        <ul>
+                            <li>Agency Case No</li>
+                            <li>Parcel No</li>
+                            <li>Property Type</li>
+                            <li>PITI</li>
+                            <li>Other Financing</li>
+                            <li>Lock Exp. Date</li>
+                        </ul>
+                    </div>
+                    <div class="screen-card">
+                        <h4>📊 Overview Panel</h4>
+                        <ul>
+                            <li>Loan Amount, Interest Rate</li>
+                            <li>LTV, DTI Ratios</li>
+                            <li>Loan Type, Occupancy</li>
+                            <li>Lock Expiration</li>
+                            <li>Cash from/to Borrower</li>
+                            <li>Earliest Closing Date (via Details)</li>
+                        </ul>
+                    </div>
+                    <div class="screen-card">
+                        <h4>👤 URLA Borrower Info</h4>
+                        <ul>
+                            <li>Personal Information</li>
+                            <li>Loan and Property Info</li>
+                            <li>Assets, Liabilities</li>
+                            <li>Declarations</li>
+                            <li>Employment and Income</li>
+                            <li>Loan Identifiers</li>
+                        </ul>
+                    </div>
+                    <div class="screen-card">
+                        <h4>📝 URLA Lender Loan Info</h4>
+                        <ul>
+                            <li>Mortgage Loan Information</li>
+                            <li>Details of Transaction</li>
+                            <li>Proposed Monthly Payment</li>
+                            <li>Title Information</li>
+                            <li>Loan Identifiers</li>
+                        </ul>
+                    </div>
+                    <div class="screen-card">
+                        <h4>📄 Loan Estimate Pages</h4>
+                        <ul>
+                            <li><strong>Page 1:</strong> Interest Rate, Parcel No, Disclosure History</li>
+                            <li><strong>Page 2:</strong> Critical Dates, Details of Transaction, Escrow, Appraisal Info</li>
+                        </ul>
+                    </div>
+                    <div class="screen-card">
+                        <h4>🔐 Closing Screens</h4>
+                        <ul>
+                            <li>Title (Endorsements, Parcel, Vesting)</li>
+                            <li>Flood, AKAs, General</li>
+                            <li>Sellers</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tip-box" style="margin-top: 25px;">
+                    <h4>💡 Pro Tips</h4>
+                    <ul>
+                        <li><strong>Use Overview Panel First</strong> - Many key loan metrics are visible at a glance</li>
+                        <li><strong>Check Multiple Locations</strong> - Some fields sync across screens; verify consistency</li>
+                        <li><strong>Processing Log for Dates</strong> - Appraisal ordered/received dates are also logged here</li>
+                        <li><strong>Status Screen for Expirations</strong> - Rate lock and underwriting expiration dates in one place</li>
+                        <li><strong>Application Summary</strong> - Quick snapshot of ratios, reserves, and transaction details</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGENTS TAB -->
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>🤖 AI Agent Opportunities</h1>
+                <p class="subtitle">Automation candidates identified from the Byte Field Guide reference process</p>
+            </div>
+
+            <!-- Heat Map -->
+            <div class="heat-map-container">
+                <h3 class="heat-map-title">🔥 Priority Heat Map</h3>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-1')">
+                        <div class="heat-score">95</div>
+                        <div class="heat-name">Field Lookup Agent</div>
+                        <div class="heat-desc">Instant field location lookup via natural language</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Effort: Low</span>
+                            <span class="heat-metric">Impact: High</span>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-2')">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Data Sync Validator</div>
+                        <div class="heat-desc">Verify field consistency across multiple screens</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Effort: Medium</span>
+                            <span class="heat-metric">Impact: High</span>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-3')">
+                        <div class="heat-score">62</div>
+                        <div class="heat-name">Screen Navigator</div>
+                        <div class="heat-desc">Auto-navigate to correct screen for data entry</div>
+                        <div class="heat-metrics">
+                            <span class="heat-metric">Effort: High</span>
+                            <span class="heat-metric">Impact: Medium</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent 1: Field Lookup Agent -->
+            <div class="agent-card" id="agent-1">
+                <div class="agent-card-header">
+                    <div class="agent-card-title">
+                        <div class="agent-icon">🔍</div>
+                        <div class="agent-name">
+                            <h3>Field Lookup Agent</h3>
+                            <span>Data Integration / Knowledge Base</span>
+                        </div>
+                    </div>
+                    <div class="agent-score critical">
+                        <div class="score-value">95</div>
+                        <div class="score-label">Priority</div>
+                    </div>
+                </div>
+                <div class="agent-card-body">
+                    <div class="agent-flow">
+                        <h4>Agent Flow</h4>
+                        <div class="flow-steps">
+                            <div class="flow-step">User Query<br><small>"Where is LTV?"</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Parse Intent<br><small>Field Extraction</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Search Index<br><small>Field Mapping DB</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Return Locations<br><small>Screen + Section</small></div>
+                        </div>
+                    </div>
+
+                    <div class="agent-metrics">
+                        <div class="agent-metric">
+                            <div class="metric-value">30s</div>
+                            <div class="metric-label">Time Saved/Query</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">Low</div>
+                            <div class="metric-label">Complexity</div>
+                        </div>
+                    </div>
+
+                    <button class="prompt-btn" onclick="openPromptModal('agent1')">✨ View AI Prompt to Build This Agent</button>
+                </div>
+            </div>
+
+            <!-- Agent 2: Data Sync Validator -->
+            <div class="agent-card" id="agent-2">
+                <div class="agent-card-header">
+                    <div class="agent-card-title">
+                        <div class="agent-icon">✅</div>
+                        <div class="agent-name">
+                            <h3>Data Sync Validator</h3>
+                            <span>Monitoring / Quality Control</span>
+                        </div>
+                    </div>
+                    <div class="agent-score high">
+                        <div class="score-value">78</div>
+                        <div class="score-label">Priority</div>
+                    </div>
+                </div>
+                <div class="agent-card-body">
+                    <div class="agent-flow">
+                        <h4>Agent Flow</h4>
+                        <div class="flow-steps">
+                            <div class="flow-step">Select Field<br><small>e.g., Interest Rate</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Query All Locations<br><small>4 screens for rate</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Compare Values<br><small>Detect Mismatch</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Alert/Report<br><small>Discrepancy Found</small></div>
+                        </div>
+                    </div>
+
+                    <div class="agent-metrics">
+                        <div class="agent-metric">
+                            <div class="metric-value">5 min</div>
+                            <div class="metric-label">Time Saved/Loan</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">99%</div>
+                            <div class="metric-label">Error Detection</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">Medium</div>
+                            <div class="metric-label">Complexity</div>
+                        </div>
+                    </div>
+
+                    <button class="prompt-btn" onclick="openPromptModal('agent2')">✨ View AI Prompt to Build This Agent</button>
+                </div>
+            </div>
+
+            <!-- Agent 3: Screen Navigator -->
+            <div class="agent-card" id="agent-3">
+                <div class="agent-card-header">
+                    <div class="agent-card-title">
+                        <div class="agent-icon">🧭</div>
+                        <div class="agent-name">
+                            <h3>Screen Navigator Agent</h3>
+                            <span>Decision Support / Navigation</span>
+                        </div>
+                    </div>
+                    <div class="agent-score medium">
+                        <div class="score-value">62</div>
+                        <div class="metric-label">Priority</div>
+                    </div>
+                </div>
+                <div class="agent-card-body">
+                    <div class="agent-flow">
+                        <h4>Agent Flow</h4>
+                        <div class="flow-steps">
+                            <div class="flow-step">User Task<br><small>"Update insurance"</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Map to Fields<br><small>Homeowner's Ins.</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Identify Screen<br><small>Best entry point</small></div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">Navigate + Open<br><small>Auto-direct user</small></div>
+                        </div>
+                    </div>
+
+                    <div class="agent-metrics">
+                        <div class="agent-metric">
+                            <div class="metric-value">45s</div>
+                            <div class="metric-label">Time Saved/Task</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="metric-value">High</div>
+                            <div class="metric-label">Complexity</div>
+                        </div>
+                    </div>
+
+                    <button class="prompt-btn" onclick="openPromptModal('agent3')">✨ View AI Prompt to Build This Agent</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Prompt Modals -->
+    <div class="modal-overlay" id="modal-agent1">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔍 Field Lookup Agent - Build Prompt</h3>
+                <button class="modal-close" onclick="closeModal('agent1')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tags">
+                    <span class="modal-tag">Data Integration</span>
+                    <span class="modal-tag">Low Complexity</span>
+                    <span class="modal-tag">Critical Priority</span>
+                </div>
+                <div class="modal-section">
+                    <h4>Agent Purpose</h4>
+                    <p>Enable users to instantly find where any loan data field is located in Byte by asking natural language questions. Eliminates time spent searching through screens or referencing documentation.</p>
+                </div>
+                <div class="modal-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="modal-code" id="prompt-agent1">You are building a Field Lookup Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: Byte Field Lookup Agent
+TYPE: Data Integration / Knowledge Base
+
+OBJECTIVE:
+Accept natural language queries about loan data fields and return the exact Byte screen(s), section(s), and field name(s) where that data can be found. Support fuzzy matching for field names (e.g., "rate" matches "Interest Rate", "Note Rate", "Int Rate").
+
+INPUT DATA SOURCES:
+1. Field Mapping Database (55+ entries)
+   - Data Field Name
+   - Byte Screen
+   - Section
+   - Sub Section
+   - Field Display Name
+   - Synonyms/Aliases
+
+2. User Query
+   - Natural language question
+   - Field name (exact or partial)
+
+FIELD MAPPING LOGIC:
+1. Parse user query to extract field intent
+2. Match against field names and synonyms
+3. Return ALL locations where field appears
+4. Rank by primary vs secondary locations
+
+OUTPUT FORMAT:
+Return a JSON object:
+{
+  "query": "where is LTV",
+  "matchedField": "Loan to Value",
+  "locations": [
+    {
+      "screen": "Overview Panel",
+      "section": "Loan",
+      "fieldName": "LTV",
+      "isPrimary": true
+    },
+    {
+      "screen": "Application Summary",
+      "section": "Loan Info",
+      "fieldName": "LTV",
+      "isPrimary": false
+    }
+  ],
+  "relatedFields": ["CLTV", "HCLTV"],
+  "confidence": 0.98
+}
+
+ERROR HANDLING:
+- No match found: Suggest similar fields
+- Multiple possible matches: Return all with confidence scores
+- Ambiguous query: Ask clarifying question
+
+INTEGRATION POINTS:
+- Byte field guide database
+- User chat interface
+- Optional: Deep link to Byte screen</div>
+                </div>
+                <button class="copy-btn" onclick="copyPrompt('agent1')">📋 Copy Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-agent2">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✅ Data Sync Validator - Build Prompt</h3>
+                <button class="modal-close" onclick="closeModal('agent2')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tags">
+                    <span class="modal-tag">Monitoring</span>
+                    <span class="modal-tag">Medium Complexity</span>
+                    <span class="modal-tag">High Priority</span>
+                </div>
+                <div class="modal-section">
+                    <h4>Agent Purpose</h4>
+                    <p>Automatically validate that fields appearing on multiple Byte screens have consistent values. Flags discrepancies that could cause compliance issues or loan processing errors.</p>
+                </div>
+                <div class="modal-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="modal-code" id="prompt-agent2">You are building a Data Sync Validator Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: Byte Data Sync Validator
+TYPE: Monitoring / Quality Control
+
+OBJECTIVE:
+For fields that appear on multiple Byte screens, query all locations and compare values to detect inconsistencies. Generate a validation report highlighting any mismatches that require correction.
+
+INPUT DATA SOURCES:
+1. Multi-Location Field Registry
+   Fields with 2+ locations:
+   - Interest Rate (4 locations)
+   - Loan Amount (3 locations)
+   - LTV (2 locations)
+   - Property Type (3 locations)
+   - Parcel Number (3 locations)
+   - Cash from/to Borrower (4 locations)
+   - First Payment Date (3 locations)
+   - And 25+ more...
+
+2. Loan Data (via Byte API or screen scrape)
+   - Current values for each field at each location
+
+VALIDATION LOGIC:
+1. For each multi-location field:
+   a. Query value at Location 1 (primary)
+   b. Query value at Locations 2-N (secondary)
+   c. Compare all values
+   d. Flag if any mismatch detected
+
+2. Tolerance Rules:
+   - Currency: Allow $0.01 rounding difference
+   - Dates: Must match exactly
+   - Percentages: Allow 0.001% difference
+   - Text: Case-insensitive exact match
+
+OUTPUT FORMAT:
+{
+  "loanNumber": "123456789",
+  "validationDate": "2026-01-27T10:30:00Z",
+  "totalFieldsChecked": 32,
+  "discrepanciesFound": 2,
+  "discrepancies": [
+    {
+      "field": "Interest Rate",
+      "severity": "HIGH",
+      "values": {
+        "Overview Panel": "6.875%",
+        "Loan Estimate Page 1": "6.875%",
+        "URLA Lender Loan Info": "6.850%",
+        "Application Summary": "6.875%"
+      },
+      "recommendation": "Update URLA Lender Loan Info to 6.875%"
+    }
+  ],
+  "passedFields": ["Loan Amount", "LTV", "..."],
+  "status": "NEEDS_REVIEW"
+}
+
+ERROR HANDLING:
+- Field not accessible: Log and continue
+- Screen timeout: Retry 3x then skip
+- All values null: Flag as "Data Missing"
+
+INTEGRATION POINTS:
+- Byte loan data API
+- QC workflow trigger
+- Email/Slack alerts for critical discrepancies</div>
+                </div>
+                <button class="copy-btn" onclick="copyPrompt('agent2')">📋 Copy Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-agent3">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🧭 Screen Navigator Agent - Build Prompt</h3>
+                <button class="modal-close" onclick="closeModal('agent3')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tags">
+                    <span class="modal-tag">Decision Support</span>
+                    <span class="modal-tag">High Complexity</span>
+                    <span class="modal-tag">Medium Priority</span>
+                </div>
+                <div class="modal-section">
+                    <h4>Agent Purpose</h4>
+                    <p>When a user needs to update or view specific loan data, automatically determine the optimal Byte screen to navigate to and either provide directions or trigger navigation directly.</p>
+                </div>
+                <div class="modal-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="modal-code" id="prompt-agent3">You are building a Screen Navigator Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: Byte Screen Navigator
+TYPE: Decision Support / Navigation
+
+OBJECTIVE:
+Accept user task descriptions and automatically determine the best Byte screen to complete that task. Consider factors like edit permissions, data source priority, and user role when recommending navigation.
+
+INPUT DATA SOURCES:
+1. Task-to-Field Mapping
+   Common tasks and their required fields:
+   - "Update insurance" → Homeowner's Insurance
+   - "Check ratios" → DTI Ratios, LTV
+   - "Verify dates" → First Payment, Lock Exp, Closing
+   - "Review borrower info" → Income, Assets, Liabilities
+
+2. Field Location Registry
+   - Screen, Section, Field for 55+ fields
+
+3. Screen Priority Matrix
+   For each field, rank screens by:
+   - Edit capability (can edit vs read-only)
+   - Data source (primary vs calculated)
+   - User role permissions
+
+USER ROLES & PERMISSIONS:
+- Loan Officer: URLA screens, Overview, Home
+- Processor: All screens except Funding
+- Closer: Closing, Doc Prep, Funding
+- Underwriter: Underwriting, 1008, URLA
+
+DECISION LOGIC:
+1. Parse task description
+2. Identify required field(s)
+3. Look up all screen locations
+4. Filter by user role permissions
+5. Rank by edit capability
+6. Return optimal screen(s)
+
+OUTPUT FORMAT:
+{
+  "task": "update homeowner's insurance amount",
+  "identifiedFields": ["Homeowner's Insurance"],
+  "userRole": "Processor",
+  "recommendedScreen": {
+    "screen": "URLA Lender Loan Info",
+    "section": "Proposed Monthly Payment for Property",
+    "fieldName": "Homeowner's Insurance",
+    "reason": "Primary editable source for insurance data"
+  },
+  "alternateScreens": [
+    {
+      "screen": "1008 Transmittal",
+      "section": "III. Underwriting Information",
+      "note": "Read-only, pulls from URLA"
+    }
+  ],
+  "navigationPath": "Loan > URLA Lender Loan Info > Proposed Monthly Payment",
+  "deepLinkAvailable": true
+}
+
+ERROR HANDLING:
+- Unknown task: Suggest common tasks
+- No edit permission: Recommend view-only screen
+- Multiple fields needed: Return multi-screen workflow
+
+INTEGRATION POINTS:
+- Byte navigation API (if available)
+- User role/permission system
+- Task management/workflow system</div>
+                </div>
+                <button class="copy-btn" onclick="copyPrompt('agent3')">📋 Copy Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markdown Modal -->
+    <div class="modal-overlay" id="modal-markdown">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📄 Markdown Documentation</h3>
+                <button class="modal-close" onclick="closeModal('markdown')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-code" id="markdown-content">Loading...</div>
+                <button class="copy-btn" onclick="copyMarkdown()">📋 Copy Markdown</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav-panel').forEach(n => n.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').classList.add('active');
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('agents-nav').classList.add('active');
+            }
+        }
+
+        // Search/filter functionality
+        function filterFields() {
+            const searchTerm = document.getElementById('fieldSearch').value.toLowerCase();
+            const screenFilter = document.getElementById('screenFilter').value;
+            let visibleCount = 0;
+            let totalCount = 0;
+
+            document.querySelectorAll('.field-table.searchable tbody tr').forEach(row => {
+                totalCount++;
+                const fieldData = row.dataset.field || '';
+                const screenData = row.dataset.screen || '';
+                const text = row.textContent.toLowerCase();
+
+                const matchesSearch = !searchTerm || fieldData.includes(searchTerm) || text.includes(searchTerm);
+                const matchesScreen = !screenFilter || screenData.includes(screenFilter);
+
+                if (matchesSearch && matchesScreen) {
+                    row.classList.remove('hidden');
+                    row.classList.toggle('highlight', searchTerm.length > 0);
+                    visibleCount++;
+                } else {
+                    row.classList.add('hidden');
+                    row.classList.remove('highlight');
+                }
+            });
+
+            const statsEl = document.getElementById('searchStats');
+            if (searchTerm || screenFilter) {
+                statsEl.innerHTML = `Found <strong>${visibleCount}</strong> of ${totalCount} field mappings`;
+            } else {
+                statsEl.innerHTML = `Showing <strong>all</strong> fields. Type to search or filter by screen.`;
+            }
+        }
+
+        // Scroll to agent
+        function scrollToAgent(agentId) {
+            const agent = document.getElementById(agentId);
+            if (agent) {
+                agent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                agent.classList.add('highlighted');
+                setTimeout(() => agent.classList.remove('highlighted'), 2000);
+            }
+        }
+
+        // Modal functions
+        function openPromptModal(agentId) {
+            document.getElementById('modal-' + agentId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById('modal-' + modalId).classList.remove('active');
+        }
+
+        function copyPrompt(agentId) {
+            const promptText = document.getElementById('prompt-' + agentId).textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = event.target;
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Prompt';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function openMarkdownModal() {
+            const mdContent = `# Byte Field Guide (Retail)
+
+## Overview
+- **System:** Byte
+- **Document Type:** Field Location Reference Guide
+- **Target Role:** Retail Loan Officers, Processors, Closers
+- **Total Fields Mapped:** 55+ data fields
+
+## Purpose
+This reference guide helps users quickly locate where specific loan data fields can be found across the various screens in Byte.
+
+## Key Categories
+1. Borrower Information Fields
+2. Appraisal Information Fields
+3. Loan Information Fields
+4. Property Information Fields
+5. Transaction Details Fields
+6. Critical Dates Fields
+7. Disclosure & Compliance Fields
+8. Insurance & Escrow Fields
+9. Title & Closing Fields
+
+## Pro Tips
+- Use Overview Panel First - Many key metrics visible at a glance
+- Check Multiple Locations - Some fields sync across screens
+- Processing Log for Dates - Appraisal dates also logged here
+- Status Screen for Expirations - Lock and UW dates in one place
+
+*Full documentation available in the workflow markdown file.*`;
+
+            document.getElementById('markdown-content').textContent = mdContent;
+            document.getElementById('modal-markdown').classList.add('active');
+        }
+
+        function copyMarkdown() {
+            const mdText = document.getElementById('markdown-content').textContent;
+            navigator.clipboard.writeText(mdText).then(() => {
+                const btn = event.target;
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Markdown';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        // Scroll spy for navigation
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
