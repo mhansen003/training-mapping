@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanSafe Fraud Manager - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.high-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.medium-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .badge.low-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Agent Summary */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; margin-left: 10px; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; }
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">LoanSafe</a>
+        <span class="separator">></span>
+        <span class="current">Fraud Manager Workflow</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>LoanSafe Fraud Manager</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflowNav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Add Credentials</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Manage Parties</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Run Report</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Launch Connect</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Review Alerts</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Clear Alerts</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">SSN Verification</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Final Report</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agentsNav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="./index.html" class="doc-btn">
+                Back to LoanSafe Home
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>LoanSafe Fraud Manager</h1>
+                <p class="subtitle">Complete fraud detection and alert clearing workflow</p>
+                <div class="meta">
+                    <span class="meta-item">System: CoreLogic LoanSafe</span>
+                    <span class="meta-item">Role: Processor / Underwriter</span>
+                    <span class="meta-item">Updated: January 2026</span>
+                    <span class="meta-item">Duration: 15-30 min</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Add Credentials -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Add CoreLogic Credentials</h2><span>First-time setup in Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Interfaces > Fraud Detection</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click CoreLogic Fraud</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Click Defaults</div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Enter Username & Password</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Credentials Saved</div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Pro Tip</h4>
+                        <p>This is a one-time setup. Once your CoreLogic credentials are saved, you won't need to enter them again unless they change.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Manage Parties -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Manage Parties Screen</h2><span>Add all required loan participants</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Required Parties</h4>
+                        <p>All parties must be added to the Parties screen before running LoanSafe. The report automatically pulls contacts from this screen.</p>
+                    </div>
+                    <table class="field-table">
+                        <thead><tr><th>Party Type</th><th>Source Document</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--text-primary);">Borrower(s)</strong></td><td>Application/Name Affidavit</td><td>Include all name variations (AKAs)</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Appraiser</strong></td><td>Appraisal License Page</td><td>Use full name from license, not signature</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">AMC</strong></td><td>Appraisal Report - Lender/Client</td><td>Skip if "No AMC" on report</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Loan Officer</strong></td><td>1008 / System</td><td>Usually pre-populated</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Loan Processor</strong></td><td>1008 / VOR / VOE</td><td>Contact info section</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Underwriter</strong></td><td>1008 Section III</td><td>Underwriting Information</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Title Company</strong></td><td>Title Commitment Schedule A</td><td>Include DBAs if listed</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Settlement Agent</strong></td><td>Closing Protection Letter</td><td>Full company name</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Selling Agent</strong></td><td>Final HUD - Transaction Info</td><td>Real estate agent info</td></tr>
+                            <tr><td><strong style="color: var(--text-primary);">Builder/Seller</strong></td><td>Title Commitment Schedule A</td><td>Property seller name</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="exception-box">
+                        <h4>Important: Name Matching</h4>
+                        <p>Names must match documentation <strong>exactly</strong>. Include middle initials, suffixes, LLC, Inc., etc. as they appear on official documents.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Run Report -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Run/Re-Run LoanSafe Report</h2><span>Submit report through Byte interface</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Interfaces > Fraud Detection</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click CoreLogic Fraud</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">First Run?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">Yes (Auto)</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Runs at File Received</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">No (Re-Run)</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Click Re-Submit</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Initial Run</h4>
+                            <div class="value">Auto</div>
+                            <div class="label">At File Received Status</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Re-Run Trigger</h4>
+                            <div class="value">Parties</div>
+                            <div class="label">When new parties added</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Final Run</h4>
+                            <div class="value">CTC</div>
+                            <div class="label">Before Clear to Close</div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Document Management</h4>
+                        <p>Mark previous reports as <strong>Inactive</strong> in Stored Docs so only the most recent report is visible with "Reviewed" status.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Launch Connect -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Launch LoanSafe Connect</h2><span>Access interactive report portal</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Click Launch LoanSafe Connect</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Login with Credentials</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Interactive Report Opens</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h4>Why Use LoanSafe Connect?</h4>
+                        <p>The interactive portal provides easier navigation than the PDF, allows you to add notes directly to alerts, and enables clearing alerts with proper documentation tracking.</p>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Key Tabs in LoanSafe Connect</h4>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li style="margin-bottom: 8px;"><strong>Alerts</strong> - View and clear all fraud alerts</li>
+                            <li style="margin-bottom: 8px;"><strong>Compare Report</strong> - Side-by-side comparison</li>
+                            <li><strong>Confirmation of Searches</strong> - Print for Stored Docs</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Review Alerts -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Review Alerts</h2><span>Analyze risk summary and individual alerts</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="summary-grid">
+                        <div class="summary-card" style="border-left: 4px solid var(--accent-rose);">
+                            <h4>HIGH Alerts</h4>
+                            <div class="value" style="color: var(--accent-rose);">UW</div>
+                            <div class="label">Underwriter clears</div>
+                        </div>
+                        <div class="summary-card" style="border-left: 4px solid var(--accent-amber);">
+                            <h4>MEDIUM Alerts</h4>
+                            <div class="value" style="color: var(--accent-amber);">UW</div>
+                            <div class="label">Underwriter clears</div>
+                        </div>
+                        <div class="summary-card" style="border-left: 4px solid var(--accent-green);">
+                            <h4>LOW Alerts</h4>
+                            <div class="value" style="color: var(--accent-green);">Proc</div>
+                            <div class="label">Processor clears</div>
+                        </div>
+                        <div class="summary-card" style="border-left: 4px solid var(--accent-purple);">
+                            <h4>Score > 900</h4>
+                            <div class="value" style="color: var(--accent-purple);">Risk</div>
+                            <div class="label">See Risk Policy</div>
+                        </div>
+                    </div>
+                    <table class="field-table">
+                        <thead><tr><th>Alert Category</th><th>Common Issues</th><th>Typical Resolution</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Occupancy & Undisclosed Debt</strong></td><td>Additional loan applications</td><td>Check REO Schedule, credit inquiries</td></tr>
+                            <tr><td><strong>Income & Employment</strong></td><td>Employment verification flags</td><td>Review VOE, paystubs, tax returns</td></tr>
+                            <tr><td><strong>Identity</strong></td><td>SSN validation, name variations</td><td>SSA-89 verification, ID documents</td></tr>
+                            <tr><td><strong>Property</strong></td><td>Value concerns, flip flags</td><td>Appraisal review, title history</td></tr>
+                            <tr><td><strong>Third Party</strong></td><td>Exclusionary list matches</td><td>Verify identity, escalate if match</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="exception-box">
+                        <h4>Fraud Score > 900</h4>
+                        <p>Underwriters must refer to the <strong>Risk Fraud Manager Policy</strong> for any fraud scores over 900. This requires comprehensive loan review with Underwriting Manager.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Clear Alerts -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Clear Alerts</h2><span>Document findings and resolve alerts</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node input">Review Alert Details</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Can Resolve?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">Yes</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Select Reason</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node input">Add Detailed Note</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Click Clear</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">No</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Add Note for UW</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node exception">Escalate</div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="field-table">
+                        <thead><tr><th>Clear Reason</th><th>When to Use</th><th>Who Can Use</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong style="color: var(--accent-green);">Explained</strong></td><td>Documentation obtained/present in file</td><td>Processor / Underwriter</td></tr>
+                            <tr><td><strong style="color: var(--accent-blue);">Data Corrected</strong></td><td>Information in Byte was incorrect and fixed</td><td>Processor / Underwriter</td></tr>
+                            <tr><td><strong style="color: var(--accent-amber);">False Positive</strong></td><td>Alert does not apply to this party</td><td>Compliance Team Only</td></tr>
+                            <tr><td><strong style="color: var(--accent-rose);">Approved Exception</strong></td><td>Management approved exception</td><td>Compliance Team Only</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box">
+                        <h4>Note Best Practices</h4>
+                        <p>Always include: what documentation was reviewed, how the alert was resolved, and reference any uploaded documents. Example: "Reviewed 2024 tax returns in file confirming income. Alert cleared - income matches application."</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: SSN Verification -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>SSN Verification</h2><span>Order SSA-89 through SentiLink</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">SSN Alert?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Obtain Signed SSA-89</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Interfaces > Verifications</div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node input">Verify Name/DOB/SSN Match</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Click Request</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Results in Stored Docs</div>
+                        </div>
+                    </div>
+                    <div class="exception-box">
+                        <h4>SSA-89 Requirements</h4>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>Both pages of SSA-89 form required</li>
+                            <li>Signed and dated within 90 days</li>
+                            <li>Name must match Byte EXACTLY</li>
+                            <li>Electronic signatures acceptable via SentiLink</li>
+                        </ul>
+                    </div>
+                    <div class="info-box">
+                        <h4>If Validation Fails</h4>
+                        <p>Confirm borrower's name, DOB, and SSN match their records with Social Security Administration. If still failing after confirmation, email <strong>LoanInvestigations@cmgfi.com</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Final Report -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Final LoanSafe Report</h2><span>Complete process at CTC</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Update All Parties</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Re-Run LoanSafe</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Clear Any New Alerts</div>
+                        </div>
+                        <div class="flow-row">
+                            <div class="flow-node action">Print Confirmation of Searches</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Attach to Condition</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Mark Approved in Stored Docs</div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Pre-CD Checklist</h4>
+                        <p>Before ordering CD, ensure all names on the Retail CD Request screen have been checked against the Confirmation of Searches Performed on the LoanSafe report.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+ACCESS: Interfaces > Fraud Detection > CoreLogic Fraud
+
+WHEN TO RUN:
+1. Initial: Auto at File Received status
+2. Re-Run: When new parties added
+3. Final: At CTC Requested (all parties confirmed)
+
+RESPONSIBILITIES:
+- Processor: Clear LOW alerts, add parties, leave notes
+- Underwriter: Clear MEDIUM/HIGH alerts, fraud score >900
+
+CLEARING ALERTS:
+- Explained: Documentation obtained/in file
+- Data Corrected: Fixed incorrect Byte data
+- False Positive: Compliance Team ONLY
+- Approved Exception: Compliance Team ONLY
+
+SSN VERIFICATION:
+- Both pages SSA-89 required
+- Signed within 90 days
+- Name must match Byte exactly
+- Order via Interfaces > Verifications
+
+EXTERNAL SEARCHES:
+- ASC: https://www.asc.gov/appraiser/advanced#
+- OFAC: https://ofac.treasury.gov/sanctions-list-search
+- SAM: https://www.sam.gov (Exclusions)
+- HUD LDP: hud.gov/program_offices/general_counsel/LDPList
+- FHFA SCP: fhfa.gov Suspended Counterparty Program
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for LoanSafe Fraud Manager Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">8 Process Steps Analyzed</span>
+                    <span class="meta-item">5 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 45% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">5</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">45%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">80%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-party-extract')" title="Click to view agent details">
+                        <div class="heat-score">92</div>
+                        <div class="heat-name">Party Auto-Extractor</div>
+                        <div class="heat-desc">Extract party info from documents</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>2</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-alert-triage')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Alert Triage Assistant</div>
+                        <div class="heat-desc">Pre-analyze and categorize alerts</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>5</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-exclusion-check')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Exclusion List Checker</div>
+                        <div class="heat-desc">Auto-verify against external lists</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-ssn-prep')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">SSN Verification Prep</div>
+                        <div class="heat-desc">Auto-validate SSA-89 forms</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>7</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-note-gen')" title="Click to view agent details">
+                        <div class="heat-score">58</div>
+                        <div class="heat-name">Alert Note Generator</div>
+                        <div class="heat-desc">Draft clearing notes from docs</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Step: <span>6</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Party Auto-Extractor -->
+                <div class="agent-card" id="agent-party-extract">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📄</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Party Auto-Extractor Agent</div>
+                            <div class="agent-type">Document Intelligence Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically extracts party names, license numbers, and contact information from loan documents (appraisals, title commitments, HUD forms) and populates the Byte Parties screen.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Scan Documents</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Extract Names</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Match to Fields</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Auto-Populate</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">8min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('party-extract')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Alert Triage -->
+                <div class="agent-card" id="agent-alert-triage">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🎯</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Alert Triage Assistant</div>
+                            <div class="agent-type">Classification Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Pre-analyzes LoanSafe alerts against file documentation, identifies likely false positives, and recommends clearing actions with supporting evidence references.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Parse Alerts</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Match to Docs</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Score Likelihood</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Recommend</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">90%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('alert-triage')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Exclusion List Checker -->
+                <div class="agent-card" id="agent-exclusion-check">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🔍</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Exclusion List Checker</div>
+                            <div class="agent-type">Compliance Verification Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically searches all parties against external exclusion lists (OFAC, SAM.gov, HUD LDP, FHFA SCP, ASC) and captures verification screenshots for documentation.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Get Party List</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Query Databases</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Capture Results</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Generate Report</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">15min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Coverage</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('exclusion-check')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: SSN Verification Prep -->
+                <div class="agent-card" id="agent-ssn-prep">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📋</div>
+                        <div class="agent-info">
+                            <div class="agent-name">SSN Verification Prep Agent</div>
+                            <div class="agent-type">Form Validation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Validates SSA-89 forms before submission - checks signature presence, date validity (within 90 days), and matches name/DOB/SSN against Byte data fields.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Read SSA-89</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Extract Fields</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Compare to Byte</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Flag Issues</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">3min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">99%</div><div class="agent-stat-label">Error Catch</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('ssn-prep')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 5: Alert Note Generator -->
+                <div class="agent-card" id="agent-note-gen">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📝</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Alert Note Generator</div>
+                            <div class="agent-type">Content Generation Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Generates professional clearing notes for LoanSafe alerts based on file documentation, following CMG's note formatting standards and compliance requirements.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Analyze Alert</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Find Evidence</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Draft Note</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Format Output</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Pro</div><div class="agent-stat-label">Quality</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('note-gen')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Prompt Modal -->
+    <div class="modal-overlay" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div>
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">X Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflowNav').style.display = 'block';
+                document.getElementById('agentsNav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflowNav').style.display = 'none';
+                document.getElementById('agentsNav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Improved scroll spy - prevents auto-scroll issues
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflowNav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => { isScrolling = false; }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            if (isScrolling) return;
+            let current = '';
+            const scrollPosition = window.scrollY + 150;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                    current = section.getAttribute('id');
+                }
+            });
+            if (current) {
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === '#' + current) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Scroll to agent
+        function scrollToAgent(agentId) {
+            const element = document.getElementById(agentId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.classList.add('highlight');
+                setTimeout(() => element.classList.remove('highlight'), 2000);
+            }
+        }
+
+        // Agent prompts data
+        const agentPrompts = {
+            'party-extract': {
+                name: 'Party Auto-Extractor Agent',
+                tags: ['Document Intelligence', 'OCR', 'Medium Complexity', 'Critical Priority'],
+                purpose: 'Automatically extracts party names, license numbers, and contact information from loan documents (appraisals, title commitments, HUD forms) and populates the Byte Parties screen, eliminating manual data entry.',
+                prompt: `You are building a Document Intelligence Agent for CMG Financial's LoanSafe workflow.
+
+AGENT NAME: Party Auto-Extractor Agent
+TYPE: Document Intelligence / OCR
+
+OBJECTIVE:
+Create an agent that scans loan documents in Stored Docs and extracts party information to auto-populate the Byte Parties screen.
+
+INPUT DOCUMENTS:
+1. Appraisal Report (PDF)
+   - Appraiser name from license page (NOT signature page)
+   - Appraiser company name
+   - AMC name from Lender/Client section
+
+2. Title Commitment Schedule A
+   - Title Company name (include DBAs)
+   - Builder/Seller names
+
+3. Final HUD / Closing Disclosure
+   - Settlement/Escrow Company
+   - Real Estate Agents (Selling, Listing)
+   - Loan Originator
+
+4. 1008 Transmittal
+   - Underwriter name (Section III)
+   - Processor name (Contact Info)
+
+EXTRACTION RULES:
+- Names must match EXACTLY as shown on documents
+- Include suffixes (Jr., Sr., III), middle initials
+- Include entity types (LLC, Inc., Corp.)
+- License numbers where visible
+- Company NMLS if shown
+
+OUTPUT FORMAT:
+{
+  "parties": [
+    {
+      "type": "Appraiser",
+      "name": "John A. Smith",
+      "company": "ABC Appraisals LLC",
+      "license": "12345",
+      "source_doc": "Appraisal Report - License Page",
+      "confidence": 0.95
+    }
+  ],
+  "warnings": ["Could not find Processor name - manual entry required"]
+}
+
+VALIDATION:
+- Flag if names differ between documents
+- Alert if required parties not found
+- Confidence score for each extraction`,
+                integration: `INTEGRATION POINTS:
+1. Byte Stored Documents API
+   - Access PDF documents by type
+   - Parse using OCR (Tesseract/Azure Form Recognizer)
+
+2. Byte Parties Screen
+   - Map extracted data to correct party fields
+   - Handle multiple entries (Additional Sellers tab)
+
+3. LoanSafe Interface
+   - Trigger extraction before report submission
+   - Validate all required parties present
+
+DEPLOYMENT:
+- Browser extension or Byte plugin
+- Runs on-demand or auto at File Received status`
+            },
+            'alert-triage': {
+                name: 'Alert Triage Assistant',
+                tags: ['Classification', 'Analysis', 'Low Complexity', 'High Priority'],
+                purpose: 'Pre-analyzes LoanSafe alerts against file documentation, identifies likely false positives, and recommends clearing actions with supporting evidence references.',
+                prompt: `You are building a Classification Agent for CMG Financial's LoanSafe alert review.
+
+AGENT NAME: Alert Triage Assistant
+TYPE: Classification / Analysis
+
+OBJECTIVE:
+Analyze incoming LoanSafe alerts and provide recommended resolution paths based on documentation in the file.
+
+INPUT:
+1. LoanSafe Alert Data (JSON from API)
+   - Alert code, severity, description
+   - Affected party name
+   - Alert category
+
+2. File Documentation Index
+   - List of documents in Stored Docs
+   - Document types and dates
+
+ANALYSIS RULES:
+Alert Type -> Check Against -> Resolution
+-----------------------------------------
+Occupancy & Debt -> REO Schedule, Credit Report -> Verify disclosed
+Income Alert -> VOE, Paystubs, Tax Returns -> Cross-reference
+SSN Mismatch -> SSA-89, Credit Report -> Verify exact match
+MERS Hit -> Title, Current Loan Status -> Check if disclosed
+Name Variation -> Name Affidavit -> Confirm AKA listed
+
+OUTPUT FORMAT:
+{
+  "alert_id": "IDP_035",
+  "severity": "HIGH",
+  "recommendation": "LIKELY CLEARABLE",
+  "reason": "MERS shows property listed on REO Schedule as rental",
+  "evidence_docs": ["REO Schedule", "Title Commitment"],
+  "suggested_note": "Reviewed REO Schedule - property disclosed as rental. Mortgage payment included in DTI.",
+  "confidence": 0.85,
+  "escalate": false
+}
+
+ESCALATION TRIGGERS:
+- Cannot find supporting documentation
+- Multiple conflicting data points
+- Fraud score > 900
+- Party match on exclusionary list`,
+                integration: `INTEGRATION POINTS:
+1. LoanSafe Connect API
+   - Pull alert details
+   - Update alert status/notes
+
+2. Byte Stored Documents
+   - Search for evidence documents
+   - Extract relevant data
+
+3. Workflow Engine
+   - Route to Processor vs Underwriter
+   - Track resolution status`
+            },
+            'exclusion-check': {
+                name: 'Exclusion List Checker',
+                tags: ['Compliance', 'Web Scraping', 'Medium Complexity', 'High Priority'],
+                purpose: 'Automatically searches all loan parties against external exclusion lists (OFAC, SAM.gov, HUD LDP, FHFA SCP, ASC) and captures verification screenshots for documentation.',
+                prompt: `You are building a Compliance Verification Agent for CMG Financial.
+
+AGENT NAME: Exclusion List Checker
+TYPE: Web Automation / Compliance
+
+OBJECTIVE:
+Automatically search all loan parties against federal exclusion databases and generate verification documentation.
+
+DATABASES TO SEARCH:
+1. OFAC Sanctions List
+   URL: https://ofac.treasury.gov/sanctions-list-search
+   Search: Name, Address (optional)
+
+2. SAM.gov Exclusions
+   URL: https://www.sam.gov
+   Filter: Excluded Individual, Excluded Other
+   Search: First Name, Last Name, SSN (for borrowers)
+
+3. HUD LDP List
+   URL: hud.gov/program_offices/general_counsel/LDPList
+   Search: Ctrl+F name search
+
+4. FHFA SCP (Suspended Counterparty)
+   Download CSV, search programmatically
+
+5. ASC National Registry (Appraisers)
+   URL: https://www.asc.gov/appraiser/advanced#
+   Search: Name, License Number, State
+
+PARTY TYPES TO SEARCH:
+- Borrower(s) - All databases
+- Appraiser - ASC, OFAC, SAM
+- Title/Escrow - OFAC, SAM, HUD LDP
+- Real Estate Agents - OFAC, SAM
+- All others - OFAC, SAM
+
+OUTPUT FORMAT:
+{
+  "party": "John Smith",
+  "type": "Borrower",
+  "searches": [
+    {
+      "database": "OFAC",
+      "result": "NO MATCH",
+      "search_date": "2026-01-26",
+      "screenshot_path": "/evidence/ofac_smith.png"
+    }
+  ],
+  "overall_status": "CLEAR",
+  "documentation_generated": true
+}
+
+ERROR HANDLING:
+- Retry on timeout (3 attempts)
+- Log failed searches for manual review
+- Alert if positive match found`,
+                integration: `INTEGRATION POINTS:
+1. Byte Parties Screen
+   - Pull party list with names
+   - Get license numbers for appraisers
+
+2. Browser Automation (Playwright/Selenium)
+   - Navigate to each database
+   - Execute searches
+   - Capture screenshots
+
+3. Document Generation
+   - Create PDF summary report
+   - Upload to Stored Docs as LDP/GSA type`
+            },
+            'ssn-prep': {
+                name: 'SSN Verification Prep Agent',
+                tags: ['Form Validation', 'OCR', 'Low Complexity', 'Medium Priority'],
+                purpose: 'Validates SSA-89 forms before submission - checks signature presence, date validity (within 90 days), and matches name/DOB/SSN against Byte data fields.',
+                prompt: `You are building a Form Validation Agent for CMG Financial.
+
+AGENT NAME: SSN Verification Prep Agent
+TYPE: Form Validation / OCR
+
+OBJECTIVE:
+Pre-validate SSA-89 forms before SentiLink submission to prevent failed verifications.
+
+VALIDATION CHECKS:
+1. Form Completeness
+   - Both pages present
+   - All required fields filled
+
+2. Signature Validation
+   - Signature present
+   - Date present
+   - Date within 90 days of today
+
+3. Data Matching (Compare to Byte)
+   - Printed Name matches Byte First/Last
+   - DOB matches Byte DOB
+   - SSN matches Byte SSN
+
+4. Name Format
+   - Middle name/initial if in Byte
+   - Suffix if in Byte
+   - No extra characters
+
+EXTRACTION FIELDS:
+- Printed Name (Line 1)
+- Date of Birth
+- Social Security Number
+- Signature Date
+- Signature (presence check)
+
+OUTPUT FORMAT:
+{
+  "form_valid": true,
+  "checks": {
+    "both_pages": true,
+    "signature_present": true,
+    "date_valid": true,
+    "name_match": true,
+    "dob_match": true,
+    "ssn_match": true
+  },
+  "warnings": [],
+  "errors": [],
+  "ready_for_submission": true
+}
+
+COMMON ISSUES:
+- Name on form: "Amy Marie America" vs Byte: "Amy America"
+  -> Flag: "Middle name mismatch - request new form or update Byte"
+- Date > 90 days old
+  -> Error: "Form expired - request new signature"`,
+                integration: `INTEGRATION POINTS:
+1. Stored Documents
+   - Locate SSA-89 by doc type
+   - Extract form images
+
+2. Byte Borrower Screen
+   - Pull Name, DOB, SSN
+   - Compare values
+
+3. Verification Interface
+   - Pre-check before Request button
+   - Display validation results`
+            },
+            'note-gen': {
+                name: 'Alert Note Generator',
+                tags: ['Content Generation', 'NLP', 'Medium Complexity', 'Medium Priority'],
+                purpose: 'Generates professional clearing notes for LoanSafe alerts based on file documentation, following CMG formatting standards and compliance requirements.',
+                prompt: `You are building a Content Generation Agent for CMG Financial.
+
+AGENT NAME: Alert Note Generator
+TYPE: Content Generation / NLP
+
+OBJECTIVE:
+Generate professional, compliant clearing notes for LoanSafe alerts based on file evidence.
+
+NOTE STRUCTURE:
+1. Alert Reference (code/type)
+2. Evidence Reviewed (specific documents)
+3. Finding Summary
+4. Resolution Statement
+5. Timestamp/User
+
+EXAMPLE OUTPUTS:
+
+Alert: IDP_035 - Additional loan applications
+Note: "Reviewed credit inquiries and REO Schedule. Inquiry dated 1/15/26 relates to refinance of investment property at 123 Oak St, disclosed on REO. Original loan application withdrawn per borrower LOE dated 1/20/26. Alert cleared - no undisclosed debt."
+
+Alert: SSN Mismatch
+Note: "SSA-89 verification completed via SentiLink on 1/25/26. SSA Verified Identity: YES. Name, DOB, and SSN confirmed to match Social Security Administration records. Alert cleared."
+
+Alert: MERS Hit
+Note: "MERS shows active mortgage on 456 Pine Ave. Property disclosed on REO Schedule as rental with $2,500/mo payment. Rental income and PITIA included in DTI calculation per 1003. Alert cleared - disclosed debt."
+
+TONE REQUIREMENTS:
+- Professional, factual
+- No subjective language
+- Reference specific documents
+- Include dates where relevant
+- Avoid abbreviations except standard (DTI, LTV, etc.)
+
+INPUT REQUIRED:
+- Alert type and description
+- Relevant documents in file
+- Key data points from documents`,
+                integration: `INTEGRATION POINTS:
+1. LoanSafe Connect
+   - Pull alert details
+   - Insert generated note
+
+2. Stored Documents
+   - Reference available evidence
+   - Extract key data points
+
+3. User Workflow
+   - Present draft note for review
+   - Allow edit before submission
+   - One-click insert to alert`
+            }
+        };
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(t => `<span class="prompt-tag">${t}</span>`).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try {
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy.');
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePromptModal(); });
+        document.getElementById('promptModal').addEventListener('click', (e) => { if (e.target.id === 'promptModal') closePromptModal(); });
+    </script>
+</body>
+</html>
