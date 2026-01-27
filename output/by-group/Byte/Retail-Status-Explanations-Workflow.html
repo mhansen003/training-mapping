@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byte Retail Status Explanations - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+        .flow-node.end { background: linear-gradient(135deg, var(--accent-rose) 0%, #be185d 100%); color: white; border-radius: 25px; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.lo-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.processor-badge { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+        .badge.uw-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .badge.closer-badge { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .badge.funder-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.system-badge { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+        .badge.end-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.secondary-badge { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Status Cards */
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .status-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .status-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .status-card h4 { color: var(--text-primary); margin-bottom: 12px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .status-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .status-card .owner { margin-top: 12px; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Byte</a>
+        <span class="separator">></span>
+        <span class="current">Retail Status Explanations</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Retail Status Guide</h2>
+            <p>Loan Lifecycle Workflow</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-0" class="nav-item active">
+                <span class="nav-number">0</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#section-1" class="nav-item">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Origination</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Processing</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Underwriting</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Closing</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Funding</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Post-Closing</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Special Statuses</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Source Document
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Byte Retail Status Explanations</h1>
+                <p class="subtitle">Complete Loan Lifecycle Status Guide for Retail Operations</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Channel: Retail</span>
+                    <span class="meta-item">Updated: Jan 24, 2023</span>
+                    <span class="meta-item">25 Total Statuses</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output/Result</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #be185d);"></div><span>End Status</span></div>
+            </div>
+
+            <!-- Section 0: Overview -->
+            <section id="section-0" class="section">
+                <div class="section-header">
+                    <div class="section-number">0</div>
+                    <div class="section-title"><h2>Status Overview</h2><span>Understanding the loan lifecycle in Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="summary-grid">
+                        <div class="summary-card"><h4>Total Statuses</h4><div class="value">25</div><div class="label">Across full lifecycle</div></div>
+                        <div class="summary-card"><h4>End Statuses</h4><div class="value">7</div><div class="label">Terminal states</div></div>
+                        <div class="summary-card"><h4>Auto Statuses</h4><div class="value">3</div><div class="label">System-triggered</div></div>
+                        <div class="summary-card"><h4>Manual Statuses</h4><div class="value">22</div><div class="label">User-triggered</div></div>
+                    </div>
+                    <div class="info-box">
+                        <h4>Support Contacts</h4>
+                        <p><strong>CLEAR Support:</strong> clearsupport@cmgfi.com | 925-359-3999 or x3999</p>
+                        <p><strong>Byte Support:</strong> byteSupport@cmgfi.com | 925-359-3999 or x3999</p>
+                    </div>
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">High-Level Loan Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Lead/Prospect</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Disclosure</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processing</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Underwriting</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Closing</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Funding</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node end">Post-Closing</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Origination -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Origination Statuses</h2><span>Lead through Disclosed - LO owned stages</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Origination Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node start">Lead (CLEAR only)</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Prospect</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Has 6 Pieces?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">LE Pending</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Disclosed</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO - Need UW Review</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Credit Only</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Pre Approved</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Lead</strong></td>
+                                <td>Appears only in Lead management queue in CLEAR</td>
+                                <td>LO enters potential Borrower Information into CLEAR</td>
+                                <td>LO converts the Lead into Prospect in CLEAR</td>
+                                <td><span class="badge lo-badge">LO in CLEAR</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Prospect</strong></td>
+                                <td>First status when the loan starts in Byte</td>
+                                <td>LO converts a Lead to a Prospect in POS. Loan number is generated and file is in Byte.</td>
+                                <td>When loan is locked without 6 pieces (advance lock), has 6 pieces (LE Pending), or LO wants loan to go to UW (Credit Only)</td>
+                                <td><span class="badge system-badge">System Auto</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">LE Pending</strong></td>
+                                <td>LO enters 6 pieces of data, loan auto-moves here</td>
+                                <td>LO enters 6 pieces of data, loan is moved automatically</td>
+                                <td>Docs are sent to borrower and status auto-changes to Disclosed</td>
+                                <td><span class="badge system-badge">System</span> / <span class="badge lo-badge">Disclosure Coord</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Credit Only</strong></td>
+                                <td>Processor moves loan to send file to UW without an address</td>
+                                <td>LO/Broker doesn't have 6 pieces but wants loan to go to UW</td>
+                                <td>Underwriter pre-approves, suspends, or denies loan</td>
+                                <td><span class="badge processor-badge">Processor</span> -> <span class="badge uw-badge">UW</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Disclosed</strong></td>
+                                <td>6 pieces of app obtained and LE sent to borrower</td>
+                                <td>LO/Broker/Disclosure Coordinator sends LE to borrower</td>
+                                <td>User in POS moves loan manually to File Received</td>
+                                <td><span class="badge lo-badge">Disclosure Coord / LO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Pre Approved</strong></td>
+                                <td>Credit Only approval by the UW</td>
+                                <td>When loan is in Credit Only Status, UW moves loan to Pre-Approved</td>
+                                <td>6 pieces of data have been obtained, loan is moved to LE Pending</td>
+                                <td><span class="badge lo-badge">LO</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>6 Pieces of Data Required</h4>
+                        <p>The "6 pieces" refers to the minimum information needed to issue a Loan Estimate: Borrower name, income, SSN, property address, estimated property value, and loan amount.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Processing -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Processing Statuses</h2><span>File Received through UW submission</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Processing Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">File Received</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Ready for UW?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">UW Received</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO - Incomplete</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node end">Canceled for Incompleteness</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">Borrower Cancels</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node end">Withdrawn</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">File Received</strong></td>
+                                <td>User in POS moves loan manually to File Received</td>
+                                <td>Manual move from Disclosed status</td>
+                                <td>Canceled for Incompleteness, UW Received, or Withdrawn</td>
+                                <td><span class="badge processor-badge">Processor</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">UW Received</strong></td>
+                                <td>Registration/Processor moves the loan for UW review</td>
+                                <td>Processor/AM manually moves the status for UW to look at file first time</td>
+                                <td>When UW decisions the loan: Approved, Suspended, Declined</td>
+                                <td><span class="badge uw-badge">UW</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Canceled for Incompleteness</strong></td>
+                                <td>Loan disclosed but not enough information for credit decision</td>
+                                <td>Manual status change from Processor</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge end-badge">Terminal</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Withdrawn</strong></td>
+                                <td>Borrower or broker/LO cancels the file prior to it being decisioned</td>
+                                <td>From Prospect/Registered/LE Pending/Disclosed/File Received - manually withdrawn prior to UW</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge end-badge">Terminal</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>End Status Warning</h4>
+                        <p><strong>Canceled for Incompleteness</strong> and <strong>Withdrawn</strong> are terminal statuses. Once a loan reaches these statuses, the file is closed and cannot be reopened.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Underwriting -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Underwriting Statuses</h2><span>Decision and condition clearing</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Underwriting Decision Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">UW Received</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">UW Decision</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">APPROVED</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Approved</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Conditions for Review</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Clear to Close</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">SUSPENDED</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node decision">Suspended</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Work Conditions</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">DECLINED</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node end">Declined</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Approved</strong></td>
+                                <td>UW decisions file as approved</td>
+                                <td>From UW Received/Suspended/Conditions for Review. UW manually moves the loan.</td>
+                                <td>Processor sends file back to UW via Conditions for Review. Also if loan is Approved Not Accepted.</td>
+                                <td><span class="badge processor-badge">Processor</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Suspended</strong></td>
+                                <td>Not enough information for an approval or denial</td>
+                                <td>UW Received/Conditions for Review/Approved - UW manually moves to suspended</td>
+                                <td>Either moving the loan to Denied or Approved</td>
+                                <td><span class="badge processor-badge">Processor</span> + <span class="badge lo-badge">LO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Conditions for Review</strong></td>
+                                <td>Processor/AM submits file back to UW to review conditions</td>
+                                <td>Processor manually moves from Approved or Suspended</td>
+                                <td>Approved/Suspended/Clear to Close by UW</td>
+                                <td><span class="badge uw-badge">UW</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Clear to Close</strong></td>
+                                <td>All conditions are cleared and UW moves loan to Clear To Close</td>
+                                <td>UW moves loan from Conditions for Review to Clear to Close</td>
+                                <td>Processor moves the loan to Docs Ordered</td>
+                                <td><span class="badge processor-badge">Processor</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Approved Not Accepted</strong></td>
+                                <td>File was underwritten and approved however borrower did not accept and the loan was canceled</td>
+                                <td>Loan was approved but not accepted by borrower so processor/AM manually moves</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge uw-badge">UW to change</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Declined</strong></td>
+                                <td>Underwriter, Processing/Underwriting Manager when file does not qualify due to program guidelines</td>
+                                <td>UW determines the loan does not qualify for selected loan program</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge uw-badge">Underwriting</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Changes to UW</strong></td>
+                                <td>Status to alert UW that changes need to be made regarding Taxes, Insurance, HOA Dues and Flood Insurance</td>
+                                <td>Operations (Processor or Closer/Funder) moves when loan needs updating after approval and before funding</td>
+                                <td>After UW makes changes and re-runs AUS, loan is moved back to previous status</td>
+                                <td><span class="badge uw-badge">Underwriting</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Loan Re-structure</strong></td>
+                                <td>Status that removes the loan's approval and allows the loan to be restructured (income, assets, loan amount changes) and AUS re-run</td>
+                                <td>Sales or Processor moves when significant changes appear and loan needs to be reworked</td>
+                                <td>Processor moves the loan into Conditions for UW status</td>
+                                <td><span class="badge lo-badge">LO/PA</span> / <span class="badge processor-badge">Processor</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Condition Clearing Cycle</h4>
+                        <p>Loans typically cycle between <strong>Approved/Suspended</strong> and <strong>Conditions for Review</strong> multiple times as conditions are submitted and reviewed until reaching <strong>Clear to Close</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Closing -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Closing Statuses</h2><span>Docs Ordered through Docs Back</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Closing Document Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">Clear to Close</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Docs Ordered</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Docs Out</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">State Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">WET STATE</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Funds Ordered</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">DRY STATE</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Docs Back</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Funds Ordered</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Docs Ordered</strong></td>
+                                <td>Processor orders docs from the closer</td>
+                                <td>Processor moved the loan to Docs Ordered</td>
+                                <td>Closer moves the loan to Docs Out when closing package has been approved and sent to closing agent</td>
+                                <td><span class="badge closer-badge">Closer</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Docs Out</strong></td>
+                                <td>Closer sends docs to closing agent/escrow company</td>
+                                <td>Closer moves the loan to Docs Out when closing package has been approved and sent</td>
+                                <td><strong>Wet State:</strong> Closer moves to Funds Ordered to request wire.<br><strong>Dry State:</strong> Closer leaves in Docs Out until signed docs returned, then moves to Docs Back.</td>
+                                <td><span class="badge closer-badge">Closer</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Docs Back</strong></td>
+                                <td>Signed closing package is returned (Dry States Only)</td>
+                                <td>When signed docs are returned and uploaded, loan is manually moved to Docs Back</td>
+                                <td>Once reviewed by Funder, loan is moved to Funds Ordered status</td>
+                                <td><span class="badge funder-badge">Funder</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Wet vs Dry Funding States</h4>
+                        <p><strong>Wet States:</strong> Funds are disbursed at closing before documents are returned. Closer moves directly to Funds Ordered after Docs Out.</p>
+                        <p><strong>Dry States:</strong> Docs must be returned and reviewed before funding. Loan goes through Docs Back status before Funds Ordered.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Funding -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Funding Statuses</h2><span>Funds Ordered through Funded</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Funding Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">Funds Ordered</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Loan Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">STANDARD</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node action">Funds Sent</div>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Funded</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">MINI-CORR</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node output">Purchased</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">PRIVATE</span>
+                                <span class="flow-arrow down">|</span>
+                                <div class="flow-node end">Private Loan Funded</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Funds Ordered</strong></td>
+                                <td>Funder orders funds to be sent to the closing agent/escrow company</td>
+                                <td>When signed docs are returned and uploaded, loan is manually moved to Docs Back</td>
+                                <td>When warehouse bank sends the wire, wire desk moves loan to Funded status</td>
+                                <td><span class="badge funder-badge">Wire Desk / Warehouse Dept</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Funds Sent</strong></td>
+                                <td>Warehouse bank sends the wire to the closing (not for Mini-Corr)</td>
+                                <td>Wire desk moves the loan to Funds Sent status</td>
+                                <td>Funder moves loan to Funded when Funder approved funds to be disbursed</td>
+                                <td><span class="badge funder-badge">Funder</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Funded</strong></td>
+                                <td>Funder clears on PTF conditions and approved funds to be disbursed</td>
+                                <td>Funder moves loan to Funded when Funder approved funds to be disbursed</td>
+                                <td>Collateral Specialist moves the loan to Collateral Sent when original note is sent to warehouse bank</td>
+                                <td><span class="badge secondary-badge">Post Closing</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Purchased</strong></td>
+                                <td>When warehouse bank sends wire (Mini-Corr only)</td>
+                                <td>Wire desk moves the loan to Purchased status (Mini-Corr only)</td>
+                                <td>Collateral Specialist moves to Collateral Sent when original note sent to warehouse bank</td>
+                                <td><span class="badge secondary-badge">Post Closing</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Private Loan Funded</strong></td>
+                                <td>Wire has been sent and loan has funded</td>
+                                <td>Processor moves loan to this status once wire funds and email confirmation received. Both Retail AND Wholesale loans status should be changed.</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge processor-badge">Loan Processor</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Mini-Corr Workflow Difference</h4>
+                        <p>Mini-Correspondent loans skip the <strong>Funds Sent</strong> status and go directly from <strong>Funds Ordered</strong> to <strong>Purchased</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Post-Closing -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Post-Closing Statuses</h2><span>Shipped through Post Closing Complete</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <h3 style="text-align: center; margin-bottom: 22px; color: var(--accent-blue);">Post-Closing Flow</h3>
+                        <div class="flow-row">
+                            <div class="flow-node action">Funded/Purchased</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Shipped</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Investor Purchased</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node end">Post Closing Complete</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr><th>Status</th><th>Description</th><th>Entry Point</th><th>Exit Point</th><th>Owner</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Shipped</strong></td>
+                                <td>Full package is sent to the investor</td>
+                                <td>Shipper moves the loan to Shipped when full package is sent to investor</td>
+                                <td>Loan is manually moved to Investor Purchased when investor purchases the loan</td>
+                                <td><span class="badge secondary-badge">Shipper</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--text-primary);">Investor Purchased</strong></td>
+                                <td>Investor purchases the loan</td>
+                                <td>Loan is manually moved to Investor Purchased when investor purchases the loan</td>
+                                <td>Loan is moved to Post Closing Complete by shipping dept</td>
+                                <td><span class="badge secondary-badge">Secondary</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--accent-rose);">Post Closing Complete</strong></td>
+                                <td>This status is for the shipping dept., which indicates when the MERS, Flood and MI has been transferred</td>
+                                <td>Loan is moved by shipping dept. when MERS, Flood and MI has been transferred</td>
+                                <td><strong>END STATUS</strong></td>
+                                <td><span class="badge secondary-badge">Shipping/Post Closing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 7: Special Statuses -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Special Statuses</h2><span>Asset Loan and Lock and List</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="status-grid">
+                        <div class="status-card">
+                            <h4>Asset Loan</h4>
+                            <p>Status used to identify loans that are currently held by CMG.</p>
+                            <p><strong>Entry:</strong> From Funded, Shipped, Investor Purchased, Private Loan Funded</p>
+                            <p><strong>Exit:</strong> Moves to Shipped, Investor Purchased</p>
+                            <div class="owner"><span class="badge secondary-badge">Admin/Secondary/Risk Admin</span></div>
+                        </div>
+                        <div class="status-card">
+                            <h4>Lock and List</h4>
+                            <p>Status used as a placeholder for the Lock and List product; pushed in via the API. Once a borrower is tied to the property this loan will be withdrawn. These loan numbers start with LAL.</p>
+                            <p><strong>Entry:</strong> From/to Withdrawn Status</p>
+                            <p><strong>Exit:</strong> To/from Withdrawn Status</p>
+                            <div class="owner"><span class="badge secondary-badge">Admin/Lock Desk/Secondary/SuperUser/Compliance</span></div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Lock and List Identifier</h4>
+                        <p>Lock and List loan numbers always start with <strong>LAL</strong> prefix, making them easy to identify in the system.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <section id="quick-ref" class="quick-ref">
+                <h3>Quick Reference Card</h3>
+                <pre>
+RETAIL STATUS QUICK REFERENCE
+=============================
+
+ORIGINATION (LO Owned):
+  Lead -> Prospect -> LE Pending -> Disclosed
+                  \-> Credit Only -> Pre Approved
+
+PROCESSING (Processor Owned):
+  File Received -> UW Received
+
+UNDERWRITING (UW Owned):
+  UW Received -> Approved / Suspended / Declined
+  Approved <-> Conditions for Review -> Clear to Close
+
+CLOSING (Closer Owned):
+  Docs Ordered -> Docs Out -> Docs Back (Dry States)
+
+FUNDING (Funder/Wire Desk Owned):
+  Funds Ordered -> Funds Sent -> Funded
+  (Mini-Corr: Funds Ordered -> Purchased)
+
+POST-CLOSING (Secondary Owned):
+  Shipped -> Investor Purchased -> Post Closing Complete
+
+END STATUSES (Terminal - Cannot Reopen):
+  - Withdrawn
+  - Canceled for Incompleteness
+  - Declined
+  - Approved Not Accepted
+  - Private Loan Funded
+  - Post Closing Complete
+
+SPECIAL STATUSES:
+  - Changes to UW: Tax/Insurance/HOA/Flood updates
+  - Loan Re-structure: Significant loan changes requiring re-approval
+  - Asset Loan: Loans held by CMG
+  - Lock and List: LAL-prefixed placeholder loans
+
+SUPPORT:
+  CLEAR Support: clearsupport@cmgfi.com | 925-359-3999
+  Byte Support:  byteSupport@cmgfi.com  | 925-359-3999
+                </pre>
+            </section>
+        </div>
+
+        <!-- ==================== AGENT OPPORTUNITIES TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation Analysis for Retail Status Workflow</p>
+                <div class="meta">
+                    <span class="meta-item">25 Statuses Analyzed</span>
+                    <span class="meta-item">5 Agent Candidates Identified</span>
+                    <span class="meta-item">Est. 35% Time Savings</span>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">5</div>
+                    <div class="agent-summary-label">Agent Candidates</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">2</div>
+                    <div class="agent-summary-label">High Priority</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">35%</div>
+                    <div class="agent-summary-label">Time Savings</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">80%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend" id="agent-heatmap">
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div><span><strong>Critical (90-100)</strong> - Immediate ROI</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div><span><strong>High (70-89)</strong> - Strong candidate</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div><span><strong>Medium (50-69)</strong> - Consider</span></div>
+                <div class="heat-legend-item"><div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div><span><strong>Low (0-49)</strong> - Future phase</span></div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container">
+                <div class="heat-map-title">Automation Priority Heat Map <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">(Click to jump to agent)</span></div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-status-tracker')" title="Click to view agent details">
+                        <div class="heat-score">92</div>
+                        <div class="heat-name">Status Transition Monitor</div>
+                        <div class="heat-desc">Auto-detect stalled loans and ownership gaps</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Phase: <span>All</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-condition-router')" title="Click to view agent details">
+                        <div class="heat-score">85</div>
+                        <div class="heat-name">Condition Router</div>
+                        <div class="heat-desc">Auto-route conditions to correct owner</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Phase: <span>UW</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-docs-validator')" title="Click to view agent details">
+                        <div class="heat-score">78</div>
+                        <div class="heat-name">Closing Docs Validator</div>
+                        <div class="heat-desc">Verify docs completeness before sending</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Medium</span></div>
+                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Phase: <span>Closing</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-wet-dry')" title="Click to view agent details">
+                        <div class="heat-score">65</div>
+                        <div class="heat-name">Wet/Dry State Router</div>
+                        <div class="heat-desc">Auto-determine funding path by property state</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Phase: <span>Closing</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-sla-monitor')" title="Click to view agent details">
+                        <div class="heat-score">58</div>
+                        <div class="heat-name">SLA Compliance Monitor</div>
+                        <div class="heat-desc">Track status duration against SLAs</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Effort: <span>Low</span></div>
+                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Phase: <span>All</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <h2 style="font-size: 1.4rem; margin: 35px 0 22px; color: var(--text-primary);" id="agent-details">Agent Specifications</h2>
+
+            <div class="agent-grid">
+                <!-- Agent 1: Status Transition Monitor -->
+                <div class="agent-card" id="agent-status-tracker">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📊</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Status Transition Monitor</div>
+                            <div class="agent-type">Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority critical">Critical</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Monitors all loans for stalled status transitions, ownership gaps, and unexpected delays. Alerts appropriate parties when loans exceed expected time in status and identifies bottlenecks in the pipeline.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Monitor Status</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check Duration</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Identify Owner</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Alert</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">-15%</div><div class="agent-stat-label">Cycle Time</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('statusTracker')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Condition Router -->
+                <div class="agent-card" id="agent-condition-router">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🔀</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Condition Router Agent</div>
+                            <div class="agent-type">Workflow Automation Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically routes conditions to the correct responsible party based on condition type. Determines if condition should go to LO, Processor, or UW and updates status accordingly for efficient condition clearing.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Parse Condition</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Classify Type</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Route to Owner</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Update Status</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">2min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">95%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('conditionRouter')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 3: Closing Docs Validator -->
+                <div class="agent-card" id="agent-docs-validator">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">📋</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Closing Docs Validator</div>
+                            <div class="agent-type">Quality Control Agent</div>
+                        </div>
+                        <span class="agent-priority high">High</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Validates closing document packages for completeness before moving to Docs Out status. Checks for required signatures, correct figures, and regulatory compliance to prevent redraw scenarios.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Extract Docs</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Validate Fields</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Check Compliance</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Approve/Flag</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">-50%</div><div class="agent-stat-label">Redraws</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">5min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Med</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('docsValidator')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 4: Wet/Dry State Router -->
+                <div class="agent-card" id="agent-wet-dry">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">🗺️</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Wet/Dry State Router</div>
+                            <div class="agent-type">Decision Support Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Automatically determines the correct funding path based on property state wet/dry funding rules. Ensures correct status transitions and prevents errors in the closing to funding flow.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Get Property State</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Lookup Rules</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Set Path</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Guide User</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">100%</div><div class="agent-stat-label">Accuracy</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">1min</div><div class="agent-stat-label">Time Saved</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('wetDry')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent 5: SLA Compliance Monitor -->
+                <div class="agent-card" id="agent-sla-monitor">
+                    <div class="agent-card-header">
+                        <div class="agent-icon">⏱️</div>
+                        <div class="agent-info">
+                            <div class="agent-name">SLA Compliance Monitor</div>
+                            <div class="agent-type">Monitoring Agent</div>
+                        </div>
+                        <span class="agent-priority medium">Medium</span>
+                    </div>
+                    <div class="agent-card-body">
+                        <p class="agent-description">Tracks time in each status against defined SLAs and escalates loans approaching or exceeding thresholds. Provides real-time visibility into pipeline health and identifies systemic bottlenecks.</p>
+                        <div class="agent-flow">
+                            <div class="agent-flow-title">Agent Flow</div>
+                            <div class="agent-flow-diagram">
+                                <div class="agent-step">Track Duration</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Compare SLA</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Calculate Risk</div>
+                                <span class="agent-arrow">-></span>
+                                <div class="agent-step">Escalate</div>
+                            </div>
+                        </div>
+                        <div class="agent-stats">
+                            <div class="agent-stat"><div class="agent-stat-value">+20%</div><div class="agent-stat-label">On-Time</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">24/7</div><div class="agent-stat-label">Monitoring</div></div>
+                            <div class="agent-stat"><div class="agent-stat-value">Low</div><div class="agent-stat-label">Complexity</div></div>
+                        </div>
+                        <button class="agent-prompt-btn" onclick="showAgentPrompt('slaMonitor')">
+                            View AI Prompt to Build This Agent
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Retail Status Explanations - Source Document</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent">RETAIL STATUS EXPLANATIONS
+CMG Financial - Byte LOS
+Last Updated: 01/24/23
+
+SUPPORT CONTACTS:
+- CLEAR Support: clearsupport@cmgfi.com | 925-359-3999 or x3999
+- Byte Support: byteSupport@cmgfi.com | 925-359-3999 or x3999
+
+This document describes all retail loan statuses in the Byte Loan Origination System,
+including entry points, exit points, and responsible parties for each status.
+
+See the workflow documentation for complete status descriptions and transitions.</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout = null;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav clicks - set isScrolling flag
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+
+                // Clear any existing timeout
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                // Reset isScrolling after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    updateActiveNav();
+                }, 1000);
+
+                // Update active state immediately on click
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // ====== AGENT PROMPT SYSTEM ======
+        const agentPrompts = {
+            statusTracker: {
+                name: 'Status Transition Monitor',
+                tags: ['Monitoring', 'Real-time', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent continuously monitors all loans in the pipeline and identifies loans that have been in a status longer than expected, alerting the responsible party and management to prevent delays.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Status Transition Monitor
+TYPE: Real-time Monitoring / Alert System
+
+OBJECTIVE:
+Create an agent that monitors loan status durations and identifies stalled loans, ownership gaps, and unexpected delays across the entire retail pipeline.
+
+STATUS DURATION THRESHOLDS:
+----------------------------------------
+Status              | Warning | Critical
+----------------------------------------
+Prospect            | 3 days  | 7 days
+LE Pending          | 1 day   | 2 days
+Disclosed           | 5 days  | 10 days
+File Received       | 2 days  | 5 days
+UW Received         | 2 days  | 4 days
+Approved            | 3 days  | 7 days
+Suspended           | 5 days  | 10 days
+Conditions for Rev  | 1 day   | 3 days
+Clear to Close      | 1 day   | 2 days
+Docs Ordered        | 1 day   | 3 days
+Docs Out            | 3 days  | 5 days
+Docs Back           | 1 day   | 2 days
+Funds Ordered       | 1 day   | 2 days
+----------------------------------------
+
+MONITORING LOGIC:
+1. Query all active loans every 15 minutes
+2. Calculate time in current status
+3. Compare against thresholds
+4. Generate alerts for Warning and Critical
+
+ALERT FORMAT:
+{
+  "loanNumber": "12345678",
+  "status": "Suspended",
+  "daysInStatus": 6,
+  "threshold": "Warning",
+  "owner": "Processor - John Smith",
+  "lastActivity": "2026-01-20",
+  "suggestedAction": "Review outstanding conditions"
+}
+
+ESCALATION MATRIX:
+- Warning: Notify owner via email/Slack
+- Critical: Notify owner + manager + ops dashboard
+- 2x Critical: Executive escalation`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Database
+   - Query loan_status table
+   - Join with user assignments
+   - Track status_changed_date
+
+2. Notification Services
+   - Email via SendGrid
+   - Slack webhook for team channels
+   - Dashboard integration
+
+3. Reporting
+   - Daily summary email to managers
+   - Weekly trend analysis
+   - Bottleneck identification
+
+TECHNICAL REQUIREMENTS:
+- Run every 15 minutes via cron
+- Process up to 10,000 active loans
+- Response time < 30 seconds
+- Store alert history for trending`
+            },
+            conditionRouter: {
+                name: 'Condition Router Agent',
+                tags: ['Workflow Automation', 'Classification', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent automatically classifies underwriting conditions and routes them to the appropriate responsible party (LO, Processor, or UW) based on condition type, reducing manual triage time.`,
+                prompt: `You are building a Workflow Automation Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Condition Router Agent
+TYPE: Classification / Workflow Automation
+
+OBJECTIVE:
+Automatically classify underwriting conditions and route to the correct responsible party for clearing, updating loan status and assignments accordingly.
+
+CONDITION CLASSIFICATION:
+-----------------------------------------
+Condition Type       | Route To   | Examples
+-----------------------------------------
+Income/Employment    | Processor  | VOE, paystubs, tax returns
+Asset               | Processor  | Bank statements, gift letters
+Credit              | LO         | LOE, credit supplements
+Property            | Processor  | Appraisal, title
+Insurance           | Processor  | HOI, flood
+Legal/Compliance    | UW         | AUS findings, manual items
+Document Correction | Processor  | Re-sign, date corrections
+-----------------------------------------
+
+CLASSIFICATION MODEL:
+Input: Condition text from UW decision
+Process:
+1. Extract key terms via NLP
+2. Match against condition taxonomy
+3. Identify priority (PTF, PTC, PTD)
+4. Determine responsible party
+
+OUTPUT:
+{
+  "conditionId": "COND-12345",
+  "conditionText": "Provide most recent 30 days paystubs",
+  "classification": "Income/Employment",
+  "priority": "PTF",
+  "routeTo": "Processor",
+  "suggestedDocs": ["Paystub - Current"],
+  "confidence": 0.95
+}
+
+ROUTING ACTIONS:
+1. Update condition assignment in Byte
+2. Send notification to assignee
+3. Update loan status if needed
+4. Log routing decision for audit`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Conditions API
+   - Read new conditions from UW decisions
+   - Update condition assignments
+   - Track condition status
+
+2. Document Management
+   - Suggest required documents
+   - Link to document templates
+   - Track document receipt
+
+3. User Directory
+   - Look up loan team assignments
+   - Route to correct processor/LO
+   - Handle backup assignments
+
+TRAINING DATA:
+- 50,000+ historical conditions
+- Manual classifications for validation
+- Retrain monthly with new patterns`
+            },
+            docsValidator: {
+                name: 'Closing Docs Validator',
+                tags: ['Quality Control', 'Document Analysis', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent validates closing document packages for completeness and accuracy before moving to Docs Out status, preventing redraws and closing delays.`,
+                prompt: `You are building a Quality Control Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Closing Docs Validator
+TYPE: Document Analysis / QC Automation
+
+OBJECTIVE:
+Validate closing document packages for completeness, accuracy, and compliance before allowing status change to Docs Out, preventing costly redraw scenarios.
+
+VALIDATION CHECKLIST:
+-----------------------------------------
+Category          | Checks
+-----------------------------------------
+Loan Terms        | Rate, amount, term match LE
+Borrower Info     | Names, SSN, DOB correct
+Property          | Address, legal desc correct
+Figures           | P&I, total payment, cash to close
+Signatures        | All required sig lines present
+Dates             | Consistent, not future-dated
+Regulatory        | TRID timing, right of rescission
+State-Specific    | State addenda, disclosures
+-----------------------------------------
+
+VALIDATION FLOW:
+1. Extract data from closing package PDF
+2. Compare against loan data in Byte
+3. Check regulatory requirements
+4. Verify state-specific requirements
+5. Generate pass/fail report
+
+OUTPUT FORMAT:
+{
+  "loanNumber": "12345678",
+  "validationStatus": "FAIL",
+  "criticalErrors": [
+    {"field": "Loan Amount", "expected": "450000", "found": "455000"}
+  ],
+  "warnings": [
+    {"field": "Closing Date", "note": "Only 2 business days from today"}
+  ],
+  "passedChecks": 47,
+  "totalChecks": 50,
+  "recommendedAction": "Do not send - correct loan amount"
+}
+
+INTEGRATION WITH STATUS:
+- Block Docs Out if critical errors
+- Allow with warnings (logged)
+- Auto-approve if all pass`,
+                integration: `INTEGRATION POINTS:
+1. Document Management System
+   - Access closing package PDFs
+   - OCR extraction for validation
+   - Store validation results
+
+2. Byte LOS
+   - Pull loan data for comparison
+   - Update validation status
+   - Control status transitions
+
+3. Compliance Engine
+   - TRID timing calculations
+   - State requirement lookup
+   - Regulatory change updates
+
+ACCURACY TARGETS:
+- 99.5% detection of critical errors
+- < 2% false positive rate
+- Process time < 60 seconds per package`
+            },
+            wetDry: {
+                name: 'Wet/Dry State Router',
+                tags: ['Decision Support', 'Rules Engine', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent automatically determines the correct funding path (wet vs dry) based on the property state and guides closers through the correct status transitions.`,
+                prompt: `You are building a Decision Support Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: Wet/Dry State Router
+TYPE: Rules Engine / Decision Support
+
+OBJECTIVE:
+Automatically determine funding type (wet vs dry) based on property state and guide closers through the correct status transition path.
+
+STATE CLASSIFICATION:
+-----------------------------------------
+WET FUNDING STATES (fund at closing):
+AL, AZ, AR, CO, CT, DC, FL, GA, HI, IL,
+IN, IA, KS, KY, LA, ME, MD, MA, MI, MN,
+MS, MO, MT, NE, NH, NJ, NM, NY, NC, ND,
+OH, OK, OR, PA, RI, SC, SD, TN, TX, UT,
+VT, VA, WA, WV, WI, WY
+-----------------------------------------
+DRY FUNDING STATES (docs back first):
+AK, CA, ID, NV
+-----------------------------------------
+
+ROUTING LOGIC:
+IF property_state IN dry_states:
+  - Docs Out -> Docs Back -> Funds Ordered
+  - Alert closer: "Dry state - await docs return"
+ELSE:
+  - Docs Out -> Funds Ordered (skip Docs Back)
+  - Alert closer: "Wet state - proceed to funding"
+
+OUTPUT:
+{
+  "loanNumber": "12345678",
+  "propertyState": "CA",
+  "fundingType": "DRY",
+  "requiredPath": ["Docs Out", "Docs Back", "Funds Ordered"],
+  "guidanceMessage": "California is a dry funding state. Wait for signed docs to return before ordering funds.",
+  "estimatedAddedDays": 3
+}
+
+STATUS GUARD:
+- Prevent direct Docs Out -> Funds Ordered in dry states
+- Require Docs Back status confirmation
+- Log any override attempts`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Status Engine
+   - Intercept status change requests
+   - Apply routing rules
+   - Guide user to correct path
+
+2. Property Data
+   - Extract state from property address
+   - Handle multi-property scenarios
+   - Support state law changes
+
+3. Training System
+   - Show correct path on status change
+   - Explain wet/dry differences
+   - Link to policy documentation
+
+MAINTENANCE:
+- Update state list when laws change
+- Annual review of classifications
+- Track state-by-state timing metrics`
+            },
+            slaMonitor: {
+                name: 'SLA Compliance Monitor',
+                tags: ['Monitoring', 'Analytics', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent tracks loan status durations against defined SLAs and provides real-time visibility into pipeline health, identifying systemic bottlenecks and escalating at-risk loans.`,
+                prompt: `You are building a Monitoring Agent for CMG Financial's Byte LOS system.
+
+AGENT NAME: SLA Compliance Monitor
+TYPE: Analytics / Monitoring
+
+OBJECTIVE:
+Track time in each status against defined SLAs, provide real-time dashboard metrics, and escalate loans approaching or exceeding thresholds.
+
+SLA DEFINITIONS (Business Hours):
+-----------------------------------------
+Stage             | SLA Target | Max
+-----------------------------------------
+Lead to Prospect  | 1 day      | 2 days
+Prospect to LE    | 3 days     | 5 days
+LE to Disclosed   | 1 day      | 2 days
+Disclosed to FR   | 5 days     | 10 days
+FR to UW Rec      | 2 days     | 4 days
+UW Decision       | 24 hours   | 48 hours
+Approved to CTC   | 5 days     | 10 days
+CTC to Docs Out   | 2 days     | 3 days
+Docs Out to Fund  | 3 days     | 5 days (wet)
+                  | 7 days     | 10 days (dry)
+-----------------------------------------
+
+METRICS TRACKED:
+1. % On-Time by Status
+2. Average Days in Status
+3. Bottleneck Identification
+4. Team/Individual Performance
+5. Trend Analysis (improving/declining)
+
+DASHBOARD OUTPUT:
+{
+  "pipelineHealth": "YELLOW",
+  "loansAtRisk": 23,
+  "loansOverdue": 8,
+  "biggestBottleneck": "Conditions for Review",
+  "avgCycleTime": 32.5,
+  "onTimeRate": 78%,
+  "trendVsLastWeek": "+3%"
+}
+
+ESCALATION TRIGGERS:
+- >10% pipeline at risk: Manager alert
+- >5% pipeline overdue: Director alert
+- Single loan 2x SLA: Individual escalation`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Database
+   - Status change timestamps
+   - User assignments
+   - Loan attributes
+
+2. Business Intelligence
+   - Power BI / Tableau integration
+   - Real-time dashboard refresh
+   - Historical trending
+
+3. Notification System
+   - Daily digest emails
+   - Real-time Slack alerts
+   - Mobile push for critical
+
+REPORTING:
+- Hourly dashboard refresh
+- Daily summary email
+- Weekly executive report
+- Monthly trend analysis`
+            }
+        };
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = `${agent.name} - Build Prompt`;
+
+            const tagsHtml = agent.tags.map(tag => `<span class="prompt-tag">${tag}</span>`).join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = `# ${agent.name}\n\n## Purpose\n${agent.purpose}\n\n## Build Prompt\n${agent.prompt}\n\n## Integration Points\n${agent.integration}`;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
