@@ -1,0 +1,39 @@
+{
+  "project": "Training Mapping",
+  "version": "1.0.0",
+  "created": "2026-01-26",
+
+  "source": {
+    "path": "",
+    "description": "Path to the 2GB training guide source folder"
+  },
+
+  "scan_settings": {
+    "include_extensions": [
+      ".pdf", ".doc", ".docx", ".ppt", ".pptx",
+      ".xls", ".xlsx", ".txt", ".rtf", ".md",
+      ".html", ".htm", ".xml", ".json"
+    ],
+    "exclude_patterns": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/Thumbs.db",
+      "**/.DS_Store",
+      "**/~$*"
+    ],
+    "max_file_size_mb": 100,
+    "follow_symlinks": false
+  },
+
+  "output": {
+    "base_path": "./output",
+    "create_indexes": true,
+    "preserve_folder_hierarchy": true
+  },
+
+  "processing": {
+    "batch_size": 50,
+    "log_progress": true,
+    "generate_metadata": true
+  }
+}

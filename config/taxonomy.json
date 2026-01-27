@@ -1,0 +1,27 @@
+{
+  "description": "Classification rules for organizing training documents",
+  "version": "1.0.0",
+
+  "groups": {
+    "description": "High-level groupings (to be populated after source scan)",
+    "items": []
+  },
+
+  "organizations": {
+    "description": "Organizational units (departments, teams, etc.)",
+    "items": []
+  },
+
+  "topics": {
+    "description": "Subject matter categories",
+    "items": []
+  },
+
+  "classification_rules": {
+    "description": "Rules for auto-classifying documents based on path/content",
+    "path_patterns": {},
+    "keyword_mappings": {}
+  },
+
+  "notes": "This file will be populated after analyzing the source folder structure"
+}
