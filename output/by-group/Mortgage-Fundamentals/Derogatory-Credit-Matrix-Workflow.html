@@ -1,0 +1,2480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derogatory Credit Matrix - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); vertical-align: top; }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.warning-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Comparison Cards */
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .comparison-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .comparison-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .comparison-card-header.conventional { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .comparison-card-header.fha { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+        .comparison-card-header.va { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .comparison-card-header.usda { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .comparison-card-header h4 { font-size: 1.05rem; }
+        .comparison-card-body { padding: 22px; }
+        .comparison-card ul { list-style: none; padding: 0; }
+        .comparison-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .comparison-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+        .info-icon { color: var(--accent-blue); font-weight: bold; }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Derogatory Credit Matrix</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Derogatory Credit</h2>
+            <p>Waiting Period Guidelines</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">General Notes</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Conventional Guidelines</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">FHA Guidelines</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">VA Guidelines</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">USDA Guidelines</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Disputed Credit</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Manual UW Triggers</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Unpaid Tax Liens</span>
+            </a>
+            <a href="#section-9" class="nav-item">
+                <span class="nav-number">9</span>
+                <span class="nav-label">Collections & Judgments</span>
+            </a>
+            <a href="#section-10" class="nav-item">
+                <span class="nav-number">10</span>
+                <span class="nav-label">Loan Modifications</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Documentation
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Derogatory Credit Matrix</h1>
+                <p class="subtitle">Comprehensive guide for waiting periods on bankruptcy, foreclosure, short sales, collections, and other derogatory credit events</p>
+                <div class="meta">
+                    <span class="meta-item">Products: Conv, FHA, VA, USDA</span>
+                    <span class="meta-item">Role: Processor / Underwriter</span>
+                    <span class="meta-item">Updated: 10/29/25</span>
+                    <span class="meta-item">Source: CMG Training</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Conventional</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>FHA</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></div><span>VA</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>USDA</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception/EC</span></div>
+            </div>
+
+            <!-- Section 1: General Notes -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>General Notes</h2><span>Key concepts and compliance reminders for derogatory credit analysis</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Important: Minimum Waiting Periods</h4>
+                        <p>All waiting periods listed in this matrix are <strong>minimum requirements</strong> according to investor guidelines. Always verify current FNMA, FHLMC, FHA, VA, and USDA guidelines before application.</p>
+                    </div>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">Extenuating Circumstances (EC)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">A non-recurring, borrower-uncontrollable event (e.g., unemployment, medical bills, death of spouse) that caused significant financial hardship.</p>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>EC Requirement</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Borrower LOX</strong></td>
+                                <td>Letter of Explanation describing the circumstances</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Supporting Documentation</strong></td>
+                                <td>Layoff notice, severance papers, medical bills, death certificate</td>
+                            </tr>
+                            <tr>
+                                <td><strong>UW Approval</strong></td>
+                                <td>Underwriter judgment and approval required</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>LTV & Transaction Restrictions for EC Cases</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Maximum 90% LTV</li>
+                            <li>Primary residence only</li>
+                            <li>Purchase or limited cash-out refinance only</li>
+                            <li>If mortgage debt was discharged in bankruptcy, FNMA allows BK timelines to be used instead of foreclosure timelines</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Compliance Reminders</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Always verify current FNMA, FHLMC, FHA, VA, and USDA guidelines before application</li>
+                            <li>Use this job aid as a reference only, not a substitute for the full investor policy</li>
+                            <li>Confirm with Underwriting before advising borrowers</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Conventional Guidelines -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Conventional Financing Guidelines</h2><span>FNMA/FHLMC waiting periods for derogatory credit events</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Measurement Date</h4>
+                        <p>Event end date to credit report date, or to disbursement date if specifically allowed per AUS. AUS Approval is required in all cases.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Derogatory Event</th>
+                                <th>Standard Waiting Period</th>
+                                <th>With Extenuating Circumstances</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 7 or 11</strong></td>
+                                <td>4 years from discharge or dismissal</td>
+                                <td>2 years from discharge or dismissal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 13</strong></td>
+                                <td>2 years from discharge<br>4 years from dismissal</td>
+                                <td>2 years from discharge<br>2 years from dismissal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Multiple BK Filings</strong><br>(more than 1 in past 7 years)</td>
+                                <td>5 years from most recent discharge or dismissal</td>
+                                <td>3 years from most recent discharge or dismissal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure</strong></td>
+                                <td>7 years from completion date</td>
+                                <td>3-7 years, 90% max LTV<br>Primary Residence<br>Purchase/Rate Term only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pre-Foreclosure (Short Sale) / Deed-in-Lieu</strong></td>
+                                <td>4 years regardless of LTV</td>
+                                <td>2 years</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">DU vs LPA Considerations</h3>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <div class="comparison-card-header conventional">
+                                <h4>DU Loans</h4>
+                            </div>
+                            <div class="comparison-card-body">
+                                <ul>
+                                    <li><span class="info-icon">i</span> Mortgage debt discharged through BK must be documented - BK waiting periods apply</li>
+                                    <li><span class="info-icon">i</span> Mortgage charge-offs subject to 4 year waiting period from disbursement date (2 years for EC)</li>
+                                    <li><span class="check-icon">!</span> DU Messaging must recognize the Derogatory Credit, or loan is not Eligible for DU Approval</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="comparison-card">
+                            <div class="comparison-card-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
+                                <h4>LPA Loans & Short Sales</h4>
+                            </div>
+                            <div class="comparison-card-body">
+                                <ul>
+                                    <li><span class="check-icon">!</span> LPA Approval is sufficient evidence appropriate waiting period is acceptably met</li>
+                                    <li><span class="info-icon">i</span> LPA feedback is valid if mortgage associated with short sale is reported on credit report</li>
+                                    <li><span class="x-icon">X</span> If mortgage involved with Short Sale is NOT reported on credit report - loan is INELIGIBLE</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Corporate Credit Approval Required</h4>
+                        <p>Any loan requiring consideration of Extenuating Circumstances to determine eligibility MUST be approved by Corporate Credit in addition to AUS Approval.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: FHA Guidelines -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>FHA Financing Guidelines</h2><span>FHA waiting periods for derogatory credit events</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Measurement Date</h4>
+                        <p>Event end date to case number assignment date. <strong>FHA "Back to Work" program is not permitted.</strong></p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Derogatory Event</th>
+                                <th>Waiting Period</th>
+                                <th>Special Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 7 or 11</strong></td>
+                                <td>2 years from Discharge Date</td>
+                                <td>Extenuating Circumstances must be approved by Corporate Credit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 13</strong></td>
+                                <td>2 years from Discharge Date</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>One year payout with all payments on time allowed</li>
+                                        <li>Plan must be completely paid out and Discharged prior to closing</li>
+                                        <li>Loan proceeds cannot pay off BK balance</li>
+                                        <li>Need written consent from court appointed trustee</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure / Deed-in-Lieu</strong></td>
+                                <td>3 years from Completion Date</td>
+                                <td>Extenuating Circumstances must be approved by Corporate Credit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Short Sale</strong></td>
+                                <td>Eligible if mortgage/installment payments 0 x 30 in 12 months prior to short sale<br><br>3 years if in default at time of sale</td>
+                                <td>Deed-in-Lieu follows Foreclosure guidelines</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Non-Credit Qualifying Streamline Refinance</h4>
+                        <p>Refer to Guidelines for Non-Credit Qualifying Streamline Refinance. Credit/Capacity Analysis is not required for these transactions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: VA Guidelines -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>VA Financing Guidelines</h2><span>VA waiting periods for derogatory credit events</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Measurement Date</h4>
+                        <p>Event end date to date of Closing unless otherwise specified in the VA Handbook. Refer to Guidelines for VA IRRRL non-credit qualifying requirements.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Derogatory Event</th>
+                                <th>Waiting Period</th>
+                                <th>Special Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 7 or 11</strong></td>
+                                <td>2 years from Discharge Date</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>>1 year to <2 years may be considered with documented EC and re-established credit</li>
+                                        <li>EC must be approved by Corporate Credit</li>
+                                        <li>LOX is required</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 13</strong></td>
+                                <td>N/A - Special Conditions</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>If Veteran finished all payments satisfactorily - re-established credit</li>
+                                        <li>If 12 months satisfactory payments + court approval - UW will review</li>
+                                        <li>Loan proceeds cannot pay off BK balance</li>
+                                        <li>Need written consent from court appointed trustee</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure / Deed-in-Lieu</strong></td>
+                                <td>2 years from completion/finalization to date of Closing</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pre-Foreclosure / Short Sale</strong></td>
+                                <td>Eligible without mandatory waiting period</td>
+                                <td>Veteran's overall credit must be good. Deed-in-Lieu follows Foreclosure guidelines.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: USDA Guidelines -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>USDA Financing Guidelines</h2><span>USDA waiting periods for derogatory credit events</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Measurement Date</h4>
+                        <p>Event end date to application date.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Derogatory Event</th>
+                                <th>Waiting Period</th>
+                                <th>Special Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 7 or 11</strong></td>
+                                <td>3 years from Discharge/Completion Date</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bankruptcy - Chapter 13</strong></td>
+                                <td>3 years from Discharge/Completion Date</td>
+                                <td>Need written consent/approval from court appointed trustee</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure / Deed-in-Lieu</strong></td>
+                                <td>3 years from Completion Date</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pre-Foreclosure / Short Sale</strong></td>
+                                <td>3 years from Completion Date</td>
+                                <td>--</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Extenuating Circumstances - USDA</h4>
+                        <p>Plans completed less than 12 months prior to submission to USDA will require a credit exception. Lenders must retain documentation in their permanent loan file. Refer to guidance in the Credit Exception Section.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Disputed Derogatory Credit -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Disputed Derogatory Credit Accounts (FHA)</h2><span>How to handle disputed credit accounts on FHA loans</span></div>
+                </div>
+                <div class="section-content">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Definition</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">A Disputed Derogatory Credit Account is any credit account that's currently in dispute and has negative credit history, such as:</p>
+
+                    <ul class="step-list">
+                        <li><strong>Charge-offs</strong></li>
+                        <li><strong>Collection accounts</strong></li>
+                        <li><strong>Accounts with late payments</strong> within the last 24 months</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <h4>Important Clarification</h4>
+                        <p>It is NOT considered disputed if the tradeline shows "dispute resolved, borrower disputed after resolution." Per FHA, they don't look at that as still being disputed.</p>
+                    </div>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">Standard Procedure</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">The lender must review all documentation provided by the borrower to confirm whether the disputed account should impact creditworthiness. Review should ensure consistency between credit report data and borrower-provided documentation.</p>
+
+                    <div class="tip-box">
+                        <h4>Exclusions from Underwriting Analysis</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Disputed medical accounts</li>
+                            <li>Disputed derogatory credit due to identity theft, credit card fraud, or unauthorized use IF the lender includes:
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>A police report, OR</li>
+                                    <li>Creditor documentation verifying the status of the account</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 10px;">All supporting evidence must be included in the case binder.</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Community Property State Note</h4>
+                        <p>The Disputed Derogatory Credit Accounts of a non-borrowing spouse in a community property state are NOT included in the cumulative balance for determining if the mortgage application is downgraded to a refer - <strong>EXCEPT</strong> they must be included if they are collection accounts.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Manual UW Triggers -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Downgrade to Manual Underwriting Triggers</h2><span>FHA TOTAL Scorecard - Accept Risk Classifications Requiring Downgrade</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Condition / Trigger</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Unverifiable or Unsupported Documentation</strong></td>
+                                <td>Mortgage file contains information that cannot be entered into or evaluated by TOTAL Mortgage Scorecard</td>
+                                <td>Loan must be downgraded to manual underwriting</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Additional Risk Factors Identified</strong></td>
+                                <td>Additional information not considered in AUS recommendation affects overall insurability</td>
+                                <td>Underwriter must perform manual review</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Disputed Derogatory Credit</strong></td>
+                                <td>Borrower has $1,000 or more collectively in disputed derogatory credit accounts</td>
+                                <td>Manual review required to confirm creditworthiness</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bankruptcy</strong></td>
+                                <td>Discharge date is within two years of case number assignment date</td>
+                                <td>Manual downgrade for further assessment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Short Sale (Pre-Foreclosure Sale)</strong></td>
+                                <td>Per FHA guidelines</td>
+                                <td>Manual downgrade required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure</strong></td>
+                                <td>Case number assignment is within three years of foreclosure sale date</td>
+                                <td>Manual downgrade required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Deed-in-Lieu of Foreclosure (DIL)</strong></td>
+                                <td>Case number assignment is within three years of title transfer date through DIL</td>
+                                <td>Downgrade to manual required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mortgage Payment History</strong></td>
+                                <td>Any mortgage trade line requires downgrade per HUD's Housing Obligations/Mortgage Payment History (TOTAL) criteria</td>
+                                <td>Late or delinquent mortgage history triggers downgrade</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Undisclosed Mortgage Debt</strong></td>
+                                <td>Borrower has Undisclosed Mortgage Debt (TOTAL) that requires downgrade</td>
+                                <td>Downgrade is mandatory</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Business Income Decline</strong></td>
+                                <td>Business income shows a decline greater than 20% over the analysis period</td>
+                                <td>Manual review required - indicates financial instability</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 8: Unpaid Tax Liens -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Unpaid Tax Liens</h2><span>Requirements by loan type for unpaid tax liens</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Financing Type</th>
+                                <th>Eligibility</th>
+                                <th>Repayment Plan</th>
+                                <th>Payment History</th>
+                                <th>Documentation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Fannie Mae / Freddie Mac</strong></td>
+                                <td>Generally ineligible if active tax lien exists</td>
+                                <td>Allowed if no lien filed but payment plan in place</td>
+                                <td>At least 1 payment prior to closing; included in DTI</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>IRS/state payment agreement</li>
+                                        <li>Proof of at least one payment</li>
+                                        <li>Documentation lien not filed or released</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA</strong></td>
+                                <td>Allowed with valid repayment agreement + payment history<br><span class="badge warning-badge">Need acceptable CAIVRS</span></td>
+                                <td>Valid repayment agreement required</td>
+                                <td>At least 3 consecutive monthly payments on time (lump-sum prepayments do not count)</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>Signed IRS/state repayment agreement</li>
+                                        <li>Proof of 3 payments (bank statements, receipts)</li>
+                                        <li>Include monthly payment in DTI</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA</strong></td>
+                                <td>May be allowed with repayment plan + timely payments<br><span class="badge warning-badge">Need acceptable CAIVRS</span></td>
+                                <td>Written agreement with IRS or taxing authority required</td>
+                                <td>Typically 12 months of satisfactory payments (per VA lender guidelines)</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>Repayment agreement</li>
+                                        <li>Proof of payments</li>
+                                        <li>Include payment in DTI</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA</strong></td>
+                                <td>Ineligible with any delinquent federal debt (including tax liens)<br><span class="badge warning-badge">Need acceptable CAIVRS</span></td>
+                                <td>Possible exception if repayment plan in place and no delinquency exists</td>
+                                <td>At least 3 consecutive timely payments before closing</td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li>Payment plan</li>
+                                        <li>Proof of payments</li>
+                                        <li>Include payment in DTI</li>
+                                        <li>Verify CAIVRS shows "No federal delinquency"</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">Unpaid Taxes (No Lien Filed)</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Financing Type</th>
+                                <th>Guidelines</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Fannie Mae / Freddie Mac</strong></td>
+                                <td>Allowed if borrower has written repayment plan, made at least one payment, and payment is included in DTI. No lien means no public encumbrance.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA</strong></td>
+                                <td>May qualify with payment plan in place even without 3-month history (FHA only applies 3-month rule when lien exists). Must provide documentation and include in DTI. <span class="badge warning-badge">Need acceptable CAIVRS</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA</strong></td>
+                                <td>May qualify if taxes are unpaid but borrower has active agreement and is current on payments. More flexibility with no lien. <span class="badge warning-badge">Need acceptable CAIVRS</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA</strong></td>
+                                <td>May qualify with IRS/state payment plan and proof of 3 consecutive timely payments. No lien = less severe, but borrower must not appear delinquent in CAIVRS.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 9: Collections & Judgments -->
+            <section id="section-9" class="section">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title"><h2>Collections & Judgments</h2><span>Treatment of collection accounts and judgments by loan type</span></div>
+                </div>
+                <div class="section-content">
+
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Collections by Property Type - Fannie Mae</h3>
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <div class="comparison-card-header conventional">
+                                <h4>1 Unit Principal Residence</h4>
+                            </div>
+                            <div class="comparison-card-body">
+                                <ul>
+                                    <li><span class="check-icon">!</span> Borrowers are NOT required to pay off outstanding collections or non-mortgage charge-offs regardless of amount</li>
+                                    <li><span class="info-icon">i</span> If marked as "to be paid at closing," DU will state accounts must be paid off</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="comparison-card">
+                            <div class="comparison-card-header" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+                                <h4>2-4 Unit Principal / Second Home</h4>
+                            </div>
+                            <div class="comparison-card-body">
+                                <ul>
+                                    <li><span class="x-icon">X</span> Collections and non-mortgage charge-offs totaling more than $5,000 must be paid in full prior to or at closing</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="comparison-card">
+                            <div class="comparison-card-header" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);">
+                                <h4>1-4 Unit Investment Property</h4>
+                            </div>
+                            <div class="comparison-card-body">
+                                <ul>
+                                    <li><span class="x-icon">X</span> Individual accounts >= $250 must be paid in full</li>
+                                    <li><span class="x-icon">X</span> Accounts totaling more than $1,000 must be paid in full prior to or at closing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">Collections by Loan Type</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Financing Type</th>
+                                <th>Collections Guidelines</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Freddie Mac (LPA Accept)</strong></td>
+                                <td>No documentation or additional assessment required. Follow the Feedback Certificate.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA</strong></td>
+                                <td>
+                                    <p><strong>Medical Collections or Charge-offs are NOT considered.</strong></p>
+                                    <p style="margin-top: 10px;"><strong>Cumulative Outstanding Collection Balances of $2,000 or more:</strong></p>
+                                    <ul style="margin-left: 15px; margin-top: 5px;">
+                                        <li>Document all debt is paid in full at/prior to settlement, OR</li>
+                                        <li>Verify borrower has payment arrangement with creditor and include monthly payment in DTI, OR</li>
+                                        <li>If no payment arrangement: Calculate 5% of outstanding balance of each collection and include in DTI</li>
+                                    </ul>
+                                    <p style="margin-top: 10px; font-style: italic;">NOTE: Collection accounts of non-borrower spouse in Community Property State must be included in $2,000 cumulative balance except as excluded by state law.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>VA</strong></td>
+                                <td>
+                                    <p><strong>Medical Collections or Charge-offs are NOT considered.</strong></p>
+                                    <p style="margin-top: 10px;"><strong>Non-Medical Collection Accounts:</strong></p>
+                                    <ul style="margin-left: 15px; margin-top: 5px;">
+                                        <li>Do not necessarily have to be paid off - UW determines</li>
+                                        <li>Part of overall credit history - must be used in DTI and residual cash calculation</li>
+                                        <li>If payment listed on credit report - use that payment</li>
+                                        <li>If no payment arrangement: use 5% of outstanding balance</li>
+                                        <li>Borrowers should have re-established satisfactory credit</li>
+                                    </ul>
+                                    <p style="margin-top: 10px;"><strong>Charge-Off Accounts:</strong> Typically collections where creditor no longer pursuing collection.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA</strong></td>
+                                <td>
+                                    <p><strong>Medical Collections or Charge-offs are NOT considered.</strong></p>
+                                    <p style="margin-top: 10px;">If total outstanding balance of all collection accounts >= $2,000 (including non-purchasing spouse in Community Property State unless excluded by state law):</p>
+                                    <ul style="margin-left: 15px; margin-top: 5px;">
+                                        <li>Remove medical collections and charge-offs from total</li>
+                                        <li>If remaining balance >= $2,000, either:
+                                            <ul style="margin-left: 15px; margin-top: 5px;">
+                                                <li>Pay collection accounts in full prior to or at closing, OR</li>
+                                                <li>Document payment arrangement with each creditor; include in DTI</li>
+                                            </ul>
+                                        </li>
+                                        <li>If no payment arrangements: 5% of outstanding balance in DTI</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: var(--text-primary); margin: 25px 0 15px;">Judgments by Loan Type</h3>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Financing Type</th>
+                                <th>Judgments Guidelines</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Fannie Mae / Freddie Mac</strong></td>
+                                <td>Judgments must be resolved (paid or under acceptable agreement) to satisfy title/lien risk as part of credit assessment. Lender must review credit report's public records section and handle judgments in accordance with policy and AUS findings.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA</strong></td>
+                                <td>
+                                    <p>Judgment must normally be paid off in full prior to or at closing UNLESS:</p>
+                                    <ul style="margin-left: 15px; margin-top: 5px;">
+                                        <li>Borrower has entered valid written payment agreement, AND</li>
+                                        <li>Has made at least 3 monthly timely payments</li>
+                                    </ul>
+                                    <p style="margin-top: 10px;">Payment amount must be included in DTI. UW must document explanation, verify payments, and examine whether judgment was due to inability to manage debt vs. disregard vs. EC.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA</strong></td>
+                                <td>
+                                    <p><strong>GUS (Automated System):</strong> Evidence of payoff for any outstanding judgments is required, regardless of "Accept" finding.</p>
+                                    <p style="margin-top: 10px;"><strong>Manual UW / Refer:</strong> If not paid in full, documented payment agreement may be acceptable. UW must document arrangement, confirm on-time payments, include monthly payment in debt ratio.</p>
+                                    <p style="margin-top: 10px;"><strong>Federal Court Judgments:</strong> A judgment obtained by the United States in Federal court (aside from U.S. Tax Court) is treated as unacceptable if outstanding.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 10: Loan Modifications -->
+            <section id="section-10" class="section">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title"><h2>Loan Modification or Restructured Loans</h2><span>Requirements for borrowers with prior loan modifications</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Financing Type</th>
+                                <th>Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Conventional</strong></td>
+                                <td>Guidelines often require <strong>24 months</strong> of on-time payments on the modified loan if obtaining a new mortgage on the same property (e.g., refinance). If purchasing another property, a <strong>12-month</strong> waiting period may apply.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FHA / VA</strong></td>
+                                <td><strong>1 year</strong> since modification or restructure with a minimum of <strong>12 months</strong> mortgage payment history since modification/restructure and <strong>no lates</strong> since the modification or restructure.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>USDA</strong></td>
+                                <td>
+                                    <ul style="margin-left: 15px;">
+                                        <li><strong>Modified loan:</strong> Minimum 12 months mortgage payment history + zero lates since modification</li>
+                                        <li><strong>Restructured loan:</strong> 3 year waiting period (same as short sale)</li>
+                                        <li><strong>Purchasing new primary:</strong> Must obtain letter from servicer confirming new purchase will not alter or cause modified loan to be due</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Definition: Restructured Loan vs. Modified Loan</h4>
+                        <p style="margin-top: 10px;">A loan is considered <strong>Restructured</strong> if there was:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Forgiveness of a portion of principal and/or interest on either the first or second mortgage</li>
+                            <li>Application of a principal curtailment by or on behalf of the investor to simulate principal forgiveness</li>
+                            <li>Conversion of any portion of the original debt to a "soft" subordinate mortgage</li>
+                            <li>Conversion of any portion of the original mortgage debt from secured to unsecured</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Quick Reference - Waiting Period Summary</h3>
+                <pre>
+BANKRUPTCY WAITING PERIODS (from discharge/dismissal)
+===========================================================
+Event                  | Conv    | FHA     | VA      | USDA
+-----------------------|---------|---------|---------|--------
+Chapter 7/11           | 4 yrs   | 2 yrs   | 2 yrs   | 3 yrs
+Chapter 7/11 (w/EC)    | 2 yrs   | -       | 1-2 yrs | -
+Chapter 13 (discharge) | 2 yrs   | 2 yrs   | Special | 3 yrs
+Chapter 13 (dismissal) | 4 yrs   | -       | -       | -
+Multiple BK (7 yrs)    | 5 yrs   | -       | -       | -
+
+FORECLOSURE / SHORT SALE WAITING PERIODS
+===========================================================
+Event                  | Conv    | FHA     | VA      | USDA
+-----------------------|---------|---------|---------|--------
+Foreclosure            | 7 yrs   | 3 yrs   | 2 yrs   | 3 yrs
+Foreclosure (w/EC)     | 3-7 yrs | -       | -       | -
+Short Sale/DIL         | 4 yrs   | 3 yrs*  | None**  | 3 yrs
+Short Sale (w/EC)      | 2 yrs   | -       | -       | -
+
+* FHA: Eligible if 0x30 in 12 months prior; 3 yrs if in default
+** VA: No mandatory waiting period if overall credit is good
+
+COLLECTIONS THRESHOLDS
+===========================================================
+FHA/USDA: $2,000 cumulative triggers payoff or payment plan
+Fannie Mae (1-unit PR): No payoff requirement
+Fannie Mae (2-4 unit/2nd): $5,000 threshold
+Fannie Mae (Investment): $250 individual / $1,000 total
+
+TAX LIEN PAYMENT HISTORY REQUIREMENTS
+===========================================================
+Conv: 1 payment    | FHA: 3 payments    | VA: 12 payments    | USDA: 3 payments
+
+MEASUREMENT DATES
+===========================================================
+Conv: Event end to credit report date (or disbursement per AUS)
+FHA:  Event end to case number assignment date
+VA:   Event end to closing date
+USDA: Event end to application date
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation potential for derogatory credit analysis workflows</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Identified Agents</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">15+</div>
+                    <div class="agent-summary-label">Minutes Saved/Loan</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">85%</div>
+                    <div class="agent-summary-label">Error Reduction</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(135deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(135deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(135deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(135deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-waitingperiod')">
+                        <div class="heat-score">9.5</div>
+                        <div class="heat-name">Waiting Period Calculator</div>
+                        <div class="heat-desc">Auto-calculate eligibility based on derogatory credit events</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-collectioncheck')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Collection Analyzer</div>
+                        <div class="heat-desc">Calculate collection thresholds and DTI impact</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-manualuw')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Manual UW Trigger Scanner</div>
+                        <div class="heat-desc">Identify conditions requiring manual underwriting</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-docassembly')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">EC Documentation Assembler</div>
+                        <div class="heat-desc">Compile extenuating circumstance documentation</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Waiting Period Calculator Agent -->
+                    <div class="agent-card" id="agent-waitingperiod">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">W</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Waiting Period Calculator</div>
+                                <div class="agent-type">Decision Engine / Compliance</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically analyzes credit report data to identify derogatory events, calculates elapsed time from event dates, and determines eligibility across all loan products (Conventional, FHA, VA, USDA) with consideration for extenuating circumstances.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Credit Report</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Identify Events</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Dates</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Output Eligibility</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('waitingperiod')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Collection Analyzer Agent -->
+                    <div class="agent-card" id="agent-collectioncheck">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Collection Analyzer</div>
+                                <div class="agent-type">Data Analysis / DTI Calculation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Scans credit report for collection and charge-off accounts, categorizes as medical vs. non-medical, calculates cumulative balances by property type, and determines payoff requirements or 5% DTI impact per investor guidelines.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Identify Collections</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Categorize Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Threshold</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">DTI Impact</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('collectioncheck')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Manual UW Trigger Scanner -->
+                    <div class="agent-card" id="agent-manualuw">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">M</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Manual UW Trigger Scanner</div>
+                                <div class="agent-type">Compliance / Risk Assessment</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically scans loan file data against FHA TOTAL Scorecard downgrade triggers including disputed credit thresholds, bankruptcy timing, business income decline, and undisclosed mortgage debt to flag files requiring manual underwriting.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Load AUS Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Triggers</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Issues</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Alert</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('manualuw')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- EC Documentation Assembler -->
+                    <div class="agent-card" id="agent-docassembly">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">E</div>
+                            <div class="agent-info">
+                                <div class="agent-name">EC Documentation Assembler</div>
+                                <div class="agent-type">Document Management</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Identifies when extenuating circumstances are being claimed, generates required documentation checklist (LOX, supporting docs), validates completeness, and assembles package for Corporate Credit approval submission.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Detect EC Claim</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Checklist</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Package for Review</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docassembly')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Derogatory Credit Matrix Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Derogatory Credit Matrix - CMG Financial
+
+## Overview
+This matrix provides waiting period requirements for borrowers with derogatory credit events including bankruptcy, foreclosure, short sales, collections, and judgments across all loan products.
+
+## Waiting Periods Summary
+
+### Bankruptcy - Chapter 7/11
+- Conventional: 4 years (2 years with EC)
+- FHA: 2 years from discharge
+- VA: 2 years from discharge
+- USDA: 3 years from discharge
+
+### Foreclosure
+- Conventional: 7 years (3-7 with EC)
+- FHA: 3 years from completion
+- VA: 2 years from completion
+- USDA: 3 years from completion
+
+### Short Sale / Deed-in-Lieu
+- Conventional: 4 years (2 with EC)
+- FHA: 0-3 years based on payment history
+- VA: No mandatory waiting period if credit is good
+- USDA: 3 years
+
+## Extenuating Circumstances Requirements
+1. Borrower Letter of Explanation (LOX)
+2. Supporting documentation
+3. Underwriter approval
+4. Corporate Credit approval (all loan types)
+
+## Collections Thresholds
+- FHA/USDA: $2,000 cumulative triggers payoff requirement
+- Conventional 1-unit PR: No payoff required
+- Conventional 2-4 unit/Second: $5,000 threshold
+- Conventional Investment: $250 individual / $1,000 total
+
+## Key Reminders
+- All waiting periods are MINIMUM requirements
+- Always verify current investor guidelines
+- Confirm with Underwriting before advising borrowers
+- Medical collections/charge-offs excluded from analysis (FHA/VA/USDA)</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            waitingperiod: {
+                name: 'Waiting Period Calculator',
+                tags: ['Decision Engine', 'Compliance', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically analyzes credit report data to identify derogatory credit events (bankruptcy, foreclosure, short sales, DIL), calculates elapsed time from event dates, and determines eligibility across all loan products with consideration for extenuating circumstances. Reduces manual calculation time and ensures compliance with investor guidelines.`,
+                prompt: `You are building a Decision Engine Agent for CMG Financial's derogatory credit analysis process.
+
+AGENT NAME: Waiting Period Calculator
+TYPE: Decision Engine / Compliance Automation
+
+OBJECTIVE:
+Create an agent that automatically identifies derogatory credit events from credit reports and calculates eligibility based on waiting period requirements for Conventional, FHA, VA, and USDA loan products.
+
+INPUT DATA:
+- Credit report XML/JSON data
+- Loan product type (Conv, FHA, VA, USDA)
+- Property type (1-unit PR, 2-4 unit, Second Home, Investment)
+- Transaction type (Purchase, Rate-Term Refi, Cash-Out Refi)
+- Application date / Case number assignment date
+
+DEROGATORY EVENTS TO IDENTIFY:
+1. Bankruptcy (Chapter 7, 11, 13)
+   - Discharge date
+   - Dismissal date
+   - Filing count in past 7 years
+2. Foreclosure
+   - Completion/sale date
+3. Short Sale / Pre-Foreclosure Sale
+   - Completion date
+   - Payment history 12 months prior
+4. Deed-in-Lieu
+   - Transfer date
+5. Loan Modification / Restructure
+   - Modification date
+   - Payment history since modification
+
+WAITING PERIOD RULES:
+{
+  "conventional": {
+    "ch7_ch11": { "standard": 4, "ec": 2 },
+    "ch13_discharge": { "standard": 2, "ec": 2 },
+    "ch13_dismissal": { "standard": 4, "ec": 2 },
+    "multiple_bk": { "standard": 5, "ec": 3 },
+    "foreclosure": { "standard": 7, "ec_min": 3, "ec_max": 7 },
+    "short_sale": { "standard": 4, "ec": 2 }
+  },
+  "fha": {
+    "ch7_ch11": 2,
+    "ch13": 2,
+    "foreclosure": 3,
+    "short_sale_clean": 0,
+    "short_sale_default": 3
+  },
+  "va": {
+    "ch7_ch11": { "standard": 2, "ec_min": 1 },
+    "foreclosure": 2,
+    "short_sale": 0
+  },
+  "usda": {
+    "bankruptcy": 3,
+    "foreclosure": 3,
+    "short_sale": 3
+  }
+}
+
+OUTPUT FORMAT:
+{
+  "eligibility_summary": {
+    "conventional": { "eligible": true, "waiting_period_met": true, "ec_required": false },
+    "fha": { "eligible": true, "waiting_period_met": true, "manual_uw_required": false },
+    "va": { "eligible": true, "waiting_period_met": true },
+    "usda": { "eligible": false, "waiting_period_met": false, "days_remaining": 45 }
+  },
+  "events_found": [...],
+  "recommendations": [...]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Credit Report Parser
+   - Parse MISMO 3.4 XML format
+   - Extract public records section
+   - Identify tradelines with derogatory marks
+
+2. LOS Integration
+   - Read loan product selection
+   - Read property/transaction type
+   - Write eligibility flags to conditions
+
+3. AUS Integration
+   - Cross-reference DU/LPA findings
+   - Validate derogatory credit recognized by AUS
+
+DEPLOYMENT:
+- Triggered on credit report import
+- Re-run when loan product changes
+- Alert processor if eligibility changes`
+            },
+            collectioncheck: {
+                name: 'Collection Analyzer',
+                tags: ['Data Analysis', 'DTI Calculation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent scans credit reports for collection and charge-off accounts, categorizes them as medical vs. non-medical, calculates cumulative balances based on property type thresholds, and determines payoff requirements or 5% DTI impact per investor guidelines.`,
+                prompt: `You are building a Data Analysis Agent for CMG Financial's collection account analysis.
+
+AGENT NAME: Collection Analyzer
+TYPE: Data Analysis / DTI Calculation
+
+OBJECTIVE:
+Automatically identify, categorize, and calculate the financial impact of collection accounts based on loan product and property type requirements.
+
+INPUT DATA:
+- Credit report collection accounts
+- Loan product type
+- Property type (for Conventional)
+- Community Property State indicator
+- Non-borrowing spouse collections (if applicable)
+
+CATEGORIZATION RULES:
+1. Medical Collections - EXCLUDED from analysis for FHA/VA/USDA
+2. Charge-off Accounts - EXCLUDED from cumulative balance
+3. Non-Medical Collections - Subject to thresholds
+
+THRESHOLD RULES:
+{
+  "conventional": {
+    "1_unit_pr": { "threshold": null, "payoff_required": false },
+    "2_4_unit_second": { "threshold": 5000, "payoff_required": true },
+    "investment": { "individual_threshold": 250, "total_threshold": 1000, "payoff_required": true }
+  },
+  "fha": { "threshold": 2000 },
+  "va": { "threshold": null, "dti_required": true },
+  "usda": { "threshold": 2000 }
+}
+
+DTI CALCULATION:
+- If no payment arrangement: 5% of outstanding balance
+- If payment arrangement exists: Use documented payment amount
+
+OUTPUT:
+{
+  "total_collections": 3500,
+  "medical_excluded": 1200,
+  "non_medical_total": 2300,
+  "threshold_exceeded": true,
+  "payoff_required": true,
+  "dti_impact": 115,
+  "accounts": [...]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Credit Report Parser
+   - Identify collection accounts
+   - Extract creditor name, balance, payment
+
+2. DTI Calculator
+   - Add calculated payment to liabilities
+   - Update qualifying ratios
+
+3. Conditions Generator
+   - Create payoff conditions if required
+   - Generate payment arrangement request
+
+DEPLOYMENT:
+- Run automatically on credit import
+- Update on manual account entry
+- Alert if threshold exceeded`
+            },
+            manualuw: {
+                name: 'Manual UW Trigger Scanner',
+                tags: ['Compliance', 'Risk Assessment', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent automatically scans loan file data against FHA TOTAL Scorecard downgrade triggers including disputed credit thresholds ($1,000+), bankruptcy timing (within 2 years), business income decline (>20%), foreclosure timing, and undisclosed mortgage debt to flag files requiring manual underwriting.`,
+                prompt: `You are building a Compliance Agent for CMG Financial's FHA manual underwriting trigger detection.
+
+AGENT NAME: Manual UW Trigger Scanner
+TYPE: Compliance / Risk Assessment
+
+OBJECTIVE:
+Automatically identify conditions that require downgrade from AUS Accept to Manual Underwriting per FHA TOTAL Scorecard requirements.
+
+TRIGGER CONDITIONS:
+1. Unverifiable/Unsupported Documentation
+   - Data that cannot be evaluated by TOTAL
+
+2. Additional Risk Factors
+   - Information affecting insurability not in AUS
+
+3. Disputed Derogatory Credit
+   - Cumulative balance >= $1,000
+
+4. Bankruptcy
+   - Discharge within 2 years of case number assignment
+
+5. Short Sale (Pre-Foreclosure)
+   - Per FHA guidelines
+
+6. Foreclosure
+   - Within 3 years of case number assignment
+
+7. Deed-in-Lieu
+   - Within 3 years of title transfer
+
+8. Mortgage Payment History
+   - Late payments per HUD criteria
+
+9. Undisclosed Mortgage Debt
+   - Per TOTAL requirements
+
+10. Business Income Decline
+    - >20% decline over analysis period
+
+OUTPUT FORMAT:
+{
+  "manual_uw_required": true,
+  "triggers_found": [
+    {
+      "category": "Disputed Derogatory Credit",
+      "condition": "Cumulative disputed balance $1,500",
+      "threshold": "$1,000",
+      "action": "Downgrade to Manual UW required"
+    }
+  ],
+  "total_triggers": 2,
+  "severity": "HIGH"
+}`,
+                integration: `INTEGRATION POINTS:
+1. AUS Response Parser
+   - Read TOTAL Scorecard findings
+   - Identify Accept classifications
+
+2. Credit Report Analyzer
+   - Check disputed accounts
+   - Calculate cumulative balances
+
+3. Income Calculator
+   - Compare YOY business income
+   - Flag >20% decline
+
+4. Alert System
+   - Notify underwriter of triggers
+   - Update loan status/conditions
+
+DEPLOYMENT:
+- Run after AUS submission
+- Re-run on data changes
+- Generate condition report`
+            },
+            docassembly: {
+                name: 'EC Documentation Assembler',
+                tags: ['Document Management', 'Workflow', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent identifies when extenuating circumstances are being claimed, generates the required documentation checklist (LOX template, supporting doc requirements), validates completeness against requirements, and assembles the package for Corporate Credit approval submission.`,
+                prompt: `You are building a Document Management Agent for CMG Financial's extenuating circumstances documentation process.
+
+AGENT NAME: EC Documentation Assembler
+TYPE: Document Management / Workflow Automation
+
+OBJECTIVE:
+Streamline the extenuating circumstances documentation process by generating checklists, validating completeness, and assembling packages for Corporate Credit approval.
+
+EC DOCUMENTATION REQUIREMENTS:
+1. Borrower Letter of Explanation (LOX)
+   - Description of event
+   - Date of occurrence
+   - How it caused financial hardship
+   - Steps taken to recover
+
+2. Supporting Documentation by EC Type:
+   - Job Loss: Layoff notice, severance papers, unemployment records
+   - Medical: Medical bills, insurance EOBs, disability documentation
+   - Death of Spouse: Death certificate, estate documents
+   - Divorce: Divorce decree, separation agreement
+   - Natural Disaster: Insurance claims, FEMA documentation
+
+3. Credit Recovery Evidence
+   - Re-established credit accounts
+   - Payment history since event
+
+EC ELIGIBILITY RESTRICTIONS:
+- Max 90% LTV
+- Primary residence only
+- Purchase or limited cash-out only
+
+CHECKLIST OUTPUT:
+{
+  "ec_type": "Job Loss",
+  "required_documents": [
+    { "name": "LOX", "status": "received", "valid": true },
+    { "name": "Layoff Notice", "status": "pending", "valid": false },
+    { "name": "Severance Agreement", "status": "not_required", "valid": true }
+  ],
+  "package_complete": false,
+  "missing_items": ["Layoff Notice"],
+  "ready_for_submission": false
+}`,
+                integration: `INTEGRATION POINTS:
+1. Document Management System
+   - Check for uploaded documents
+   - Validate document types
+
+2. Condition Generator
+   - Create EC-specific conditions
+   - Track document receipt
+
+3. Workflow Engine
+   - Route to Corporate Credit when complete
+   - Track approval status
+
+4. LOX Template Generator
+   - Pre-populate borrower info
+   - Include event-specific prompts
+
+DEPLOYMENT:
+- Triggered when EC flag set
+- Monitor document uploads
+- Alert when package complete`
+            }
+        };
+
+        function showAgentPrompt(agentId) {
+            const agent = agentPrompts[agentId];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+            document.getElementById('promptTags').innerHTML = agent.tags.map(tag =>
+                `<span class="prompt-tag">${tag}</span>`
+            ).join('');
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            const content = document.getElementById('promptContent').textContent;
+            try {
+                await navigator.clipboard.writeText(content);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
