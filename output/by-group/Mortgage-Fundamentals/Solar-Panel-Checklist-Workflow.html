@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Panel Checklist - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge.stop-badge { background: rgba(244, 63, 94, 0.25); color: var(--accent-rose); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* MI Comparison Cards */
+        .mi-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .mi-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .mi-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .mi-card-header h4 { font-size: 1.05rem; }
+        .mi-card-body { padding: 22px; }
+        .mi-card ul { list-style: none; padding: 0; }
+        .mi-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .mi-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Solar Panel Checklist</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Solar Panel Checklist</h2>
+            <p>Leased & PPA Certification Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Loan Information</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Ineligible Programs</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Fannie Mae / DU</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Freddie Mac / LP</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Jumbo</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Government: FHA/VA</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Exceptions</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Title / Misc</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Leased & PPA Solar Panel Checklist</h1>
+                <p class="subtitle">Complete certification guide for properties with solar panels leased or owned by a third party (PPA)</p>
+                <div class="meta">
+                    <span class="meta-item">Document: 03.03.16</span>
+                    <span class="meta-item">Role: Underwriter / Processor</span>
+                    <span class="meta-item">Applies: All Loan Types</span>
+                    <span class="meta-item">Risk: Title / Lien Position</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Eligible/Pass</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>STOP - Ineligible</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Required Documentation</span></div>
+            </div>
+
+            <!-- Section 1: Loan Information -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Loan Information</h2><span>Gather and document essential loan and solar panel details</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Identify Solar Panels</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Leased or PPA?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Complete Checklist</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Borrower Name</strong></td>
+                                <td>Full name of the borrower(s)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Loan Number</strong></td>
+                                <td>CMG loan identifier</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Solar Company</strong></td>
+                                <td>Name of the solar panel provider/lessor</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Title Type</strong></td>
+                                <td>Lien, UCC, Notice, or Other</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Completed By</strong></td>
+                                <td>Name of processor/underwriter completing checklist</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Completed Date</strong></td>
+                                <td>Date checklist was completed</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Scope of This Checklist</h4>
+                        <p>This checklist is used for <strong>all properties with solar panels leased or owned by a third party (PPA)</strong>. All items must be underwritten in accordance with CMG overlays, agency guidelines, and underwriting risk review.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Ineligible Programs -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Ineligible Solar Programs</h2><span>STOP - These programs are not eligible with CMG new mortgage</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Check Solar Program Type</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Ineligible Program?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node exception">STOP - Must Pay Off</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Proceed to Guidelines</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>INELIGIBLE PROGRAMS - STOP IF ANY APPLY</h4>
+                        <p>The following loan programs are <strong>NOT eligible</strong> with CMG new mortgage if they will remain on title:</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Program</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PACE</strong></td>
+                                <td>Property Assessed Clean Energy - payments included in tax assessment and must be paid off prior to property selling</td>
+                                <td><span class="badge stop-badge">STOP</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>HERO</strong></td>
+                                <td>Home Energy Renovation Opportunity - payments included in tax assessments</td>
+                                <td><span class="badge stop-badge">STOP</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Solar TAX Assessment</strong></td>
+                                <td>Any Solar Energy/Panel TAX Assessment Program(s) - lease payments included in property tax assessments. Property taxes take precedent over mortgage lien positions</td>
+                                <td><span class="badge stop-badge">STOP</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>First Lien Impact</strong></td>
+                                <td>Any Solar Energy/Panel affecting CMG first lien position</td>
+                                <td><span class="badge stop-badge">STOP</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Why These Programs Are Ineligible</h4>
+                        <p>These programs create tax assessment liens that take precedent over mortgage lien positions, which jeopardizes CMG's first lien position and creates unacceptable risk for the loan.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Fannie Mae / DU -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Fannie Mae / DU Requirements</h2><span>Conventional loan guidelines for leased solar panels</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Requirement 1: DTI Treatment</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">The lease payment must be included in DTI unless the lease is structured to:</p>
+                        <ul class="step-list">
+                            <li><strong>Fixed Energy Delivery:</strong> Provide delivery of a specific amount of energy at a fixed payment during a given period, AND</li>
+                            <li><strong>Production Guarantee:</strong> Have a production guarantee that compensates the borrower on a prorated basis in the event the solar panels fail to meet the energy output required in the lease for that period</li>
+                        </ul>
+                        <div class="info-box">
+                            <h4>PPA Exception</h4>
+                            <p>This requirement does not apply in the case of a <strong>Power Purchase Agreement (PPA)</strong> where the payment is calculated solely based on the energy produced and used - may be excluded from the DTI.</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Requirement 2: Lease/PPA Must Indicate</h3>
+                        <ul class="step-list">
+                            <li><strong>Damage Responsibility:</strong> Any damage from installation, malfunction, manufacturing defect, or removal is the responsibility of the equipment owner. Owner must be obligated to repair and return improvements to original/prior condition (sound, watertight, architecturally consistent)</li>
+                            <li><strong>Insurance Requirements:</strong> The owner of solar panels agrees NOT to be a named loss payee (or named insured) on the property owner's property insurance policy. Alternative: Verify owner is not named on the insurance policy</li>
+                            <li><strong>Foreclosure Rights:</strong> In event of foreclosure, CMG has discretion to:
+                                <ul style="margin-top: 10px; margin-left: 20px;">
+                                    <li>Terminate lease/agreement and require removal of equipment, OR</li>
+                                    <li>Become beneficiary of borrower's lease/agreement without transfer fee, OR</li>
+                                    <li>Enter into new lease/agreement under terms no less favorable</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Title Exceptions</strong></td>
+                                <td>Any exceptions to coverage on title insurance policy for recorded instruments relating to solar panels must comply with B7-2-05, Title Exceptions and Impediments</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appraised Value</strong></td>
+                                <td>Leased solar panels CANNOT be included in the appraised value of the property</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Alternate Power</strong></td>
+                                <td>Property must maintain access to an alternate source of electric power that meets community standards</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Single Loan Exception</strong></td>
+                                <td>Required for ALL Fannie/DU loans with leased/PPA solar panels</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 4: Freddie Mac / LP -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Freddie Mac / LP Requirements</h2><span>Additional requirements beyond Fannie Mae guidelines</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Important: Includes All Fannie Mae Requirements</h4>
+                        <p>Freddie Mac/LP loans must meet ALL Fannie Mae leased solar panel requirements listed above, PLUS the following additional requirements:</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Area Consistency</strong></td>
+                                <td>Energy-efficient property uses (cost, construction, materials, mechanical systems, equipment, site orientation) must be consistent with area and meet community standards</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appraiser Identification</strong></td>
+                                <td>Appraiser must identify the property energy-efficient features</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marketability Comments</strong></td>
+                                <td>Appraiser must comment on any effect to value or marketability and make appropriate adjustments to reflect market reaction to energy-efficient features</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Foreclosure Restriction</strong></td>
+                                <td>In the event of foreclosure, CMG <strong>CANNOT</strong> take over energy-efficient/solar panels</td>
+                                <td><span class="badge stop-badge">RESTRICTION</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Key Difference: Foreclosure Rights</h4>
+                        <p>Unlike Fannie Mae, Freddie Mac does NOT allow CMG to take over the solar panels/lease in foreclosure. This is a critical distinction when determining loan eligibility.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Jumbo -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Jumbo Requirements</h2><span>Guidelines for Jumbo loan products</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Jumbo Product Guidelines</h4>
+                        <p>Refer to the <strong>Jumbo product matrices</strong> for detailed requirements specific to each Jumbo product. Solar panel requirements may vary by investor and product type.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Best Practice</h4>
+                        <p>Always verify current Jumbo product guidelines as they may have specific solar panel requirements that differ from agency guidelines. Contact your underwriting team if clarification is needed.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Government FHA/VA -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Government: FHA / VA</h2><span>Federal Housing Administration and Veterans Affairs requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Requirement 1: DTI Treatment</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">The lease payment <strong>MUST</strong> be included in the DTI.</p>
+                        <div class="info-box">
+                            <h4>VA Note</h4>
+                            <p>Standard 14 cents Maintenance & Utilities still applies regardless of lower utilities costs from solar panels.</p>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Requirement 2: Conveyance Protection</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Lease agreement must NOT cause a conveyance (ownership transfer) of property by the borrower to:</p>
+                        <ul class="step-list">
+                            <li>Be void, or voidable by a third party</li>
+                            <li>Be basis of contractual liability of borrower (including rights of first refusal, pre-emptive rights or options related to borrower's efforts to convey)</li>
+                            <li>Terminate or be subject to termination all or part of interest held by the borrower</li>
+                            <li>Be subject to consent of a third party</li>
+                            <li>Be subject to limits on sales proceeds borrower can retain (e.g., due to lien, "due on sale" clause, etc.)</li>
+                            <li>Be grounds for accelerating the insured mortgage</li>
+                            <li>Be grounds for increasing the interest rate of the insured mortgage</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Requirement 3: FHA Regulations</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Any restrictions from lease/PPA provisions must NOT conflict with FHA regulations unless provisions encumbering or restricting transfer of real property.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Requirement 4: Legal Restrictions on Conveyance</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Legal restrictions on free assumability of real property that could require consent of a third party include but are not limited to:</p>
+                        <ul class="step-list">
+                            <li><strong>Credit Approval:</strong> Must NOT require system owner consent before seller can convey real property</li>
+                            <li><strong>Termination Option:</strong> Unless provisions may be terminated at option of and with no cost to current homeowner</li>
+                            <li><strong>Transfer Restrictions:</strong> If lease/PPA could cause restriction upon transfer of home, property is subject to impermissible legal restrictions and generally ineligible</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Appraised Value</strong></td>
+                                <td>Leased solar panels CANNOT be included in appraised value</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Solar System ID</strong></td>
+                                <td>Appraiser must identify solar system features</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Marketability</strong></td>
+                                <td>Appraiser must comment on marketability</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Single Loan Exception</strong></td>
+                                <td>Required for ALL FHA loans with leased/PPA solar panels</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 7: Exceptions -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Exceptions</h2><span>Streamlined requirements for specific loan types</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="tip-box">
+                        <h4>Simplified Requirements</h4>
+                        <p>The following loan types have streamlined solar panel requirements:</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Loan Type</th>
+                                <th>Requirement</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>NCQ FHA Streamline</strong></td>
+                                <td>Only require title to ensure CMG new mortgage will be in first lien position</td>
+                                <td><span class="badge optional-badge">Simplified</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>NCQ VA IRRRL</strong></td>
+                                <td>Only require title to ensure CMG new mortgage will be in first lien position</td>
+                                <td><span class="badge optional-badge">Simplified</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Why Streamlined?</h4>
+                        <p>Non-Credit Qualifying (NCQ) streamline refinances have reduced documentation requirements because they are refinancing existing government-insured loans. The primary concern is maintaining CMG's first lien position.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Title / Misc -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Title / Misc Requirements</h2><span>Title review and subordination requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Requirement 1: Lien Subordination</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Lien on title must be subordinated to CMG first lien position.</p>
+                        <ul class="step-list">
+                            <li><strong>Review:</strong> Review full lease agreement/PPA</li>
+                            <li><strong>Obtain:</strong> Executed subordination agreement</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Requirement 2: UCC/Notice on Title</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">When easements reflect lease Uniform Commercial Code (UCC) financing statement or Notice of Independent Solar Energy on title:</p>
+                        <ul class="step-list">
+                            <li><strong>Request/Review:</strong> Recorded document(s), exhibit(s), and applicable solar lease agreement/PPA must meet ONE of the following:</li>
+                            <li><strong>Option A:</strong> Subordinate to CMG first lien position, OR</li>
+                            <li><strong>Option B:</strong> Title to ensure CMG is in first lien position, OR</li>
+                            <li><strong>Option C:</strong> Remove/delete UCC financing statement or Notice Independent Solar Energy</li>
+                        </ul>
+                    </div>
+
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Title</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">UCC/Lien Found?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Obtain Subordination</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Confirm First Lien</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical: First Lien Position</h4>
+                        <p>Under NO circumstances should CMG proceed with a loan where the solar panel arrangement jeopardizes the first lien position. Always obtain proper subordination or removal of conflicting liens before closing.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Solar Panel Quick Reference</h3>
+                <pre>
+SOLAR PANEL CHECKLIST - QUICK REFERENCE
+=======================================
+
+INELIGIBLE PROGRAMS (STOP - MUST PAY OFF)
+-----------------------------------------
+[ ] PACE - Property Assessed Clean Energy
+[ ] HERO - Home Energy Renovation Opportunity
+[ ] Any Solar TAX Assessment Program
+[ ] Any arrangement affecting CMG first lien
+
+FANNIE MAE / DU REQUIREMENTS
+----------------------------
+[ ] DTI: Include lease unless fixed delivery + production guarantee
+[ ] PPA: May exclude from DTI if based solely on energy used
+[ ] Lease must address: damage responsibility, insurance, foreclosure rights
+[ ] Title exceptions comply with B7-2-05
+[ ] Leased panels NOT in appraised value
+[ ] Alternate power source available
+[ ] Single Loan Exception required
+
+FREDDIE MAC / LP (All Fannie + below)
+-------------------------------------
+[ ] All Fannie Mae requirements above
+[ ] Energy features consistent with area
+[ ] Appraiser identifies energy features
+[ ] Appraiser comments on value/marketability
+[ ] CMG CANNOT take over panels in foreclosure
+
+GOVERNMENT: FHA / VA
+--------------------
+[ ] Lease payment MUST be in DTI (no exceptions)
+[ ] VA: 14 cents M&U still applies
+[ ] Lease cannot cause conveyance issues
+[ ] No third-party consent for sale
+[ ] Appraiser identifies system features
+[ ] Appraiser comments on marketability
+[ ] Single Loan Exception required
+
+EXCEPTIONS (STREAMLINED)
+------------------------
+[ ] NCQ FHA Streamline - Title only (first lien)
+[ ] NCQ VA IRRRL - Title only (first lien)
+
+TITLE REQUIREMENTS
+------------------
+[ ] Review full lease/PPA
+[ ] Lien subordinated to CMG
+[ ] UCC/Notice: Subordinate, confirm, or remove
+[ ] Executed subordination agreement obtained
+
+KEY DOCUMENTS TO COLLECT
+------------------------
+- Solar lease agreement / PPA
+- Subordination agreement
+- Title showing CMG first lien
+- Appraiser comments (if applicable)
+- Insurance policy (verify named insured)
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Solar Panel Checklist process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-programcheck')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Program Eligibility Agent</div>
+                        <div class="heat-desc">Auto-detect PACE/HERO/TAX assessments from title</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-leaseparser')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Lease Parser Agent</div>
+                        <div class="heat-desc">Extract key terms from solar lease/PPA documents</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>High</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-titlereview')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Title Review Agent</div>
+                        <div class="heat-desc">Identify UCC filings and lien position issues</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-checklist')">
+                        <div class="heat-score">6.1</div>
+                        <div class="heat-name">Checklist Generator</div>
+                        <div class="heat-desc">Auto-populate checklist based on loan type</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Program Eligibility Agent -->
+                    <div class="agent-card" id="agent-programcheck">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">P</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Program Eligibility Agent</div>
+                                <div class="agent-type">Document Analysis / Pattern Matching</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically scans title documents and tax records to identify PACE, HERO, or other solar tax assessment programs that would make the loan ineligible. Flags issues immediately to prevent processing time waste on ineligible loans.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Receive Title</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Scan for PACE/HERO</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Tax Records</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag/Clear</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('programcheck')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lease Parser Agent -->
+                    <div class="agent-card" id="agent-leaseparser">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">L</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Lease Parser Agent</div>
+                                <div class="agent-type">NLP / Document Extraction</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Uses natural language processing to extract key terms from solar lease and PPA documents including damage responsibility clauses, insurance requirements, foreclosure rights, and transfer restrictions. Maps findings to agency-specific requirements.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Upload Lease</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">OCR/Parse</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Extract Terms</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Map to Rules</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">High</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('leaseparser')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Title Review Agent -->
+                    <div class="agent-card" id="agent-titlereview">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">T</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Title Review Agent</div>
+                                <div class="agent-type">Document Analysis / Lien Detection</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Analyzes title documents to identify UCC financing statements, solar-related easements, and potential lien position issues. Automatically flags items requiring subordination and generates checklist of required actions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Title</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Find UCC/Liens</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Assess Position</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Tasks</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('titlereview')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checklist Generator Agent -->
+                    <div class="agent-card" id="agent-checklist">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Checklist Generator</div>
+                                <div class="agent-type">Rule Engine / Automation</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically generates the appropriate solar panel checklist based on loan type (Fannie, Freddie, FHA, VA, Jumbo) and pre-populates known information from the loan file. Tracks completion status and identifies missing items.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Detect Loan Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Load Rules</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Pre-fill Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Track Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('checklist')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Solar Panel Checklist Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Leased & PPA Solar Panel Checklist
+
+## Overview
+This checklist is used for all properties with solar panels leased or owned by a third party (PPA). All items must be underwritten in accordance with CMG overlays, agency guidelines, and underwriting risk review.
+
+## Ineligible Programs (STOP)
+- PACE - Property Assessed Clean Energy
+- HERO - Home Energy Renovation Opportunity
+- Any Solar TAX Assessment Program
+- Any arrangement affecting CMG first lien position
+
+## Fannie Mae / DU Requirements
+- DTI: Include lease unless fixed delivery + production guarantee
+- PPA: May exclude from DTI if based solely on energy used
+- Lease must address: damage responsibility, insurance, foreclosure rights
+- Title exceptions comply with B7-2-05
+- Leased panels NOT in appraised value
+- Alternate power source available
+- Single Loan Exception required
+
+## Freddie Mac / LP Requirements
+- All Fannie Mae requirements PLUS:
+- Energy features consistent with area
+- Appraiser identifies energy features
+- Appraiser comments on value/marketability
+- CMG CANNOT take over panels in foreclosure
+
+## Government (FHA/VA) Requirements
+- Lease payment MUST be in DTI
+- VA: 14 cents M&U still applies
+- Lease cannot cause conveyance issues
+- No third-party consent for sale
+- Appraiser identifies system features
+- Single Loan Exception required
+
+## Exceptions
+- NCQ FHA Streamline: Title only (first lien)
+- NCQ VA IRRRL: Title only (first lien)
+
+## Title Requirements
+- Lien subordinated to CMG first position
+- UCC/Notice: Subordinate, confirm, or remove
+- Executed subordination agreement required</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            programcheck: {
+                name: 'Program Eligibility Agent',
+                tags: ['Document Analysis', 'Pattern Matching', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically scans title documents and tax records to identify PACE, HERO, or other solar tax assessment programs that would make the loan ineligible. It flags issues immediately to prevent processing time waste on ineligible loans, saving significant time and ensuring compliance with CMG guidelines.`,
+                prompt: `You are building a Document Analysis Agent for CMG Financial's Solar Panel Checklist process.
+
+AGENT NAME: Program Eligibility Agent
+TYPE: Document Analysis / Pattern Matching
+
+OBJECTIVE:
+Create an agent that automatically scans title documents and tax records to identify ineligible solar programs (PACE, HERO, TAX Assessments) that would disqualify the loan.
+
+INPUT DATA:
+- Title commitment document (PDF)
+- Property tax records
+- Property address
+- County/State information
+
+PATTERN MATCHING RULES:
+
+1. PACE Programs:
+   - Keywords: "PACE", "Property Assessed Clean Energy", "PACE financing"
+   - Tax line items containing "clean energy assessment"
+   - Lien recordings referencing PACE administrator
+
+2. HERO Programs:
+   - Keywords: "HERO", "Home Energy Renovation Opportunity"
+   - Renovate America references
+   - Tax assessments labeled "energy improvement"
+
+3. Solar TAX Assessments:
+   - Any tax line item containing "solar"
+   - Property tax assessments for energy improvements
+   - Special assessment districts for renewable energy
+
+4. First Lien Impact:
+   - UCC filings with solar company names
+   - Fixture filings for solar equipment
+   - Superior lien recordings
+
+DETECTION LOGIC:
+{
+  "document_type": "title_commitment",
+  "scan_sections": ["Schedule B", "Exceptions", "Special Assessments"],
+  "keyword_match": true/false,
+  "program_detected": "PACE|HERO|TAX|NONE",
+  "confidence_score": 0.0-1.0,
+  "excerpt": "relevant text snippet",
+  "recommendation": "STOP|CLEAR|REVIEW"
+}
+
+OUTPUT:
+- STOP: Ineligible program detected with high confidence
+- CLEAR: No ineligible programs found
+- REVIEW: Possible match, requires human review
+
+ERROR HANDLING:
+- OCR quality check before processing
+- Flag illegible sections for manual review
+- Validate against multiple document sections`,
+                integration: `INTEGRATION POINTS:
+
+1. Document Intake
+   - Connect to Byte Stored Documents
+   - Auto-trigger on title upload
+   - Queue for batch processing
+
+2. Tax Record APIs
+   - County assessor databases
+   - CoreLogic property data
+   - ATTOM tax records
+
+3. Byte LOS Integration
+   - Flag loan in system if STOP condition
+   - Add condition for subordination if needed
+   - Update solar panel checklist status
+
+4. Notification System
+   - Alert processor immediately on STOP
+   - Create task for required actions
+   - Log all findings for audit trail
+
+DEPLOYMENT:
+- Triggered automatically on title document upload
+- Results displayed in loan dashboard
+- Findings stored with confidence scores`
+            },
+            leaseparser: {
+                name: 'Lease Parser Agent',
+                tags: ['NLP', 'Document Extraction', 'High Complexity', 'High Priority'],
+                purpose: `This agent uses natural language processing to extract key terms from solar lease and PPA documents including damage responsibility clauses, insurance requirements, foreclosure rights, and transfer restrictions. It maps findings directly to Fannie Mae, Freddie Mac, FHA, and VA requirements to determine compliance.`,
+                prompt: `You are building an NLP Document Extraction Agent for CMG Financial's Solar Panel Checklist process.
+
+AGENT NAME: Solar Lease Parser Agent
+TYPE: NLP / Document Extraction
+
+OBJECTIVE:
+Extract and analyze key provisions from solar lease and PPA agreements to determine compliance with agency guidelines.
+
+INPUT DATA:
+- Solar lease agreement (PDF)
+- Power Purchase Agreement (PPA) (PDF)
+- Loan type (Fannie, Freddie, FHA, VA, Jumbo)
+
+KEY PROVISIONS TO EXTRACT:
+
+1. Payment Structure:
+   - Fixed payment vs. usage-based
+   - Production guarantee terms
+   - Payment amount and frequency
+
+2. Damage Responsibility:
+   - Who is responsible for installation damage
+   - Repair obligations
+   - Restoration requirements
+
+3. Insurance Requirements:
+   - Named insured/loss payee provisions
+   - Insurance policy requirements
+   - Waiver of subrogation
+
+4. Foreclosure Rights:
+   - Lender rights upon foreclosure
+   - Lease termination options
+   - Assignment/assumption provisions
+
+5. Transfer Restrictions:
+   - Consent requirements for sale
+   - Credit approval requirements
+   - Fees for transfer
+
+6. Term and Termination:
+   - Lease duration
+   - Early termination rights
+   - Buyout options
+
+EXTRACTION SCHEMA:
+{
+  "document_type": "lease|ppa",
+  "solar_company": "string",
+  "payment_structure": {
+    "type": "fixed|variable|ppa",
+    "amount": "number",
+    "frequency": "monthly|annually",
+    "production_guarantee": true/false
+  },
+  "damage_provisions": {
+    "owner_responsible": true/false,
+    "restoration_required": true/false,
+    "compliant_text": "excerpt"
+  },
+  "insurance_provisions": {
+    "named_loss_payee": true/false,
+    "compliant": true/false
+  },
+  "foreclosure_rights": {
+    "termination_allowed": true/false,
+    "assumption_allowed": true/false,
+    "new_lease_allowed": true/false
+  },
+  "transfer_restrictions": {
+    "consent_required": true/false,
+    "credit_approval_required": true/false,
+    "fees_apply": true/false
+  }
+}
+
+COMPLIANCE MAPPING:
+- Map each extracted provision to agency requirements
+- Flag non-compliant terms
+- Identify missing required provisions`,
+                integration: `INTEGRATION POINTS:
+
+1. Document Processing
+   - PDF text extraction with OCR fallback
+   - Section identification using ML
+   - Clause boundary detection
+
+2. NLP Engine
+   - Named entity recognition for parties
+   - Clause classification model
+   - Semantic similarity for requirement matching
+
+3. Rules Engine
+   - Agency-specific requirement rules
+   - Loan type conditional logic
+   - Exception handling
+
+4. Byte LOS Integration
+   - Pre-fill checklist items
+   - Attach extracted data to loan
+   - Create conditions for non-compliant items
+
+5. Training Data
+   - Collect annotated lease documents
+   - Continuous model improvement
+   - Accuracy tracking per solar company
+
+DEPLOYMENT:
+- Triggered on lease document upload
+- Results mapped to checklist items
+- Human review queue for low-confidence extractions`
+            },
+            titlereview: {
+                name: 'Title Review Agent',
+                tags: ['Document Analysis', 'Lien Detection', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent analyzes title documents to identify UCC financing statements, solar-related easements, and potential lien position issues. It automatically flags items requiring subordination and generates a checklist of required actions to ensure CMG maintains first lien position.`,
+                prompt: `You are building a Document Analysis Agent for CMG Financial's Solar Panel Checklist process.
+
+AGENT NAME: Title Review Agent
+TYPE: Document Analysis / Lien Detection
+
+OBJECTIVE:
+Analyze title commitment documents to identify solar-related liens, UCC filings, and easements that could affect CMG's first lien position.
+
+INPUT DATA:
+- Title commitment (PDF)
+- Schedule B exceptions
+- UCC search results
+- Property legal description
+
+DETECTION TARGETS:
+
+1. UCC Financing Statements:
+   - Solar equipment financing
+   - Fixture filings
+   - Collateral descriptions mentioning solar
+
+2. Solar Easements:
+   - Access easements for maintenance
+   - Sunlight/view easements
+   - Equipment placement rights
+
+3. Notices on Title:
+   - Notice of Independent Solar Energy
+   - Solar lease memorandum
+   - PPA recording
+
+4. Lien Position Analysis:
+   - Recording dates vs. mortgage date
+   - Priority of solar-related liens
+   - Subordination status
+
+ANALYSIS OUTPUT:
+{
+  "title_findings": [
+    {
+      "type": "UCC|Easement|Notice|Lien",
+      "description": "string",
+      "recording_info": {
+        "book": "string",
+        "page": "string",
+        "date": "date"
+      },
+      "parties": ["debtor", "secured_party"],
+      "affects_lien_position": true/false,
+      "action_required": "subordinate|remove|none"
+    }
+  ],
+  "lien_position_status": "clear|requires_action",
+  "required_actions": [
+    {
+      "action": "Obtain subordination agreement",
+      "party": "Solar Company Name",
+      "deadline": "before closing"
+    }
+  ]
+}
+
+SUBORDINATION WORKFLOW:
+1. Identify items affecting lien position
+2. Determine subordination requirements
+3. Generate subordination request letter
+4. Track subordination status`,
+                integration: `INTEGRATION POINTS:
+
+1. Title Company Integration
+   - Receive title commitment electronically
+   - Parse Schedule B exceptions
+   - Request additional searches if needed
+
+2. UCC Search APIs
+   - State UCC filing databases
+   - National UCC search services
+   - Fixture filing indexes
+
+3. Byte LOS Integration
+   - Create title conditions
+   - Track subordination requests
+   - Update checklist status
+   - Store title analysis results
+
+4. Document Generation
+   - Subordination request templates
+   - Solar company contact lookup
+   - Follow-up reminder automation
+
+5. Audit Trail
+   - Log all title findings
+   - Track resolution status
+   - Compliance documentation
+
+DEPLOYMENT:
+- Triggered on title commitment upload
+- Real-time analysis results
+- Automatic condition creation in Byte`
+            },
+            checklist: {
+                name: 'Checklist Generator Agent',
+                tags: ['Rule Engine', 'Automation', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent automatically generates the appropriate solar panel checklist based on loan type and pre-populates known information from the loan file. It tracks completion status, identifies missing items, and ensures all agency-specific requirements are addressed.`,
+                prompt: `You are building a Rule Engine Agent for CMG Financial's Solar Panel Checklist process.
+
+AGENT NAME: Solar Checklist Generator
+TYPE: Rule Engine / Automation
+
+OBJECTIVE:
+Automatically generate and populate the correct solar panel checklist based on loan type, tracking completion and flagging missing items.
+
+INPUT DATA:
+- Loan type (Fannie Mae, Freddie Mac, FHA, VA, Jumbo)
+- Loan number
+- Borrower name(s)
+- Property address
+- Solar company name (if known)
+- Existing loan file data
+
+CHECKLIST RULES BY LOAN TYPE:
+
+1. Fannie Mae / DU:
+   - DTI treatment verification
+   - Lease/PPA provisions check (6 items)
+   - Title exception compliance
+   - Appraised value exclusion
+   - Alternate power verification
+   - Single Loan Exception required
+
+2. Freddie Mac / LP:
+   - All Fannie Mae items PLUS:
+   - Area consistency verification
+   - Appraiser energy feature identification
+   - Marketability comments
+   - Foreclosure restriction acknowledgment
+
+3. FHA:
+   - DTI inclusion (mandatory)
+   - Conveyance protection (7 sub-items)
+   - FHA regulation compliance
+   - Legal restriction review (3 sub-items)
+   - Appraised value exclusion
+   - Solar system identification
+   - Marketability comments
+   - Single Loan Exception required
+
+4. VA:
+   - All FHA items PLUS:
+   - 14 cents M&U acknowledgment
+
+5. Jumbo:
+   - Refer to product matrix
+   - Track investor-specific requirements
+
+CHECKLIST OUTPUT:
+{
+  "loan_number": "string",
+  "loan_type": "string",
+  "checklist_items": [
+    {
+      "section": "string",
+      "item_number": 1,
+      "description": "string",
+      "status": "pending|complete|na",
+      "required": true/false,
+      "completed_by": "string",
+      "completed_date": "date",
+      "notes": "string"
+    }
+  ],
+  "completion_percentage": 0-100,
+  "missing_items": ["list of incomplete required items"],
+  "ready_for_review": true/false
+}
+
+AUTO-POPULATION:
+- Borrower name from loan file
+- Loan number from loan file
+- Solar company from title (if available)
+- Title type from title commitment`,
+                integration: `INTEGRATION POINTS:
+
+1. Byte LOS Data
+   - Pull loan type and borrower info
+   - Access existing document data
+   - Store completed checklist
+
+2. Rule Engine
+   - Agency guideline rules database
+   - Loan type conditional logic
+   - Dynamic checklist generation
+
+3. Status Tracking
+   - Real-time completion percentage
+   - Missing item alerts
+   - Deadline tracking
+
+4. Workflow Integration
+   - Create tasks for missing items
+   - Route for UW review when complete
+   - Milestone tracking
+
+5. Reporting
+   - Checklist completion metrics
+   - Common missing items analysis
+   - Processing time tracking
+
+DEPLOYMENT:
+- Auto-generate on solar panel detection
+- Update as documents are received
+- Dashboard widget for status visibility`
+            }
+        };
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>

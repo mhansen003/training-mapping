@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settle-In Ops Buydown Input - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box, .warning-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        .warning-box { background: rgba(245, 158, 11, 0.08); border-color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); border-left: 4px solid var(--accent-amber); }
+        .warning-box h4 { color: var(--accent-amber); margin-bottom: 10px; font-size: 1rem; }
+        .warning-box p, .warning-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Option Cards */
+        .option-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 22px 0; }
+
+        .option-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden; }
+        .option-card-header { background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%); color: white; padding: 18px; text-align: center; }
+        .option-card-header h4 { font-size: 1.05rem; }
+        .option-card-body { padding: 22px; }
+        .option-card ul { list-style: none; padding: 0; }
+        .option-card li { padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.95rem; }
+        .option-card li:last-child { border-bottom: none; }
+        .check-icon { color: var(--accent-green); font-weight: bold; }
+        .x-icon { color: var(--accent-rose); font-weight: bold; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Buydown Input Job Aid</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Settle-In Buydown</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Program Overview</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Eligibility & Core Concept</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Workflow by Role</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Calculator & Documentation</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Byte System Input</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Buydown Options</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Principal Verification</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Compliance & Tips</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Settle-In Ops Buydown Input</h1>
+                <p class="subtitle">Complete guide for processing CMG's Settle-In Prepaid Buydown program in Byte LOS</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Processor / Closer / Funder</span>
+                    <span class="meta-item">Updated: Jan 23, 2026</span>
+                    <span class="meta-item">Duration: 1-36 Months Buydown</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Program Overview -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Program Overview</h2><span>Understanding the Settle-In Prepaid Buydown concept</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>What is Settle-In Prepaid Buydown?</h4>
+                        <p>The <strong>Settle-In Prepaid Buydown</strong> is CMG's creative use of seller concessions to prepay part of a borrower's monthly mortgage payment. It functions similarly to a temporary rate buydown but <strong>does not affect the rate or APR</strong>. Funds are placed in a subsidy account, and servicing draws the same amount each month to reduce the borrower's payment.</p>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>Buydown Duration</h4>
+                            <div class="value">1-36</div>
+                            <div class="label">Flexible Months</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Fund Source</h4>
+                            <div class="value">Seller</div>
+                            <div class="label">Concessions</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Payment Type</h4>
+                            <div class="value">Level</div>
+                            <div class="label">Same Each Month</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Rate Impact</h4>
+                            <div class="value">None</div>
+                            <div class="label">APR Unchanged</div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>SETTLE-IN OPTIONS DO NOT REDUCE THE BORROWER'S CASH TO CLOSE</h4>
+                        <p>Flex Cash provides payment relief over time, not at closing. This is a key distinction from traditional closing cost credits.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Eligibility & Core Concept -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Eligibility & Core Concept</h2><span>Program requirements and how the buydown works</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Eligible Programs</th>
+                                <th>Ineligible Programs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="check-icon">&#10003;</span> FHA, VA, USDA (Ginnie Mae loans)</td>
+                                <td><span class="x-icon">&#10007;</span> Conventional</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="x-icon">&#10007;</span> Any DPAs, housing agency loans, or private investors</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><span class="x-icon">&#10007;</span> Temporary rate buydowns (cannot be combined)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Key Program Rules</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong>Permanent rate buydowns ARE allowed</strong> in conjunction with Settle-In</li>
+                            <li>Seller concessions must still comply with <strong>maximum IPC limits</strong> per program</li>
+                            <li>Borrower funds used to prepay principal must be <strong>seasoned</strong> and <strong>not counted toward the minimum down payment</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Core Concept - How It Works</h3>
+                        <ul class="step-list">
+                            <li><strong>Subsidy Account:</strong> Seller concessions fund a subsidy account</li>
+                            <li><strong>Level Payment:</strong> Servicing draws the <strong>same amount each month</strong> for the duration of the buydown</li>
+                            <li><strong>Principal Restriction:</strong> Funds <strong>cannot</strong> be applied to principal - only interest, taxes, insurance, or mortgage insurance</li>
+                            <li><strong>Flexible Duration:</strong> From 1 to 36 months (unlike 12/24/36 in temporary buydowns)</li>
+                            <li><strong>Optional Principal Prepay:</strong> Borrowers may choose to prepay principal using their own funds to temporarily "pause" monthly payments, but this prepayment <strong>does not apply toward the minimum required investment</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Workflow by Role -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Workflow Summary by Role</h2><span>Role-specific responsibilities for Settle-In processing</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">LO Discusses Options</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">LO Completes Calculator</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processor Verifies</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Closer Inputs</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Servicing Activated</div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Loan Officer Responsibilities</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Discuss program options with borrower</li>
+                            <li><strong>Step 2:</strong> Determine if borrower wants to use seller concessions, own funds, or both</li>
+                            <li><strong>Step 3:</strong> Complete and provide the <strong>Prepaid Buydown Calculator Worksheet</strong> using the CMG Settle-In Mortgage Calculator</li>
+                            <li><strong>Step 4:</strong> Upload worksheet to the loan file</li>
+                            <li><strong>Step 5:</strong> Attest to completing the required training before originating</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Processor / Underwriter Responsibilities</h3>
+                        <ul class="step-list">
+                            <li><strong>Verify:</strong> Loan is eligible (FHA/VA/USDA only)</li>
+                            <li><strong>Verify:</strong> Seller concessions do not exceed IPC limits</li>
+                            <li><strong>Verify:</strong> Borrower's prepaid principal funds are seasoned and separate from down payment</li>
+                            <li><strong>Ensure:</strong> Calculator worksheet is in the file</li>
+                            <li><strong>Confirm:</strong> Prepaid Buydown box is checked on the Prepaid Buydown Screen in Byte (ensures Buydown Agreement prints with doc package)</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Closer / Funder Responsibilities</h3>
+                        <ul class="step-list">
+                            <li><strong>Input:</strong> Total buydown amount as a <strong>lump sum</strong> in Section H ("Paid to CMG")</li>
+                            <li><strong>Record:</strong> If borrower prepays principal, record it separately (borrower's own funds)</li>
+                            <li><strong>Net:</strong> Each buydown line item from the wire</li>
+                            <li><strong>Ensure:</strong> Prepaid Buydown checkbox is selected - this sends data to Servicing</li>
+                            <li><strong>Confirm:</strong> Buydown Agreement populates correctly and is included in the doc package</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Calculator & Documentation -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Calculator & Documentation</h2><span>Using the CMG Settle-In Mortgage Calculator</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Prepaid Buydown Calculator Features</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong>Plug-and-play design</strong> - easy to use interface</li>
+                            <li><strong>Validates</strong> that the buydown amount doesn't dip into the principal</li>
+                            <li><strong>Flags errors</strong> for noncompliant structures</li>
+                            <li><strong>Generates PDF summary</strong> showing borrower's selection and monthly subsidy amount</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Calculator Workflow Steps</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Loan Officer attests to completing course</li>
+                            <li><strong>Step 2:</strong> Input mortgage information (loan amount, rate, term, PITI breakdown)</li>
+                            <li><strong>Step 3:</strong> Click "Compute Results"</li>
+                            <li><strong>Step 4:</strong> LO selects from Options 1-4 based on borrower's choice</li>
+                            <li><strong>Step 5:</strong> Click "Create Results PDF"</li>
+                            <li><strong>Step 6:</strong> LO adds PDF to file and notes conversation log</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Website Resource</h4>
+                        <p>Access the <strong>CMG Settle-In Mortgage Calculator</strong> to complete the Prepaid Buydown Calculator Worksheet with borrower.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Byte System Input -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Byte System Input</h2><span>Configuring the Prepaid Buydown screen in Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="info-box">
+                        <h4>Prepaid Buydown Screen Purpose</h4>
+                        <p>The Prepaid Buydown screen in Byte is used to set up the subsidy account details so Servicing can withdraw a <strong>level amount each month</strong> to reduce the borrower's payment.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Instructions</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>First Payment Date</strong></td>
+                                <td>Always the <strong>Note First Payment Date</strong></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total PITI</strong></td>
+                                <td>Enter full payment (exclude HOA/optional dues)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monthly Prepaid Buydown Amount</strong></td>
+                                <td>Enter the monthly breakdown amount in the corresponding field (Seller, Lender, or Borrower)<br><em>Formula: Total Prepaid Amount / Total # of Months = Monthly Prepaid Principal Amount</em></td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monthly Borrower Pmt During Buydown</strong></td>
+                                <td>= Total PITI - Monthly Prepaid Buydown Amount</td>
+                                <td><span class="badge calculated-badge">Calculated</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Prepaid Buydown Amount Contributor</strong></td>
+                                <td>Choose either the Seller or Borrower field. Enter the <strong>total contribution amount</strong> from both borrower and/or seller</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total # of Buydown Months</strong></td>
+                                <td>1-36 months (the borrower decides the # of months)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Buydown Agreement Checkbox</strong></td>
+                                <td><strong>Must be checked</strong> for servicing setup</td>
+                                <td><span class="badge required-badge">Critical</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Prepaid Buydown and Principal Funds</strong></td>
+                                <td>The total of <strong>all contributions</strong> from both borrower and seller</td>
+                                <td><span class="badge calculated-badge">Auto-Calc</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Critical: Payment Restrictions</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>The monthly buydown amount must remain <strong>the same each month</strong></li>
+                            <li>Can only be applied to portions of the payment that are <strong>not principal</strong> (interest, taxes, insurance, and MI)</li>
+                            <li>If borrower is attempting to "pause payments," borrower may contribute their own <strong>seasoned funds</strong> to cover the principal portion</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Buydown Options -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Buydown Options (1-4)</h2><span>Four scenario options for borrower payment reduction</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="option-cards">
+                        <div class="option-card">
+                            <div class="option-card-header">
+                                <h4>Option 1: Payment Reduction (Pause Payments)</h4>
+                            </div>
+                            <div class="option-card-body">
+                                <ul>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Purpose:</strong> Cover borrower's full monthly payment for a set period</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>How it works:</strong> Seller concessions fund non-principal portion</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Borrower:</strong> Brings seasoned funds to cover principal</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Ops confirm:</strong> Level payment each month, borrower funds documented separately</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="option-card">
+                            <div class="option-card-header">
+                                <h4>Option 2: Front-Load (Max Up Front)</h4>
+                            </div>
+                            <div class="option-card-body">
+                                <ul>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Purpose:</strong> Largest monthly payment reduction upfront</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>How it works:</strong> Higher monthly subsidy over fewer months</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Ops confirm:</strong> Monthly subsidy doesn't exceed non-principal limit</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Note:</strong> Borrower still pays principal portion</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="option-card">
+                            <div class="option-card-header">
+                                <h4>Option 3: Fixed Months</h4>
+                            </div>
+                            <div class="option-card-body">
+                                <ul>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Purpose:</strong> Payment reduction for specific number of months</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>How it works:</strong> Worksheet calculates monthly subsidy needed</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Borrower chooses:</strong> The timeframe (1-36 months)</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Ops confirm:</strong> Months within limits, principal covered</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="option-card">
+                            <div class="option-card-header">
+                                <h4>Option 4: Fixed Amount</h4>
+                            </div>
+                            <div class="option-card-body">
+                                <ul>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Purpose:</strong> Reduce payment by specific dollar amount/month</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>How it works:</strong> Worksheet calculates how many months subsidy supports</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Ops confirm:</strong> Total funds support selected amount</li>
+                                    <li><span class="check-icon">&#10003;</span> <strong>Limits:</strong> Months don't exceed 36, principal not subsidized</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Principal Verification -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Verify Borrower Payment Covers Principal</h2><span>Critical validation step using Amortization Schedule</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Amortization Schedule</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Princ. Red. Column</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Payment > Principal?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed - Compliant</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Adjust Buydown Amount</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Verification Process</h4>
+                        <p>On the <strong>Amortization Schedule Screen</strong>, compare the Princ. Red. column amount for the Total # of buydown months. Confirm that the borrower's monthly payment during buydown is <strong>greater than the principal portion</strong> of the borrower's payment.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Example Verification</h4>
+                        <p><strong>16 Total # of Buydown Months:</strong><br>
+                        Borrower's monthly payment during buydown is $3,761.74.<br>
+                        That is greater than the principal of $481.28.<br>
+                        <strong>Calculator should also confirm this validation.</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Compliance & Tips -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Compliance & Operational Tips</h2><span>Timing requirements and best practices</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Compliance & Timing</h3>
+                        <ul class="step-list">
+                            <li><strong>No new disclosures</strong> or 3-day TRID wait (prepaids, not fees)</li>
+                            <li>If the compliance test fails, adjust the <strong>GFE block to "None"</strong></li>
+                            <li>Funds from seller concessions count toward the <strong>VA 4% max</strong> if applicable</li>
+                            <li>At <strong>payoff/refi</strong>, any remaining subsidy funds are applied to principal</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Operational Tips</h4>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Keep seller credits as <strong>lump sums</strong> for easier IPC tracking</li>
+                            <li><strong>Push back</strong> on LOs asking ops to calculate scenarios - use the calculator tool</li>
+                            <li>Double-check principal coverage using the <strong>Amortization Schedule</strong></li>
+                            <li><strong>Feedback encouraged</strong> - this workflow is new and subject to refinement</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Section H Input Reminder</h4>
+                        <p>Input the total buydown amount as a lump sum in <strong>Section H ("Paid to CMG")</strong>. Line 1330 - Prepaid Buydown Agreement Fee. Ensure "Net from Wire" is selected and "Paid To" shows "CMG".</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Settle-In Buydown Quick Reference</h3>
+                <pre>
+SETTLE-IN PREPAID BUYDOWN OVERVIEW
+===================================
+
+ELIGIBLE PROGRAMS:     FHA, VA, USDA (Ginnie Mae loans ONLY)
+INELIGIBLE:            Conventional, DPAs, Housing Agency Loans, Private Investors
+                       Cannot combine with Temporary Rate Buydowns
+
+KEY CONCEPT:
+- Seller concessions fund subsidy account
+- Servicing draws SAME amount each month
+- Funds applied to: Interest, Taxes, Insurance, MI
+- Funds CANNOT be applied to: Principal
+- Duration: 1-36 months (flexible)
+
+CALCULATOR OPTIONS
+==================
+Option 1: Payment Reduction  - "Pause" payments, borrower covers principal
+Option 2: Front-Load         - Maximum reduction upfront, fewer months
+Option 3: Fixed Months       - Borrower chooses duration
+Option 4: Fixed Amount       - Borrower chooses monthly reduction amount
+
+BYTE PREPAID BUYDOWN SCREEN FIELDS
+===================================
+Field                              | Value/Instruction
+-----------------------------------|------------------------------------------
+First Payment Date                 | Note First Payment Date
+Total PITI                         | Full payment (exclude HOA)
+Monthly Prepaid Buydown Amount     | Total Amount / # of Months
+Total # of Buydown Months          | 1-36 (borrower choice)
+Buydown Agreement Checkbox         | MUST BE CHECKED for servicing
+Total Prepaid Buydown & Principal  | Sum of all contributions
+
+VERIFICATION CHECKLIST
+======================
+[ ] Loan eligible (FHA/VA/USDA)
+[ ] Seller concessions within IPC limits
+[ ] Calculator worksheet uploaded
+[ ] Prepaid Buydown checkbox SELECTED in Byte
+[ ] Borrower payment > Principal (check Amortization Schedule)
+[ ] Section H lump sum entered correctly
+[ ] Buydown Agreement in doc package
+
+COMPLIANCE NOTES
+================
+- No TRID wait (prepaids, not fees)
+- VA: Seller concessions count toward 4% max
+- At payoff/refi: Remaining subsidy applied to principal
+- Permanent buydowns OK, Temporary buydowns NOT OK
+
+RESOURCES
+=========
+- CMG Settle-In Mortgage Calculator (online tool)
+- LO Training Attestation required before originating
+- Submit feedback on workflow improvements
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Settle-In Buydown process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-eligibility')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Eligibility Validator</div>
+                        <div class="heat-desc">Auto-verify loan program eligibility for Settle-In</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-calculator')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Calculator Assistant</div>
+                        <div class="heat-desc">Pre-fill calculator and validate buydown structures</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-principal')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Principal Verifier</div>
+                        <div class="heat-desc">Verify payment covers principal via amortization</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-ipc')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">IPC Limit Checker</div>
+                        <div class="heat-desc">Validate seller concessions against IPC limits</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Eligibility Validator Agent -->
+                    <div class="agent-card" id="agent-eligibility">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">E</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Eligibility Validator</div>
+                                <div class="agent-type">Rule Engine / Validation</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically validates loan program eligibility for Settle-In Prepaid Buydown by checking loan type (FHA/VA/USDA), ensuring no conflicting temporary buydowns exist, and flagging ineligible programs before processing begins.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read Loan Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Eligibility</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Scan Buydowns</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Return Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('eligibility')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Assistant Agent -->
+                    <div class="agent-card" id="agent-calculator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Calculator Assistant</div>
+                                <div class="agent-type">Data Pre-fill / Validation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Pre-fills the CMG Settle-In Mortgage Calculator with loan data from Byte, validates buydown structures against compliance rules, and ensures principal is never subsidized before generating the PDF worksheet.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract Loan Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Pre-fill Calculator</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Structure</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate PDF</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('calculator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Principal Verifier Agent -->
+                    <div class="agent-card" id="agent-principal">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">P</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Principal Verifier</div>
+                                <div class="agent-type">Compliance Validation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically cross-references the Prepaid Buydown screen with the Amortization Schedule to verify that borrower's monthly payment during buydown exceeds the principal portion for all buydown months.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read Buydown Amt</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Pull Amort Schedule</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Values</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Alert if Fail</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">100%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('principal')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- IPC Limit Checker Agent -->
+                    <div class="agent-card" id="agent-ipc">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">I</div>
+                            <div class="agent-info">
+                                <div class="agent-name">IPC Limit Checker</div>
+                                <div class="agent-type">Compliance / Rule Engine</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates that total seller concessions including the Settle-In buydown amount do not exceed IPC (Interested Party Contribution) limits per program guidelines (FHA, VA, USDA) and flags VA 4% max considerations.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Sum Concessions</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Lookup IPC Limit</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate %</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Pass/Fail</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('ipc')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Settle-In Buydown Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Settle-In Ops Buydown Input - Byte LOS
+
+## Overview
+The Settle-In Prepaid Buydown is CMG's creative use of seller concessions to prepay part of a borrower's monthly mortgage payment. It functions similarly to a temporary rate buydown but does not affect the rate or APR.
+
+## Program Eligibility
+- ELIGIBLE: FHA, VA, USDA (Ginnie Mae loans)
+- INELIGIBLE: Conventional, DPAs, Housing Agency Loans, Private Investors
+- Cannot combine with temporary rate buydowns
+- Permanent rate buydowns ARE allowed
+
+## Core Concept
+- Seller concessions fund subsidy account
+- Servicing draws SAME amount each month
+- Funds applied to: Interest, Taxes, Insurance, MI
+- Funds CANNOT be applied to: Principal
+- Duration: 1-36 months (flexible)
+
+## Workflow by Role
+
+### Loan Officer
+1. Discuss options with borrower
+2. Complete Prepaid Buydown Calculator Worksheet
+3. Upload to loan file
+4. Attest to completing required training
+
+### Processor/Underwriter
+1. Verify loan eligibility (FHA/VA/USDA)
+2. Verify seller concessions within IPC limits
+3. Verify borrower prepaid principal funds are seasoned
+4. Ensure calculator worksheet in file
+5. Confirm Prepaid Buydown checkbox in Byte
+
+### Closer/Funder
+1. Input total buydown as lump sum in Section H
+2. Record borrower principal prepay separately
+3. Net buydown line items from wire
+4. Ensure Prepaid Buydown checkbox selected
+5. Confirm Buydown Agreement in doc package
+
+## Byte Field Reference
+- First Payment Date: Note First Payment Date
+- Total PITI: Full payment (exclude HOA)
+- Monthly Prepaid Buydown Amount: Total / # Months
+- Buydown Agreement Checkbox: MUST BE CHECKED
+
+## Compliance Notes
+- No TRID wait (prepaids, not fees)
+- VA: Seller concessions count toward 4% max
+- At payoff/refi: Remaining subsidy applied to principal</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            eligibility: {
+                name: 'Eligibility Validator Agent',
+                tags: ['Rule Engine', 'Validation', 'Low Complexity', 'Critical Priority'],
+                purpose: `This agent automatically validates loan program eligibility for Settle-In Prepaid Buydown by checking loan type (FHA/VA/USDA), ensuring no conflicting temporary buydowns exist, and flagging ineligible programs before processing begins.`,
+                prompt: `You are building a Rule Engine Agent for CMG Financial's Settle-In Prepaid Buydown process.
+
+AGENT NAME: Eligibility Validator
+TYPE: Rule Engine / Validation
+
+OBJECTIVE:
+Automatically validate loan eligibility for Settle-In Prepaid Buydown before any processing begins.
+
+ELIGIBILITY RULES:
+1. ELIGIBLE LOAN TYPES (Ginnie Mae loans):
+   - FHA
+   - VA
+   - USDA
+
+2. INELIGIBLE LOAN TYPES:
+   - Conventional
+   - DPAs (Down Payment Assistance programs)
+   - Housing agency loans
+   - Private investor loans
+
+3. BUYDOWN CONFLICT RULES:
+   - Temporary rate buydowns: CANNOT be combined with Settle-In
+   - Permanent rate buydowns: CAN be combined with Settle-In
+
+INPUT DATA (from Byte LOS):
+{
+  "loan_type": "FHA" | "VA" | "USDA" | "CONV" | ...,
+  "investor_type": "Ginnie Mae" | "Fannie Mae" | "Private" | ...,
+  "has_dpa": boolean,
+  "has_temp_buydown": boolean,
+  "has_perm_buydown": boolean
+}
+
+VALIDATION LOGIC:
+1. Check loan_type IN ['FHA', 'VA', 'USDA']
+2. Check investor_type = 'Ginnie Mae'
+3. Check has_dpa = false
+4. Check has_temp_buydown = false
+
+OUTPUT:
+{
+  "eligible": true | false,
+  "loan_type": "FHA",
+  "failures": [],
+  "warnings": ["Permanent buydown present - OK to combine"],
+  "recommendation": "Proceed with Settle-In" | "Ineligible - See failures"
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Database
+   - Query loan type from loan file
+   - Query investor assignment
+   - Check for existing buydown conditions
+
+2. Trigger Points
+   - On loan file open
+   - When Settle-In is selected
+   - Before calculator submission
+
+3. User Interface
+   - Display eligibility status badge
+   - Block Settle-In screen if ineligible
+   - Show detailed failure reasons
+
+4. Audit Trail
+   - Log all eligibility checks
+   - Track manual overrides (if any)
+   - Generate compliance report`
+            },
+            calculator: {
+                name: 'Calculator Assistant Agent',
+                tags: ['Data Pre-fill', 'Validation', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent pre-fills the CMG Settle-In Mortgage Calculator with loan data from Byte, validates buydown structures against compliance rules, and ensures principal is never subsidized before generating the PDF worksheet.`,
+                prompt: `You are building a Data Pre-fill Agent for CMG Financial's Settle-In Prepaid Buydown Calculator.
+
+AGENT NAME: Calculator Assistant
+TYPE: Data Pre-fill / Validation
+
+OBJECTIVE:
+Extract loan data from Byte LOS and pre-fill the CMG Settle-In Mortgage Calculator, then validate the buydown structure.
+
+DATA EXTRACTION FROM BYTE:
+{
+  "home_price": number,
+  "down_payment": number,
+  "base_loan_amount": number,
+  "interest_rate": number,
+  "loan_term": number,
+  "property_tax_monthly": number,
+  "property_ins_monthly": number,
+  "mortgage_ins_rate": number,
+  "total_piti": number,
+  "seller_concession_available": number
+}
+
+CALCULATOR PRE-FILL MAPPING:
+- Home Price -> Mortgage Inputs: Home Price
+- Down Payment -> Mortgage Inputs: Down Payment
+- Interest Rate -> Mortgage Inputs: Interest Rate
+- Loan Term -> Mortgage Inputs: Loan Term
+- Property Tax -> Mortgage Inputs: Property Tax
+- Property Insurance -> Mortgage Inputs: Property Ins
+- MI Rate -> Mortgage Inputs: FHA Mortgage Ins Rate
+- Seller Concessions -> Flex Cash Scenario Inputs: Total Flex Cash
+
+VALIDATION RULES:
+1. Monthly buydown cannot exceed (PITI - Principal)
+2. Total buydown months: 1-36
+3. Seller concessions within IPC limits
+4. Level payment maintained each month
+
+OUTPUT OPTIONS (1-4):
+- Option 1: Pause Payments (up to 6 months)
+- Option 2: Front-Load (Maximum Up Front)
+- Option 3: Fixed Months (borrower chooses duration)
+- Option 4: Fixed Amount (borrower chooses $/month)
+
+POST-VALIDATION:
+{
+  "pre_fill_complete": true,
+  "validation_passed": true,
+  "principal_protected": true,
+  "recommended_option": 3,
+  "max_months_available": 16,
+  "max_reduction_per_month": 500.00
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS API
+   - Read loan data fields
+   - Pull amortization schedule
+   - Access seller concession data
+
+2. Calculator Integration
+   - API or browser automation
+   - Pre-fill all input fields
+   - Trigger compute results
+
+3. PDF Generation
+   - Capture borrower selection
+   - Generate summary PDF
+   - Auto-upload to loan file
+
+4. Notes Integration
+   - Add conversation log entry
+   - Document option selected
+   - Track LO attestation`
+            },
+            principal: {
+                name: 'Principal Verifier Agent',
+                tags: ['Compliance', 'Validation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically cross-references the Prepaid Buydown screen with the Amortization Schedule to verify that borrower's monthly payment during buydown exceeds the principal portion for all buydown months.`,
+                prompt: `You are building a Compliance Validation Agent for CMG Financial's Settle-In Prepaid Buydown.
+
+AGENT NAME: Principal Verifier
+TYPE: Compliance Validation
+
+OBJECTIVE:
+Ensure the borrower's monthly payment during buydown period is greater than the principal portion of the payment for all buydown months.
+
+DATA SOURCES:
+1. Prepaid Buydown Screen:
+   - Monthly Borrower Pmt During Buydown
+   - Total # of Buydown Months
+
+2. Amortization Schedule:
+   - Principal Reduction (Princ. Red.) column
+   - For each month of buydown period
+
+VERIFICATION LOGIC:
+FOR each month IN range(1, buydown_months + 1):
+    principal_due = amortization_schedule[month].principal_reduction
+    borrower_payment = buydown_screen.monthly_borrower_pmt
+
+    IF borrower_payment <= principal_due:
+        FAIL("Month {month}: Payment ${borrower_payment} does not cover principal ${principal_due}")
+
+RETURN PASS if all months verified
+
+EXAMPLE VALIDATION:
+{
+  "buydown_months": 16,
+  "monthly_borrower_payment": 3761.74,
+  "principal_values": [
+    { "month": 1, "principal": 443.82, "covered": true },
+    { "month": 2, "principal": 446.22, "covered": true },
+    ...
+    { "month": 16, "principal": 481.28, "covered": true }
+  ],
+  "validation_result": "PASS",
+  "minimum_margin": 3280.46
+}
+
+ALERT TRIGGERS:
+- Payment < Principal: BLOCK transaction
+- Payment = Principal: WARNING (no margin)
+- Payment > Principal by < 10%: WARNING (low margin)`,
+                integration: `INTEGRATION POINTS:
+1. Byte Prepaid Buydown Screen
+   - Read buydown configuration
+   - Extract monthly payment amount
+   - Get buydown duration
+
+2. Byte Amortization Schedule
+   - Query for loan number
+   - Extract principal column
+   - Filter by buydown months
+
+3. Real-time Validation
+   - Trigger on field change
+   - Recalculate on save
+   - Block if validation fails
+
+4. User Feedback
+   - Green checkmark if pass
+   - Red alert if fail
+   - Show month-by-month breakdown`
+            },
+            ipc: {
+                name: 'IPC Limit Checker Agent',
+                tags: ['Compliance', 'Rule Engine', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent validates that total seller concessions including the Settle-In buydown amount do not exceed IPC (Interested Party Contribution) limits per program guidelines and flags VA 4% max considerations.`,
+                prompt: `You are building a Compliance Rule Engine for CMG Financial's Seller Concession IPC Limits.
+
+AGENT NAME: IPC Limit Checker
+TYPE: Compliance / Rule Engine
+
+OBJECTIVE:
+Validate seller concessions including Settle-In buydown against IPC (Interested Party Contribution) limits by loan program.
+
+IPC LIMITS BY PROGRAM:
+1. FHA:
+   - LTV > 90%: 6% of sales price
+   - LTV <= 90%: 6% of sales price
+
+2. VA:
+   - Standard limit: 4% of sales price (includes buydown)
+   - Note: Seller concessions for closing costs separate
+
+3. USDA:
+   - Standard limit: 6% of sales price
+
+INPUT DATA:
+{
+  "loan_type": "VA",
+  "sales_price": 500000,
+  "ltv": 96.5,
+  "seller_concessions": {
+    "closing_costs": 5000,
+    "prepaids": 3000,
+    "settle_in_buydown": 8000,
+    "discount_points": 2000
+  }
+}
+
+CALCULATION LOGIC:
+total_concessions = sum(seller_concessions.values())
+ipc_limit = get_ipc_limit(loan_type, ltv) * sales_price
+remaining_capacity = ipc_limit - total_concessions
+
+VA SPECIAL HANDLING:
+- 4% max includes: Prepaid buydown, discount points, gift of equity
+- 4% max excludes: Closing costs, prepaids, recording fees
+
+OUTPUT:
+{
+  "loan_type": "VA",
+  "ipc_limit_percent": 4,
+  "ipc_limit_amount": 20000,
+  "total_concessions": 18000,
+  "remaining_capacity": 2000,
+  "validation": "PASS",
+  "warnings": ["VA 4% max includes buydown - $2,000 remaining capacity"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Loan Data
+   - Read loan type
+   - Get sales price
+   - Calculate LTV
+
+2. Fee Worksheets
+   - Sum seller credits
+   - Categorize by type
+   - Track buydown separately
+
+3. Real-time Calculation
+   - Update on any fee change
+   - Recalculate on buydown input
+   - Alert when approaching limit
+
+4. Compliance Dashboard
+   - Show IPC utilization %
+   - Display remaining capacity
+   - Flag when > 90% utilized`
+            }
+        };
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
