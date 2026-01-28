@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Fundamentals - Documentation | CMG Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        .system-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 50px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .system-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header-content { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .system-icon { font-size: 4rem; margin-bottom: 15px; }
+
+        .system-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .system-description { font-size: 1.15rem; color: var(--text-secondary); max-width: 650px; }
+
+        .header-stats { display: flex; gap: 25px; margin-top: 30px; flex-wrap: wrap; }
+
+        .header-stat {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 18px 28px;
+            border-radius: 12px;
+        }
+
+        .header-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stat-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 30px; }
+
+        .category-section { margin-bottom: 40px; }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .category-icon { font-size: 1.8rem; }
+        .category-title { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
+
+        .category-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .module-card.complete { border-color: rgba(34, 197, 94, 0.3); }
+
+        .module-card.complete::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-teal) 100%);
+        }
+
+        .module-name { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+        .module-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
+
+        .module-status { display: flex; gap: 10px; margin-bottom: 18px; }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.complete { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+
+        .module-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .module-link:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+        }
+
+        .module-link.primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border: none;
+            color: white;
+        }
+
+        .module-link.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .system-title { font-size: 2rem; }
+            .header-stats { gap: 15px; }
+            .header-stat { padding: 12px 18px; }
+            .module-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="breadcrumb">
+        <a href="../../index.html">🏠 Portal Home</a>
+        <span class="separator">›</span>
+        <span class="current">📚 Mortgage Fundamentals</span>
+    </nav>
+
+    <header class="system-header">
+        <div class="header-content">
+            <div class="system-icon">📚</div>
+            <h1 class="system-title">Mortgage Fundamentals</h1>
+            <p class="system-description">Core mortgage concepts, processing workflows, documentation requirements, compliance guidelines, and industry knowledge essential for all mortgage professionals.</p>
+
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">49</div>
+                    <div class="header-stat-label">Total Modules</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">49</div>
+                    <div class="header-stat-label">Documented</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">140+</div>
+                    <div class="header-stat-label">AI Agent Opportunities</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <!-- Tax Documents (4506) -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📋</span>
+                <h2 class="category-title">Tax Documents (4506)</h2>
+                <span class="category-count">5 of 5</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">4506 Form Types Needed</h3>
+                    <p class="module-description">Guide to determining which 4506 form types are required for different loan scenarios.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./4506-Form-Types-Needed-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">4506C - Completing the Form</h3>
+                    <p class="module-description">Step-by-step guide for properly completing the 4506-C tax transcript request form.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./4506C-Completing-Form-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">IRS 4506-C Workflow</h3>
+                    <p class="module-description">Complete IRS 4506-C processing workflow and submission procedures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./IRS-4506-C-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Mastering the 4506-C FAQ</h3>
+                    <p class="module-description">Frequently asked questions and expert answers about 4506-C forms.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Mastering-4506-C-FAQ-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Revising 4506 & Ordering Transcripts</h3>
+                    <p class="module-description">How to revise 4506 forms and order tax transcripts from the IRS.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Revising-4506-Ordering-Transcripts-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- First Time Homebuyer -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🏠</span>
+                <h2 class="category-title">First Time Homebuyer (FTHB)</h2>
+                <span class="category-count">8 of 8</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Affordability Worksheet</h3>
+                    <p class="module-description">Help first-time buyers calculate what they can afford.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Affordability-Worksheet-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Budget Worksheet</h3>
+                    <p class="module-description">Budget planning worksheet for first-time homebuyers.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Budget-Worksheet-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Do's and Don'ts</h3>
+                    <p class="module-description">Essential guidelines for first-time homebuyers to follow.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Dos-and-Donts-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Home Comparison Checklist</h3>
+                    <p class="module-description">Checklist for comparing homes during the shopping process.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Home-Comparison-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB New Homeowner Checklist</h3>
+                    <p class="module-description">Post-purchase checklist for new homeowners.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-New-Homeowner-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Terms You Should Know</h3>
+                    <p class="module-description">Glossary of essential mortgage terms for first-time buyers.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Terms-You-Should-Know-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Understanding Credit</h3>
+                    <p class="module-description">Credit education guide for first-time homebuyers.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Understanding-Credit-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">FTHB Who's Who</h3>
+                    <p class="module-description">Guide to the professionals involved in a mortgage transaction.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FTHB-Whos-Who-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Processing Workflows -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">⚙️</span>
+                <h2 class="category-title">Processing Workflows</h2>
+                <span class="category-count">10 of 10</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">CMG Processor Workflow</h3>
+                    <p class="module-description">Core processor workflow and responsibilities at CMG.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./CMG-Processor-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processing Assistant Manual</h3>
+                    <p class="module-description">Comprehensive manual for processing assistants.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processing-Assistant-Manual-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processing Checklist</h3>
+                    <p class="module-description">Master checklist for loan processing tasks.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processing-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processor Certification</h3>
+                    <p class="module-description">Internal processor certification documentation.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processor-Certification-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processor File Flow - Purchase</h3>
+                    <p class="module-description">Step-by-step file flow for purchase transactions.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processor-File-Flow-Purchase-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processor File Flow - Refi</h3>
+                    <p class="module-description">Step-by-step file flow for refinance transactions.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processor-File-Flow-Refi-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Processor III Responsibilities</h3>
+                    <p class="module-description">Responsibilities and condition codes for Processor III role.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Processor-III-Responsibilities-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">LO File Submission Form</h3>
+                    <p class="module-description">Loan Officer file submission requirements and form.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./LO-File-Submission-Form-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Life of Loan Roadmap</h3>
+                    <p class="module-description">End-to-end journey of a loan from application to closing.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Life-of-Loan-Roadmap-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">File Quality Coaching Plan</h3>
+                    <p class="module-description">Quality coaching plan for file review and improvement.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./File-Quality-Coaching-Plan-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credit & Liabilities -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💳</span>
+                <h2 class="category-title">Credit & Liabilities</h2>
+                <span class="category-count">5 of 5</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Collections & Judgments Reference</h3>
+                    <p class="module-description">Guidelines for handling collections and judgments on credit reports.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Collections-Judgements-Reference-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Credit Inquiry Letter</h3>
+                    <p class="module-description">Letter of explanation for credit inquiries template and guide.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Credit-Inquiry-Letter-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Derogatory Credit Matrix</h3>
+                    <p class="module-description">Matrix for seasoning requirements on derogatory credit events.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Derogatory-Credit-Matrix-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Large Deposit Letter</h3>
+                    <p class="module-description">Letter of explanation for large deposits template.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Large-Deposit-Letter-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Pre-Qual to Mortgage Report</h3>
+                    <p class="module-description">Converting pre-qualification to mortgage-only credit report.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Pre-Qual-to-Mortgage-Report-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Income & Employment -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">💰</span>
+                <h2 class="category-title">Income & Employment</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Income Calculations Quick Reference</h3>
+                    <p class="module-description">Quick reference guide for income calculation methods.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Income-Calculations-Quick-Reference-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Income Verification Workflow</h3>
+                    <p class="module-description">Complete workflow for verifying borrower income.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Income-Verification-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Title & Insurance -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🏦</span>
+                <h2 class="category-title">Title & Insurance</h2>
+                <span class="category-count">4 of 4</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Hazard Insurance Review</h3>
+                    <p class="module-description">Guidelines for reviewing homeowners insurance policies.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Hazard-Insurance-Review-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Hazard Insurance Review Checklist</h3>
+                    <p class="module-description">Checklist for verifying insurance policy requirements.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Hazard-Insurance-Review-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Prelim Title Review Checklist</h3>
+                    <p class="module-description">Checklist for preliminary title review.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Prelim-Title-Review-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Title CPL & Wire Instructions</h3>
+                    <p class="module-description">Closing Protection Letter and wire instruction procedures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Title-CPL-Wire-Instructions-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Disclosures & Compliance -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📜</span>
+                <h2 class="category-title">Disclosures & Compliance</h2>
+                <span class="category-count">5 of 5</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Disclosure Training Manual (Retail)</h3>
+                    <p class="module-description">Comprehensive disclosure training for retail channel.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Disclosure-Training-Manual-Retail-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Change of Circumstance Definitions</h3>
+                    <p class="module-description">Definitions and triggers for Change of Circumstance disclosures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Change-of-Circumstance-Definitions-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Equal Access Letter</h3>
+                    <p class="module-description">Equal Credit Opportunity Act compliance letter template.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Equal-Access-Letter-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">NY Subprime Fail Disclosure</h3>
+                    <p class="module-description">New York specific subprime disclosure requirements.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./NY-Subprime-Fail-Disclosure-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Patriot Act Borrower Documentation</h3>
+                    <p class="module-description">USA PATRIOT Act compliance documentation requirements.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Patriot-Act-Borrower-Documentation-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payoffs & Transcripts -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📤</span>
+                <h2 class="category-title">Payoffs & Transcripts</h2>
+                <span class="category-count">3 of 3</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Ordering CMG Payoffs</h3>
+                    <p class="module-description">Job aid for ordering payoff statements from CMG.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Ordering-CMG-Payoffs-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Ordering Transcripts via 8821</h3>
+                    <p class="module-description">Process for ordering tax transcripts using Form 8821.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Ordering-Transcripts-8821-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Payoff Request Form</h3>
+                    <p class="module-description">Payoff request form and submission procedures.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Payoff-Request-Form-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing & Funding -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">✅</span>
+                <h2 class="category-title">Closing & Funding</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">CMG eClosing</h3>
+                    <p class="module-description">Electronic closing process and procedures at CMG.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./CMG-eClosing-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Funder QC Checklist</h3>
+                    <p class="module-description">Quality control checklist for funding department.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Funder-QC-Checklist-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Assets & Documentation -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">📁</span>
+                <h2 class="category-title">Assets & Documentation</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Asset & Source of Funds Cheat Sheet</h3>
+                    <p class="module-description">Quick reference for asset documentation requirements.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Asset-Source-Funds-Cheat-Sheet-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Print URL Source on Documents</h3>
+                    <p class="module-description">How to print URL source on internet-sourced documents.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Print-URL-Source-Internet-Documents-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appraisals & Property -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🏡</span>
+                <h2 class="category-title">Appraisals & Property</h2>
+                <span class="category-count">1 of 1</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">Appraisal Help Resources</h3>
+                    <p class="module-description">Resources and guidance for appraisal-related questions.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Appraisal-Help-Resources-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Government Programs -->
+        <section class="category-section">
+            <div class="category-header">
+                <span class="category-icon">🏛️</span>
+                <h2 class="category-title">Government Programs</h2>
+                <span class="category-count">2 of 2</span>
+            </div>
+            <div class="module-grid">
+                <div class="module-card complete">
+                    <h3 class="module-name">FHA Case Number SUA</h3>
+                    <p class="module-description">How to pull FHA case numbers for Single Unit Approval.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./FHA-Case-Number-SUA-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+                <div class="module-card complete">
+                    <h3 class="module-name">Converting Loan to GFE</h3>
+                    <p class="module-description">Process for converting a loan to Good Faith Estimate.</p>
+                    <div class="module-status"><span class="status-badge complete">✓ Complete</span></div>
+                    <div class="module-links"><a href="./Converting-Loan-to-GFE-Workflow.html" class="module-link primary">📊 View Workflow</a></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>CMG Training Documentation Portal — Mortgage Fundamentals — Last Updated: January 2026</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,2433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processor III Responsibilities - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        /* Condition Category Card */
+        .condition-category {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .condition-category-header {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .condition-category-header h4 {
+            color: var(--accent-blue);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .condition-category-body { padding: 0; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Processor III Responsibilities</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Processor III Tasks</h2>
+            <p>Condition Clearance Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Overview & Access</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">APP Conditions</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">DISC Conditions</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">CRED Conditions</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">INC Conditions</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">ASSET Conditions</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">PROP Conditions</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">MISC/TITLE/GOV</span>
+            </a>
+            <a href="#section-9" class="nav-item">
+                <span class="nav-number">9</span>
+                <span class="nav-label">Title Exceptions</span>
+            </a>
+            <a href="#section-10" class="nav-item">
+                <span class="nav-number">10</span>
+                <span class="nav-label">Disclosure Management</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Processor III Responsibilities</h1>
+                <p class="subtitle">Complete guide for Processor III condition clearance and sign-off authority in Byte LOS</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Processor III</span>
+                    <span class="meta-item">Updated: June 21, 2023</span>
+                    <span class="meta-item">Loan Type: Conventional (unless noted)</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Overview & Access -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Overview & Access</h2><span>Understanding Processor III role and Byte login requirements</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Login to Byte</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Select Processor III Profile</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Access PIII Conditions</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h4>Processor III Role</h4>
+                        <p>Processor III has the same access as Processor II, <strong>plus</strong> the ability to sign off on Processor III conditions prior to the loan being CTC (Clear to Close) by the Underwriter. These conditions are marked with "Processor III" in the class column.</p>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Key Responsibility</h4>
+                        <p><strong>Processor III must mark the documents attached to the conditions as APPROVED.</strong> The success of the PIII role relies on ensuring that files are complete for submission to investors, as these conditions are not reviewed by an Underwriter.</p>
+                    </div>
+                    <div class="exception-box">
+                        <h4>Important Note</h4>
+                        <p>Processor III conditions apply to <strong>conventional loans</strong> unless specifically stated otherwise. When logging into Byte, select <strong>Processor III profile</strong> instead of Processor II to access these clearance capabilities.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: APP Conditions -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>APP Conditions</h2><span>Application-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Key Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>APP 102</strong></td>
+                                <td>CMG Lender requires ___% mortgage insurance coverage with monthly premium rate of ___</td>
+                                <td><span class="badge required-badge">PTD Required</span> All LTVs 90-95% with credit score 680+ can be delegated. LTVs over 95% or 90% with score below 680 are non-delegated. All Manufactured Homes regardless of LTV/FICO.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>APP 103</strong></td>
+                                <td>Letter of explanation for cash-out from borrower(s)</td>
+                                <td><span class="badge required-badge">Signed & Dated</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="info-box">
+                        <h4>MI Coverage Delegation Rules</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>Delegated:</strong> All LTVs 90-95% with credit score of 680 and above</li>
+                            <li><strong>Non-Delegated:</strong> All LTVs over 95% OR 90% with credit score below 680</li>
+                            <li><strong>Non-Delegated:</strong> All Manufactured Homes regardless of LTV/FICO</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: DISC Conditions -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>DISC Conditions</h2><span>Disclosure-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>DISC 200</strong></td>
+                                <td>Washington: non-borrowing registered domestic partner to sign Security Instrument and Notice of Right to Cancel (if applicable)</td>
+                                <td><span class="badge optional-badge">WA State</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DISC 208</strong></td>
+                                <td>Washington: Rate Lock Agreement required for all disclosures and re-disclosures</td>
+                                <td><span class="badge required-badge">Within 3 business days of lock</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DISC 213</strong></td>
+                                <td>Acknowledgment of Intent to Proceed</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DISC 216</strong></td>
+                                <td>Fully executed 4506C form from borrowers</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DISC 217</strong></td>
+                                <td>Initial state or federal disclosures missing / or needing signatures</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DISC 220</strong></td>
+                                <td>Signed Affiliated Business Disclosure if affiliates exist or letter on letterhead stating no affiliates exist</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 4: CRED Conditions -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>CRED Conditions</h2><span>Credit-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>CRED 300</strong></td>
+                                <td>CMG - Complete fraud alert call based on fraud alert placed on credit report by consumer</td>
+                                <td><span class="badge required-badge">CMG Task</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 301</strong></td>
+                                <td>Copy of current payoff on existing lien(s) and to reflect no late payments</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 302</strong></td>
+                                <td>Provide borrower signed and dated LOE regarding addresses not listed in residence history</td>
+                                <td><span class="badge required-badge">Signed & Dated</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 307</strong></td>
+                                <td>CMG - Validation of Social Security Number</td>
+                                <td><span class="badge required-badge">CMG Task</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 314</strong></td>
+                                <td>Internal Processor: Obtain final Undisclosed Debt Monitoring</td>
+                                <td><span class="badge calculated-badge">Internal</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 315</strong></td>
+                                <td>Letter of explanation from borrower explaining all inquiries listed on credit report for last 120 days</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 316</strong></td>
+                                <td>Copy of Social Security Card or CMG Account Manager to run SSN check to verify number</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 319</strong></td>
+                                <td>Credit Supplement, canceled checks, bank statements, or mortgage statements showing payments made through current month/closing</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 323</strong></td>
+                                <td>Credit Invoice provided by Loan Processor</td>
+                                <td><span class="badge calculated-badge">Internal</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 325</strong></td>
+                                <td>Due to fraud alert - CMG Processor/AM to contact Borrower(s) to confirm mortgage application using Byte Fraud Alert Call Form</td>
+                                <td><span class="badge required-badge">CMG Task</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CRED 333</strong></td>
+                                <td>Conventional loan with LTV of 95% or higher - Home Buyers Ed per loan product is required</td>
+                                <td><span class="badge required-badge">Conv 95%+ LTV</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 5: INC Conditions -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>INC Conditions</h2><span>Income-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>INC 410</strong></td>
+                                <td>Tax Transcripts from IRS for most recent 2 years. If salaried, W-2 verification for most recent 2 years acceptable if income validation policy is met.</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>INC 411</strong></td>
+                                <td>CMG-Verbal verification of employment within 10 calendar days of note date for Govt loans and 10 business days for Conv loans. Document how employer's phone number was confirmed.</td>
+                                <td><span class="badge required-badge">Govt: 10 cal days / Conv: 10 bus days</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>INC 421</strong></td>
+                                <td>4506-C for Business Tax Returns to be completed and added as PTF Doc to be sent to closing</td>
+                                <td><span class="badge required-badge">PTF Doc</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>INC 422</strong></td>
+                                <td>Prepare Business 4506Cs for any non-schedule C business for which income is used to qualify. Add form(s) to PTF for execution at closing.</td>
+                                <td><span class="badge required-badge">PTF Doc</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="exception-box">
+                        <h4>VVOE Timing Requirements</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>Government Loans:</strong> Within 10 <em>calendar</em> days of note date</li>
+                            <li><strong>Conventional Loans:</strong> Within 10 <em>business</em> days of note date</li>
+                        </ul>
+                        <p style="margin-top: 10px;">Must document how the employer's phone number was confirmed (website printouts, etc.)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: ASSET Conditions -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>ASSET Conditions</h2><span>Asset-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>ASSET 502</strong></td>
+                                <td>Fully executed Access Letter needed for Borrower(s) unrestricted use of funds in bank account(s)</td>
+                                <td><span class="badge required-badge">Fully Executed</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ASSET 514</strong></td>
+                                <td>GIFT - CONVENTIONAL Documentation of gift funds</td>
+                                <td><span class="badge required-badge">Conv Only</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="info-box">
+                        <h4>Gift Documentation Requirements (ASSET 514)</h4>
+                        <p>Documentation must include:</p>
+                        <ol style="margin-top: 10px; margin-left: 20px;">
+                            <li>Fully executed Gift Letter from an acceptable source in the specified amount</li>
+                            <li>Source of gift with one of the following:
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>Copy of donor's check and borrower's deposit slip</li>
+                                    <li>Copy of donor's withdrawal slip and borrower's deposit slip</li>
+                                    <li>Copy of donor's certified check, cashier's check, or other official check to closing agent</li>
+                                    <li>Settlement statement showing receipt of donor's check</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: PROP Conditions -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>PROP Conditions</h2><span>Property-related conditions clearable by Processor III</span></div>
+                </div>
+                <div class="section-content">
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Description</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PROP 601</strong></td>
+                                <td>Proof of hazard insurance with coverage equal to 100% of insurable value. Coverage equal to loan amount acceptable if loan amount is 80%+ of insurable value. Max deductible 5% or more if state requires. Premiums renewing within 60 days require proof of premium paid. Must state CMG as Mortgagee.</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 602</strong></td>
+                                <td>Select Partner to provide hazard insurance for 100% of insured value or equal to total of liens if 80% of insured value. Max deductible 5%. Must reflect Select Partner as Mortgagee.</td>
+                                <td><span class="badge required-badge">Select Partner</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 605</strong></td>
+                                <td>Appraisal form 1004D. Final inspection with photos of subject property complete. Manager involvement required to accept after closing. If moved to Post Closing, must be completed prior to loan delivery.</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 610</strong></td>
+                                <td>Confirmation of appraisal received by borrower 3 days prior to closing, or Three-Day Appraisal Waiver signed and dated 3 days prior to closing. Waiver must be in file prior to delivery of appraisal to use the Waive in lieu of Appraisal Delivery.</td>
+                                <td><span class="badge required-badge">3 Days Prior</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 615</strong></td>
+                                <td>CMG - Closing documents cannot be signed until specified date to comply with federal appraisal requirements</td>
+                                <td><span class="badge required-badge">Compliance</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 626</strong></td>
+                                <td>Internal Processor: collect Flood Certificate</td>
+                                <td><span class="badge calculated-badge">Internal</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>PROP 630</strong></td>
+                                <td>SC Attorney/Ins Preference Checklist must include borrower-selected Attorney's name in 1(a) and Insurance Agent's name in 2(a). All Borrower(s) must execute. If flood insurance required, #2 must state hazard and flood with flood agent name in 2(a).</td>
+                                <td><span class="badge optional-badge">SC State</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="tip-box">
+                        <h4>HOI Coverage Validation Checkpoints</h4>
+                        <p>When validating Homeowner's Insurance (HOI) Certificate:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Validate coverage amount - if no appraisal available for 80% insurable value, collect cost estimator from insurance company</li>
+                            <li>Coverage must equal the lesser of: 100% insurable value OR unpaid principal balance (if it equals 80%+ of insurable value)</li>
+                            <li>Maximum deductible is 5% of face amount of policy</li>
+                            <li>Ensure coverage period aligns with closing dates</li>
+                            <li>Ensure property, borrower, and mortgagee information are accurate</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: MISC/TITLE/GOV Conditions -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>MISC / TITLE / GOV Conditions</h2><span>Miscellaneous, Title, and Government loan conditions</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="condition-category">
+                        <div class="condition-category-header">
+                            <h4>MISC Conditions</h4>
+                        </div>
+                        <div class="condition-category-body">
+                            <table class="field-table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 100px;"><strong>MISC 718</strong></td>
+                                        <td>Internal Processor: Obtain updated Loan Safe Report with names of all required parties showing on page 2 and documentation to clear all hits on report</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MISC 730</strong></td>
+                                        <td>Processor to add alias names for borrower(s) in Byte from documentation provided by borrower(s)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MISC 746</strong></td>
+                                        <td>Evidence that borrower has signed the CMG Borrower's Employment/Forbearance Certification within 5 days of closing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MISC 757</strong></td>
+                                        <td>All NM Loan Approvals and Lock Notifications to be signed by Processor prior to closing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MISC 765</strong></td>
+                                        <td>ComplianceEase must be reviewed and passing prior to CTC. If not passing, there needs to be an approval exception for failing section</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="condition-category">
+                        <div class="condition-category-header">
+                            <h4>TITLE Conditions</h4>
+                        </div>
+                        <div class="condition-category-body">
+                            <table class="field-table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 100px;"><strong>TITLE 908</strong></td>
+                                        <td>Closing Protection Letter / Title's Errors & Omissions / Wire Instructions - CPL must be dated or effective through note signed date (wet/table funding states) or funding date (dry/escrow states)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="condition-category">
+                        <div class="condition-category-header">
+                            <h4>GOV Conditions</h4>
+                        </div>
+                        <div class="condition-category-body">
+                            <table class="field-table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 100px;"><strong>GOV 1009</strong></td>
+                                        <td>FHA Amendatory Clause to be executed by all parties (not required on REO properties) and FHA Real Estate Certification to be signed by all parties (including REO)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GOV 1057</strong></td>
+                                        <td>Signed W-9 from Appraiser</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: Title Exceptions -->
+            <section id="section-9" class="section">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title"><h2>Title Conditions & Exceptions</h2><span>Title issues that may require Underwriter involvement</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Title</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Exception Present?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">PIII Can Clear</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node exception">Escalate to UW</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exception-box">
+                        <h4>Title Conditions Requiring Escalation</h4>
+                        <p>If there ARE exceptions on the following items, Processor III should NOT clear the condition - escalate to Underwriter:</p>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
+                            <ul style="margin-left: 20px;">
+                                <li>Right of first refusal</li>
+                                <li>Deed Restrictions</li>
+                                <li>Encroachments</li>
+                                <li>Unpaid property taxes (Delinquent)</li>
+                                <li>Liens for unpaid federal/state income tax</li>
+                                <li>Vesting</li>
+                                <li>Mechanics liens</li>
+                            </ul>
+                            <ul style="margin-left: 20px;">
+                                <li>SBA loans affecting title</li>
+                                <li>Private road</li>
+                                <li>HERO</li>
+                                <li>California First</li>
+                                <li>PACE</li>
+                                <li>Energy resolution</li>
+                                <li>Life Estate</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h4>UW Authority to Update Class</h4>
+                        <p>Underwriters have the authority to update the Class on any condition they feel comfortable for a Processor III to clear. If the UW changes the class to Processor III, the Processor III may clear the condition.</p>
+                        <p style="margin-top: 10px;"><strong>Note:</strong> UW should understand that not all processors have this access and may still be required to clear their own conditions even when the class reflects Processor III.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Disclosure Management -->
+            <section id="section-10" class="section">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title"><h2>Disclosure Management</h2><span>Managing disclosures for investor submission</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review All Disclosures</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Signed & Complete?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Mark Approved</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO / DUPLICATE</span>
+                                <div class="flow-node action">Mark Inactive</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <h4>Disclosure Status Rules</h4>
+                        <p>All disclosures that should be sent to the investor must be marked <strong>Approved</strong>. Those that are unsigned or duplicates should be marked <strong>Inactive</strong>. <em>None should be left as "not reviewed" or "reviewed."</em></p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>DISC</td><td>Borrower Certification and Authorization</td><td>Certification and Authorization (CMG Mortgage, Inc. dba CMG Home Loans)</td></tr>
+                            <tr><td>DISC</td><td>Credit Score Disclosure</td><td>Credit Score Disclosure Exception Notice</td></tr>
+                            <tr><td>DISC</td><td>Debt Notice</td><td>Debt Notice</td></tr>
+                            <tr><td>DISC</td><td>ECOA Disclosure</td><td>ECOA Notice (CMG Mortgage, Inc dba CMG Home Loans)</td></tr>
+                            <tr><td>DISC</td><td>Mortgage Fraud</td><td>FBI Fraud Warning</td></tr>
+                            <tr><td>DISC</td><td>Intent to Proceed</td><td>Intent to Proceed with Application</td></tr>
+                            <tr><td>DISC</td><td>IRS 4506</td><td>Additional 4506-C IVES Request for Transcript of Tax Return</td></tr>
+                            <tr><td>DISC</td><td>Counseling Agencies</td><td>List of Homeownership Counseling Organizations</td></tr>
+                            <tr><td>DISC</td><td>Loan Estimate</td><td>Loan Estimate</td></tr>
+                            <tr><td>DISC</td><td>State Specific Disclosures</td><td>State-specific disclosure requirements</td></tr>
+                            <tr><td>DISC</td><td>Patriot Act - Information Disclosure</td><td>Patriot Act Information Disclosures</td></tr>
+                            <tr><td>DISC</td><td>Privacy Notice</td><td>Privacy Policy Notice</td></tr>
+                            <tr><td>DISC</td><td>SSA-89</td><td>Social Security Number Verification</td></tr>
+                            <tr><td>DISC</td><td>TaxPayer Consent Form</td><td>Taxpayer Consent Form</td></tr>
+                            <tr><td>DISC</td><td>Shoppable Providers</td><td>Written List of Providers</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>MI Cert Validation</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Ensure the MI Cert is in the file (not just a quote)</li>
+                            <li>MI Cert must be accurate coverage and align with loan data</li>
+                            <li>If revised MI Cert is needed due to loan changes, mark the first MI Cert document <strong>Inactive</strong></li>
+                            <li>Only 1 MI Cert should be marked Approved in the document folder</li>
+                            <li>File must go back to UW to clear any MI Conditions</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Verbal VOE Validation</h4>
+                        <p>Validate Verbal VOE to ensure no loss of income (during COVID period) and expected continued employment.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Processor III Quick Reference</h3>
+                <pre>
+PROCESSOR III CONDITION CODES SUMMARY
+=====================================
+
+APP CONDITIONS (Application)
+----------------------------
+APP 102  | MI Coverage & Premium Rate (PTD required)
+APP 103  | Cash-out LOE (signed & dated)
+
+DISC CONDITIONS (Disclosures)
+-----------------------------
+DISC 200 | WA - Domestic Partner Signing
+DISC 208 | WA - Rate Lock Agreement (3 bus days)
+DISC 213 | Intent to Proceed
+DISC 216 | Fully Executed 4506C
+DISC 217 | Missing/Unsigned Disclosures
+DISC 220 | Affiliated Business Disclosure
+
+CRED CONDITIONS (Credit)
+------------------------
+CRED 300 | Fraud Alert Call
+CRED 301 | Current Payoff (no late payments)
+CRED 302 | Address LOE (signed & dated)
+CRED 307 | SSN Validation
+CRED 314 | Undisclosed Debt Monitoring
+CRED 315 | Inquiry LOE (120 days)
+CRED 316 | SSN Card or SSN Check
+CRED 319 | Credit Supplement/Mtg Pmts
+CRED 323 | Credit Invoice
+CRED 325 | Fraud Alert Call (Byte Form)
+CRED 333 | Home Buyers Ed (Conv 95%+ LTV)
+
+INC CONDITIONS (Income)
+-----------------------
+INC 410  | Tax Transcripts (2 years)
+INC 411  | VVOE (Govt: 10 cal / Conv: 10 bus)
+INC 421  | Business 4506-C (PTF Doc)
+INC 422  | Non-Sched C Business 4506Cs
+
+ASSET CONDITIONS
+----------------
+ASSET 502 | Access Letter (unrestricted funds)
+ASSET 514 | Gift Documentation (Conv only)
+
+PROP CONDITIONS (Property)
+--------------------------
+PROP 601 | Hazard Insurance (CMG Mortgagee)
+PROP 602 | Select Partner Insurance
+PROP 605 | Appraisal 1004D
+PROP 610 | Appraisal Receipt/Waiver (3 days)
+PROP 615 | Signing Date Compliance
+PROP 626 | Flood Certificate
+PROP 630 | SC Attorney/Ins Preference
+
+MISC CONDITIONS
+---------------
+MISC 718 | Loan Safe Report
+MISC 730 | Alias Names in Byte
+MISC 746 | Employment/Forbearance Cert (5 days)
+MISC 757 | NM Loan Approvals/Lock Notifications
+MISC 765 | ComplianceEase Review
+
+TITLE CONDITIONS
+----------------
+TITLE 908 | CPL/E&O/Wire Instructions
+
+GOV CONDITIONS (Government)
+---------------------------
+GOV 1009 | FHA Amendatory Clause/RE Cert
+GOV 1057 | Appraiser W-9
+
+TITLE EXCEPTIONS - ESCALATE TO UW IF PRESENT
+============================================
+- Right of first refusal    - SBA loans affecting title
+- Deed Restrictions         - Private road
+- Encroachments             - HERO
+- Unpaid property taxes     - California First
+- Federal/state tax liens   - PACE
+- Vesting issues            - Energy resolution
+- Mechanics liens           - Life Estate
+
+DISCLOSURE STATUS RULES
+=======================
+- Signed & Complete  --> Mark APPROVED
+- Unsigned/Duplicate --> Mark INACTIVE
+- Never leave as "Not Reviewed" or "Reviewed"
+
+KEY REMINDERS
+=============
+1. Login as Processor III profile (not PII)
+2. Mark attached documents as APPROVED
+3. Only 1 MI Cert should be Approved (mark others Inactive)
+4. Validate HOI coverage checkpoints
+5. Validate VVOE for continued employment
+6. ComplianceEase must be passing before CTC
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for Processor III condition clearance</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">65%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">15 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-conditioncheck')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Condition Checker Agent</div>
+                        <div class="heat-desc">Auto-validate PIII conditions and flag missing documents</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-discstatus')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Disclosure Status Agent</div>
+                        <div class="heat-desc">Auto-mark disclosures as Approved or Inactive</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-titleexception')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Title Exception Scanner</div>
+                        <div class="heat-desc">Scan title for exceptions requiring UW escalation</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-hoivalidator')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">HOI Validator Agent</div>
+                        <div class="heat-desc">Validate homeowner's insurance coverage checkpoints</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Condition Checker Agent -->
+                    <div class="agent-card" id="agent-conditioncheck">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Condition Checker Agent</div>
+                                <div class="agent-type">Validation / Compliance</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically validates all Processor III conditions by checking attached documents, signatures, dates, and required fields. Flags incomplete conditions and provides clear action items for the processor.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Scan Conditions</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Fields</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('conditioncheck')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Disclosure Status Agent -->
+                    <div class="agent-card" id="agent-discstatus">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Disclosure Status Agent</div>
+                                <div class="agent-type">Document Processing</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically reviews all disclosures in the loan file, checks for signatures and completeness, and sets appropriate status (Approved for complete, Inactive for unsigned/duplicates). Ensures no disclosures are left in "Not Reviewed" status.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">List Disclosures</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Signatures</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Detect Duplicates</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Set Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('discstatus')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Title Exception Scanner -->
+                    <div class="agent-card" id="agent-titleexception">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">T</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Title Exception Scanner</div>
+                                <div class="agent-type">Document Analysis / NLP</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Scans title commitment and related documents for the 14 exception types that require UW escalation (HERO, PACE, Life Estate, etc.). Alerts processor immediately if any exceptions are found before they attempt to clear title conditions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Title</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">NLP Analysis</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Match Exceptions</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Alert/Clear</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('titleexception')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- HOI Validator Agent -->
+                    <div class="agent-card" id="agent-hoivalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">H</div>
+                            <div class="agent-info">
+                                <div class="agent-name">HOI Validator Agent</div>
+                                <div class="agent-type">Data Validation</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates homeowner's insurance certificates against loan data and compliance requirements. Checks coverage amounts, deductibles, mortgagee clauses, effective dates, and borrower/property information accuracy.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract HOI Data</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Loan</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Rules</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Issues</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">96%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('hoivalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Processor III Responsibilities Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Processor III Responsibilities - Byte LOS
+
+## Overview
+Processor III has the same access as Processor II, plus the ability to sign off on Processor III conditions prior to the loan being CTC by the Underwriter.
+
+## Key Requirements
+- Login to Byte using Processor III profile
+- Mark attached documents as APPROVED
+- Conditions apply to conventional loans unless specified
+
+## Condition Categories
+
+### APP (Application)
+- APP 102: MI Coverage Requirements
+- APP 103: Cash-out LOE
+
+### DISC (Disclosures)
+- DISC 200-220: Various disclosure requirements
+
+### CRED (Credit)
+- CRED 300-333: Credit verification and validation
+
+### INC (Income)
+- INC 410-422: Tax transcripts, VVOE, 4506-C forms
+
+### ASSET
+- ASSET 502: Access Letters
+- ASSET 514: Gift Documentation (Conv)
+
+### PROP (Property)
+- PROP 601-630: Insurance, appraisal, flood cert
+
+### MISC/TITLE/GOV
+- Various compliance and government loan conditions
+
+## Title Exceptions (Escalate to UW)
+- Right of first refusal
+- Deed Restrictions
+- HERO/PACE/California First
+- Life Estate
+- And more...
+
+## Disclosure Management
+- Mark complete disclosures as APPROVED
+- Mark unsigned/duplicates as INACTIVE
+- Never leave as "Not Reviewed"</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            conditioncheck: {
+                name: 'Condition Checker Agent',
+                tags: ['Validation', 'Compliance', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically validates all Processor III conditions by checking attached documents, verifying signatures, dates, and required fields. It provides a clear status report and action items for any incomplete conditions, ensuring files are complete for investor submission.`,
+                prompt: `You are building a Validation Agent for CMG Financial's Byte LOS Processor III workflow.
+
+AGENT NAME: Condition Checker Agent
+TYPE: Validation / Compliance Automation
+
+OBJECTIVE:
+Automatically validate all Processor III conditions on a loan file, checking document attachments, signatures, dates, and required fields.
+
+INPUT DATA:
+- Loan Number
+- List of PIII conditions with codes
+- Attached documents per condition
+- Loan data (borrower names, dates, amounts)
+
+VALIDATION RULES BY CONDITION TYPE:
+
+APP CONDITIONS:
+- APP 102: Verify MI Cert attached, coverage matches loan data
+- APP 103: Check LOE signed, dated, explains cash-out purpose
+
+DISC CONDITIONS:
+- DISC 213: Intent to Proceed signed
+- DISC 216: 4506C fully executed, all borrowers
+- DISC 217: All disclosures have signatures
+- DISC 220: ABD signed or no-affiliate letter present
+
+CRED CONDITIONS:
+- CRED 300/325: Fraud alert call form completed
+- CRED 302/315: LOE signed, dated, addresses all items
+- CRED 316: SSN card copy OR SSN check completed
+
+INC CONDITIONS:
+- INC 410: Tax transcripts for 2 years present
+- INC 411: VVOE within required timeframe
+- INC 421/422: 4506-C forms in PTF folder
+
+OUTPUT FORMAT:
+{
+  "loan_number": "2026-001234",
+  "total_conditions": 15,
+  "validated": 12,
+  "action_required": 3,
+  "conditions": [
+    {
+      "code": "APP 103",
+      "status": "INCOMPLETE",
+      "issue": "LOE missing borrower signature",
+      "action": "Obtain signed LOE from borrower"
+    }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS API
+   - Read condition list by loan
+   - Access attached documents
+   - Update condition status
+
+2. Document Analysis
+   - OCR for signature detection
+   - Date extraction and validation
+   - Field matching against loan data
+
+3. Notification System
+   - Alert processor of issues
+   - Generate task list for completion
+   - Track condition aging
+
+4. Reporting
+   - Dashboard for PIII condition status
+   - Pipeline view of pending clearances
+   - Compliance audit trail`
+            },
+            discstatus: {
+                name: 'Disclosure Status Agent',
+                tags: ['Document Processing', 'Automation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent automatically reviews all disclosures in the loan file, checks for signatures and completeness, detects duplicates, and sets the appropriate status. It ensures no disclosures are left in "Not Reviewed" status before investor submission.`,
+                prompt: `You are building a Document Processing Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: Disclosure Status Agent
+TYPE: Document Processing / Status Automation
+
+OBJECTIVE:
+Automatically review all disclosures and set appropriate status (Approved/Inactive) based on completeness and duplicate detection.
+
+DISCLOSURE LIST TO PROCESS:
+- Borrower Certification and Authorization
+- Credit Score Disclosure
+- Debt Notice
+- ECOA Disclosure
+- Mortgage Fraud (FBI Warning)
+- Intent to Proceed
+- IRS 4506
+- Counseling Agencies List
+- Loan Estimate
+- State Specific Disclosures
+- Patriot Act Disclosure
+- Privacy Notice
+- SSA-89
+- Taxpayer Consent Form
+- Written List of Providers
+
+STATUS RULES:
+1. APPROVED: Document is signed, dated, and complete
+2. INACTIVE: Document is unsigned, incomplete, or duplicate
+3. NEVER leave as "Not Reviewed" or "Reviewed"
+
+DUPLICATE DETECTION:
+- Compare document hash/content
+- Check creation dates
+- Keep most recent signed version as Approved
+- Mark older/duplicate versions as Inactive
+
+SIGNATURE VALIDATION:
+- Check for borrower signature(s)
+- Verify all required signers present
+- Check signature dates within valid range
+
+OUTPUT:
+{
+  "loan_number": "2026-001234",
+  "disclosures_processed": 15,
+  "approved": 12,
+  "inactive": 3,
+  "changes_made": [
+    { "doc": "Loan Estimate", "old_status": "Reviewed", "new_status": "Approved" },
+    { "doc": "Loan Estimate (Copy)", "old_status": "Not Reviewed", "new_status": "Inactive", "reason": "Duplicate" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Document Store
+   - List all DISC category documents
+   - Read document metadata
+   - Update document status
+
+2. Signature Detection
+   - OCR signature analysis
+   - Multi-borrower signature tracking
+   - Date validation
+
+3. Duplicate Detection
+   - Content hashing
+   - Fuzzy matching for near-duplicates
+   - Version tracking
+
+4. Audit Log
+   - Log all status changes
+   - Track who/what made changes
+   - Support compliance review`
+            },
+            titleexception: {
+                name: 'Title Exception Scanner',
+                tags: ['Document Analysis', 'NLP', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent scans title commitment documents for the 14 specific exception types that require Underwriter escalation. It alerts the processor immediately before they attempt to clear title conditions, preventing compliance issues.`,
+                prompt: `You are building a Document Analysis Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: Title Exception Scanner
+TYPE: Document Analysis / NLP
+
+OBJECTIVE:
+Scan title commitment and related documents to detect exceptions that require Underwriter escalation before Processor III can clear title conditions.
+
+EXCEPTION TYPES TO DETECT:
+1. Right of first refusal
+2. Deed Restrictions
+3. Encroachments
+4. Unpaid property taxes (Delinquent)
+5. Liens for unpaid federal/state income tax
+6. Vesting issues
+7. Mechanics liens
+8. SBA loans affecting title
+9. Private road
+10. HERO
+11. California First
+12. PACE
+13. Energy resolution
+14. Life Estate
+
+NLP KEYWORDS/PATTERNS:
+- "right of first refusal" / "ROFR"
+- "deed restriction" / "restrictive covenant"
+- "encroachment" / "encroaches"
+- "delinquent tax" / "unpaid property tax"
+- "federal tax lien" / "IRS lien" / "state tax lien"
+- "vesting" / "manner of holding title"
+- "mechanic's lien" / "materialman's lien"
+- "SBA" / "Small Business Administration"
+- "private road" / "easement for access"
+- "HERO" / "Home Energy Renovation"
+- "California First"
+- "PACE" / "Property Assessed Clean Energy"
+- "energy improvement" / "energy assessment"
+- "life estate" / "life tenant"
+
+OUTPUT:
+{
+  "loan_number": "2026-001234",
+  "title_doc_analyzed": "Title Commitment - First American",
+  "exceptions_found": true,
+  "escalation_required": true,
+  "exceptions": [
+    {
+      "type": "PACE",
+      "text_found": "Subject to PACE assessment recorded...",
+      "location": "Schedule B, Item 14",
+      "action": "Escalate to Underwriter - PIII cannot clear"
+    }
+  ],
+  "clear_to_proceed": false
+}`,
+                integration: `INTEGRATION POINTS:
+1. Document Parsing
+   - PDF text extraction
+   - Section identification (Schedule A, B, etc.)
+   - Exception item isolation
+
+2. NLP Engine
+   - Keyword matching
+   - Context analysis
+   - Confidence scoring
+
+3. Alert System
+   - Real-time notification to processor
+   - Block condition clearance if exceptions found
+   - Create UW escalation task
+
+4. Learning System
+   - Track false positives/negatives
+   - Improve keyword patterns
+   - Add new exception types`
+            },
+            hoivalidator: {
+                name: 'HOI Validator Agent',
+                tags: ['Data Validation', 'Compliance', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent validates homeowner's insurance certificates against loan data and compliance requirements. It checks coverage amounts, deductibles, mortgagee clauses, effective dates, and ensures property/borrower information accuracy.`,
+                prompt: `You are building a Data Validation Agent for CMG Financial's Byte LOS.
+
+AGENT NAME: HOI Validator Agent
+TYPE: Data Validation / Compliance Check
+
+OBJECTIVE:
+Validate homeowner's insurance certificates against loan data and regulatory requirements for PROP 601/602 conditions.
+
+VALIDATION CHECKPOINTS:
+
+1. COVERAGE AMOUNT:
+   - Must equal 100% of insurable value of improvements, OR
+   - Equal to unpaid principal balance if it's 80%+ of insurable value
+   - If no appraisal, require cost estimator from insurance company
+
+2. DEDUCTIBLE:
+   - Maximum 5% of face amount of policy
+   - Higher allowed only if state requires
+
+3. MORTGAGEE CLAUSE:
+   - PROP 601: Must state "CMG" as Mortgagee
+   - PROP 602: Must reflect "Select Partner" as Mortgagee
+   - Verify mortgagee address is correct
+
+4. EFFECTIVE DATES:
+   - Coverage period must align with closing date
+   - If renewing within 60 days: Proof of premium paid required
+
+5. BORROWER/PROPERTY INFO:
+   - Borrower name matches loan file
+   - Property address matches exactly
+   - Legal description (if included) matches
+
+INPUT DATA:
+- HOI Certificate/Binder (OCR extracted)
+- Loan data (amount, property value, borrower names)
+- Closing date
+- Appraisal value (if available)
+
+OUTPUT:
+{
+  "loan_number": "2026-001234",
+  "hoi_document": "Farmers Insurance Binder",
+  "validation_passed": false,
+  "issues": [
+    {
+      "checkpoint": "Coverage Amount",
+      "expected": "$450,000 (100% insurable value)",
+      "found": "$400,000",
+      "action": "Request increased coverage or cost estimator"
+    },
+    {
+      "checkpoint": "Mortgagee",
+      "expected": "CMG Financial Services",
+      "found": "CMG Mortgage",
+      "action": "Request corrected mortgagee clause"
+    }
+  ],
+  "passed_checkpoints": ["Deductible", "Effective Date", "Borrower Name"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Document OCR
+   - Extract HOI certificate data
+   - Parse coverage amounts, dates
+   - Identify mortgagee clause
+
+2. Loan Data API
+   - Retrieve loan amount
+   - Get property value/appraisal
+   - Fetch borrower information
+
+3. Validation Engine
+   - Compare extracted vs. required values
+   - Calculate coverage percentages
+   - Date validation logic
+
+4. Action Items
+   - Generate specific correction requests
+   - Track outstanding HOI issues
+   - Link to PROP condition status`
+            }
+        };
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
