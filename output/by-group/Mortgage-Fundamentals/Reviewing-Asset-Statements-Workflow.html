@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewing Asset Statements - Process Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-green: #22c55e;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --sidebar-width: 280px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: linear-gradient(90deg, #0d1525 0%, #1a2234 100%);
+            padding: 14px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .breadcrumb .separator { color: var(--text-muted); font-size: 1.2rem; }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; padding: 8px 16px; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 54px);
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-header h2 { color: var(--text-primary); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .sidebar-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Tab Switch */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .sidebar-tab:hover { background: rgba(255,255,255,0.03); color: var(--text-secondary); }
+        .sidebar-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+        .sidebar-tab.agent-tab.active { color: var(--accent-purple); border-bottom-color: var(--accent-purple); background: rgba(139, 92, 246, 0.08); }
+
+        .sidebar-nav { padding: 15px 0; flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.1); border-left-color: var(--accent-blue); color: var(--text-primary); }
+
+        .nav-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-number { background: var(--accent-blue); color: white; }
+        .nav-label { font-size: 0.95rem; font-weight: 500; }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .doc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .doc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3); }
+
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); padding: 80px 40px 40px 40px; }
+
+        /* Tab Panels */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        .header .meta { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+
+        .header .meta-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-color { width: 18px; height: 18px; border-radius: 4px; }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            scroll-margin-top: 75px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 22px 25px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .section-number {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; color: var(--text-primary); }
+        .section-title span { font-size: 0.9rem; color: var(--text-muted); }
+        .section-content { padding: 28px; }
+
+        /* Workflow Diagrams */
+        .workflow-diagram {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .flow-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 15px 0; }
+
+        .flow-node {
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 150px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%); color: white; border-radius: 25px; border: none; }
+        .flow-node.action { background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%); color: white; border: none; }
+        .flow-node.decision { background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%); color: var(--bg-primary); border: none; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%); color: white; border: none; }
+        .flow-node.exception { background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%); color: white; border: none; }
+
+        .flow-arrow { color: var(--accent-blue); font-size: 1.5rem; }
+        .flow-arrow.down { transform: rotate(90deg); }
+
+        .decision-branch { display: flex; gap: 40px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .branch { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
+
+        .field-table th {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .field-table td { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); }
+        .field-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+        .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+
+        /* Info Boxes */
+        .exception-box, .tip-box, .info-box {
+            padding: 18px 22px;
+            margin: 18px 0;
+            border-radius: 0 10px 10px 0;
+            border-left-width: 4px;
+            border-left-style: solid;
+        }
+
+        .exception-box { background: rgba(244, 63, 94, 0.08); border-color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.2); border-left: 4px solid var(--accent-rose); }
+        .exception-box h4 { color: var(--accent-rose); margin-bottom: 10px; font-size: 1rem; }
+        .exception-box p, .exception-box li { color: var(--text-secondary); }
+
+        .tip-box { background: rgba(34, 197, 94, 0.08); border-color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.2); border-left: 4px solid var(--accent-green); }
+        .tip-box h4 { color: var(--accent-green); margin-bottom: 10px; font-size: 1rem; }
+        .tip-box p, .tip-box li { color: var(--text-secondary); }
+
+        .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
+        .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
+        .info-box p, .info-box li { color: var(--text-secondary); }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 22px;
+            margin: 22px 0;
+        }
+
+        .decision-tree h3 { color: var(--accent-blue); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle); font-size: 1.1rem; }
+
+        .tree-node { margin-left: 20px; padding: 12px; border-left: 2px solid var(--accent-teal); position: relative; color: var(--text-secondary); }
+        .tree-node::before { content: ''; position: absolute; left: -2px; top: 22px; width: 15px; height: 2px; background: var(--accent-teal); }
+        .tree-node.level-1 { margin-left: 0; border-left: none; }
+        .tree-node.level-1::before { display: none; }
+
+        .tree-label { background: var(--accent-amber); color: var(--bg-primary); padding: 6px 14px; border-radius: 6px; font-weight: 700; display: inline-block; margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Summary Grid */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 22px 0; }
+
+        .summary-card { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px; text-align: center; }
+        .summary-card h4 { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+        .summary-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .summary-card .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--border-subtle);
+            padding: 28px;
+            border-radius: 16px;
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            scroll-margin-top: 75px;
+        }
+
+        .quick-ref h3 { color: var(--accent-amber); margin-bottom: 18px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .quick-ref pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* ====== AGENT OPPORTUNITIES STYLES ====== */
+        .agent-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .agent-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-header .subtitle { color: var(--text-secondary); font-size: 1.1rem; position: relative; }
+
+        /* Heat Map */
+        .heat-map-container { margin-bottom: 35px; }
+        .heat-map-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .heat-item:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .heat-item:active { transform: scale(0.98); }
+
+        .heat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+
+        .heat-item.critical::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .heat-item.high::before { background: linear-gradient(90deg, #f97316, #eab308); }
+        .heat-item.medium::before { background: linear-gradient(90deg, #eab308, #22c55e); }
+        .heat-item.low::before { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+
+        .heat-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding-right: 50px; }
+        .heat-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+
+        .heat-metrics { display: flex; gap: 15px; margin-top: 12px; }
+        .heat-metric { font-size: 0.75rem; color: var(--text-muted); }
+        .heat-metric span { color: var(--text-secondary); font-weight: 600; }
+
+        /* Agent Cards */
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; margin-bottom: 35px; }
+
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+
+        .agent-card.highlight {
+            animation: highlightPulse 2s ease;
+            box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes highlightPulse {
+            0% { box-shadow: 0 0 0 3px var(--accent-purple), 0 15px 50px rgba(139, 92, 246, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.5), 0 15px 50px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 0 0px transparent, 0 15px 50px rgba(0,0,0,0.3); }
+        }
+
+        .agent-card-header {
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+        .agent-type { font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .agent-priority.low { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+        .agent-card-body { padding: 22px; }
+        .agent-description { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+        .agent-flow {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .agent-flow-diagram { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+        .agent-step {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .agent-arrow { color: var(--accent-purple); font-size: 1.2rem; }
+
+        .agent-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+        .agent-stat {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+        /* View Prompt Button */
+        .agent-prompt-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+            color: var(--accent-purple);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .agent-prompt-btn:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Summary Stats */
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .agent-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Heat Map Legend */
+        .heat-legend {
+            display: flex;
+            gap: 25px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .heat-legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-secondary); }
+        .heat-legend-color { width: 24px; height: 24px; border-radius: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 26, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-header h3 { font-size: 1.25rem; font-weight: 700; }
+        .modal-actions { display: flex; gap: 12px; }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn:hover { transform: scale(1.05); }
+        .modal-btn.copy { background: white; color: var(--accent-blue); }
+        .modal-btn.close { background: rgba(255,255,255,0.2); color: white; }
+
+        .modal-body { padding: 28px; overflow-y: auto; flex: 1; }
+
+        .modal-body pre {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 22px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 3000;
+            display: none;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+        /* Prompt Modal */
+        .prompt-modal .modal { max-width: 800px; }
+        .prompt-modal .modal-header { background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%); }
+
+        .prompt-section { margin-bottom: 25px; }
+        .prompt-section h4 { color: var(--accent-purple); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+        .prompt-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-prompt-btn {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .copy-prompt-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Reviewing Asset Statements</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Asset Statements</h2>
+            <p>Interactive Workflow Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Request Asset Statements</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Upload Asset Statement</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Review Bank Statement</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">Large Deposits</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Earnest Money</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Retirement Statements</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Resources</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Reviewing Asset Statements</h1>
+                <p class="subtitle">Complete guide for uploading and reviewing asset statements to verify source of funds for down payment, closing costs, and reserves</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Processor</span>
+                    <span class="meta-item">Updated: 03.28.2022</span>
+                    <span class="meta-item">Duration: 10-15 min per borrower</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Request Asset Statements -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Request Asset Statements</h2><span>Review AUS findings and contact borrower for required documentation</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Start</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Open AUS Findings</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Locate Asset Conditions</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Contact Borrower</div>
+                        </div>
+                    </div>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Open the AUS Findings in <strong>Stored Documents</strong></li>
+                        <li><strong>Step 2:</strong> Locate the Assets conditions under the <strong>Verification Messages/Approval Conditions</strong> section</li>
+                        <li><strong>Step 3:</strong> Review the AUS findings to determine the type of asset statements needed and how many months to obtain</li>
+                        <li><strong>Step 4:</strong> Contact the borrower to obtain the asset documentation required per the AUS findings</li>
+                    </ul>
+
+                    <div class="decision-tree">
+                        <h3>Common AUS Asset Conditions</h3>
+                        <table class="field-table">
+                            <thead>
+                                <tr>
+                                    <th>MSG ID</th>
+                                    <th>Condition Type</th>
+                                    <th>Requirements</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>MSG ID 0063</strong></td>
+                                    <td>Verify liquid assets</td>
+                                    <td>Verify assets totaling the required amount from the 1003</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MSG ID 0084</strong></td>
+                                    <td>Retirement accounts</td>
+                                    <td>Recent depository or brokerage statement; 20% rule for down payment</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MSG ID 1880</strong></td>
+                                    <td>Depository assets</td>
+                                    <td>Two-month bank statements; source large deposits per Selling Guide</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MSG ID 1887</strong></td>
+                                    <td>Earnest money</td>
+                                    <td>Verify source of deposit if part of borrower's minimum contribution</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MSG ID 2573</strong></td>
+                                    <td>Gift funds</td>
+                                    <td>Signed gift letter, transfer documentation, eligible source verification</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>AUS Findings Location</h4>
+                        <p>The AUS Findings document contains all verification messages and approval conditions. Look for the <strong>Assets</strong> section to find specific requirements for documenting the borrower's funds.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Upload Asset Statement -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Upload Asset Statement</h2><span>Import and categorize the asset document in Stored Documents</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Stored Documents</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Import from Disk</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node input">Select Document Type</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Store New Documents</div>
+                        </div>
+                    </div>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Open the <strong>Stored Documents</strong> screen</li>
+                        <li><strong>Step 2:</strong> Click <strong>Import and Edit New Document(s) from Disk</strong></li>
+                        <li><strong>Step 3:</strong> The Select File(s) to Store pop-up window will appear. Search for the file to upload, select file and click <strong>Open</strong></li>
+                        <li><strong>Step 4:</strong> Select the appropriate document <strong>Type</strong> from the drop-down list (Bank Statement, Retirement Account Statement, etc.)</li>
+                        <li><strong>Step 5:</strong> Update the <strong>Description</strong> field with the bank name and time period covered</li>
+                        <li><strong>Step 6:</strong> Mark the Status as <strong>Reviewed</strong></li>
+                        <li><strong>Step 7:</strong> Click <strong>Store New Documents</strong> to store the document</li>
+                    </ul>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value/Action</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>Reviewed</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Type</strong></td>
+                                <td>Bank Statement, Retirement Account Statement, etc.</td>
+                                <td>Bank Statement</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Category</strong></td>
+                                <td>ASSET</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Description</strong></td>
+                                <td>Bank name and time period</td>
+                                <td>TD Bank - March Stmt</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Document Naming Best Practice</h4>
+                        <p>Use a clear, descriptive name in the Description field (e.g., "Bank of America - Jan/Feb 2025") to make it easy to identify the statement period and institution in Stored Documents.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Review Bank Statement -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Review Bank Statement</h2><span>Verify all required information is present and matches Byte</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Statement</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Info Complete?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Verify in URLA</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Request Updated Docs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Bank Statement Review Checklist</h3>
+                        <ul class="step-list">
+                            <li><strong>Item 1:</strong> The <strong>borrower's name and address</strong> should be listed on the statement</li>
+                            <li><strong>Item 2:</strong> The <strong>bank name, account number, time period and running balance</strong> should be reflected. Confirm this information matches the asset account entry in the URLA Borrower Info screen and update as necessary</li>
+                            <li><strong>Item 3:</strong> If it is a <strong>Bank Print Out</strong>: Need the above along with a stamp and signature from a bank teller</li>
+                            <li><strong>Item 4:</strong> If it is a <strong>Website Print Out</strong>: Need the above along with the URL showing at the top or bottom of the page</li>
+                            <li><strong>Item 5:</strong> Ensure <strong>all pages are present</strong>, including any intentionally left blank pages</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Required Element</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Borrower Name</strong></td>
+                                <td>Full name as it appears on the account</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Borrower Address</strong></td>
+                                <td>Mailing address on the statement</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bank Name</strong></td>
+                                <td>Financial institution name</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account Number</strong></td>
+                                <td>Full or last 4 digits (privacy redaction acceptable)</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Statement Period</strong></td>
+                                <td>Date range covered by the statement</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Running Balance</strong></td>
+                                <td>Account balance throughout the period</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>All Pages</strong></td>
+                                <td>Including intentionally blank pages</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Account Number Privacy</h4>
+                        <p>If the statement does not include the full account number for privacy reasons, this is acceptable. The <strong>last 4 digits</strong> of the account number would be accepted.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Large Deposits -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>Large Deposits & Withdrawals</h2><span>Identify and source unusual transactions (Purchase transactions only)</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Transactions</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Large Non-Payroll Deposits?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node exception">Request LOE + Docs</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Proceed to Earnest Money</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Large Deposit Thresholds by Loan Type</h3>
+                        <table class="field-table">
+                            <thead>
+                                <tr>
+                                    <th>Loan Type</th>
+                                    <th>Large Deposit Definition</th>
+                                    <th>Action Required</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Conventional</strong></td>
+                                    <td>Anything over 50% of total qualifying income</td>
+                                    <td>Must be sourced with LOE and supporting docs</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Government (FHA/VA/USDA)</strong></td>
+                                    <td>Individual deposits more than 1% of adjusted value</td>
+                                    <td>Must be sourced with LOE and supporting docs</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Check for <strong>large deposits</strong> that are not payroll</li>
+                        <li><strong>Step 2:</strong> Request <strong>letter of explanation</strong> and any supporting documentation needed to explain the non-payroll deposit (Purchase only)</li>
+                        <li><strong>Step 3:</strong> Check for any <strong>deductions or withdrawals</strong> that are abnormal (e.g., payments to the IRS, child support, alimony)</li>
+                    </ul>
+
+                    <div class="tip-box">
+                        <h4>Backing Out Large Deposits</h4>
+                        <p>Large deposits can be backed out of the available balance to avoid sourcing, <strong>if the funds are not needed for closing</strong>. See your Product Guidelines for more information.</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Abnormal Withdrawals</h4>
+                        <p>Watch for deductions or withdrawals that may indicate undisclosed obligations:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Payments to the IRS that are not documented</li>
+                            <li>Child support payments</li>
+                            <li>Alimony payments</li>
+                            <li>Any recurring payments to individuals or entities not reflected in the loan file</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Earnest Money -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Earnest Money Verification</h2><span>Verify source of earnest money deposit for purchase transactions</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">EMD Part of Min Contribution?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Verify Source</div>
+                                <span class="flow-arrow down">-></span>
+                                <div class="flow-node action">Check 2-Month Avg Balance</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node output">Proceed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Earnest Money Documentation Requirements</h4>
+                        <p>For purchase transactions with Earnest Money, if the deposit is being used as part of the <strong>borrower's minimum contribution requirement</strong>, it must be verified that the funds are from an acceptable source.</p>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Requirement 1:</strong> Bank statements must evidence that the <strong>average balance for the past two months</strong> was large enough to support the amount of the deposit</li>
+                        <li><strong>Requirement 2:</strong> If a copy of the cancelled deposit check is used to document the source of funds, the bank statements must cover the period up to (and including) <strong>the date the check cleared</strong> the bank account</li>
+                        <li><strong>Requirement 3:</strong> If it cannot be determined that funds were withdrawn from the borrower's account, additional verification of the source and evidence that the funds have actually <strong>changed hands</strong> should be provided</li>
+                        <li><strong>Requirement 4:</strong> Receipt of the deposit must be verified by either a copy of the <strong>borrower's canceled check</strong> or a <strong>written statement from the holder</strong> of the deposit</li>
+                    </ul>
+
+                    <div class="exception-box">
+                        <h4>Large Earnest Money Deposits</h4>
+                        <p>Large earnest money deposits and deposits that exceed the amount customary for the area should be <strong>closely evaluated</strong>. Additional documentation may be required to verify the source and legitimacy of the funds.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Verification Method</th>
+                                <th>Documentation Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cancelled Check</strong></td>
+                                <td>Copy of cleared check + bank statement showing clearance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Wire Transfer</strong></td>
+                                <td>Wire confirmation + bank statement showing withdrawal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Written Statement</strong></td>
+                                <td>Letter from holder (seller, realtor, escrow agent, settlement attorney)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 6: Retirement Statements -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Retirement Statement Review</h2><span>Review retirement accounts for funds to close or reserves</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Retirement Stmt</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Using for Closing?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Get Terms + Liquidation Proof</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">RESERVES ONLY</span>
+                                <div class="flow-node output">No Withdrawal Needed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Retirement Statement Checklist</h3>
+                        <ul class="step-list">
+                            <li><strong>Item 1:</strong> The <strong>borrower's name and address</strong> should be listed on the statement</li>
+                            <li><strong>Item 2:</strong> The <strong>time period</strong> should be listed on the statement. Need most recent statement covering a <strong>two-month period</strong> with all pages included</li>
+                            <li><strong>Item 3:</strong> If using account for <strong>funds to close</strong>: need terms of withdrawal and copy of liquidation check or transaction confirmation showing account information</li>
+                            <li><strong>Item 4:</strong> We will also need updated bank statement showing the retirement funds deposited into the bank account and <strong>available for closing</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>70% Vested Balance Rule</h4>
+                        <p>The balance entered for the retirement account should be <strong>70% of the vested amount</strong> of the account. Enter this in the Balance field in the Asset entry on the URLA Borrower Info screen.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Usage</th>
+                                <th>Documentation Required</th>
+                                <th>Withdrawal Needed?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Funds to Close</strong></td>
+                                <td>Terms of withdrawal, liquidation check/confirmation, updated bank statement</td>
+                                <td><span class="badge required-badge">Yes</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reserves Only</strong></td>
+                                <td>Two-month statement with vested balance</td>
+                                <td><span class="badge optional-badge">No</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>URLA Entry for Retirement Accounts</h4>
+                        <p>When entering retirement account information in Byte:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Account Type: Retirement Funds</li>
+                            <li>Account No: Enter the account number from the statement</li>
+                            <li>Balance: Enter <strong>70%</strong> of the vested amount (e.g., if vested amount is $69,321, enter $48,525.00)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Resources -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Resources & Special Cases</h2><span>Additional guidance for gifts and joint accounts</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>Gift Funds</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">For gift information, the AUS and the guidelines must always be referenced for documentation requirements.</p>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Obtain a <strong>signed gift letter</strong></li>
+                            <li><strong>Step 2:</strong> Document the <strong>transfer of the funds</strong></li>
+                            <li><strong>Step 3:</strong> Ensure the gift comes from an <strong>eligible source</strong> (as defined in the Selling Guide) and does not come from an interested party to the transaction</li>
+                            <li><strong>Step 4:</strong> If the gift is a grant that the borrower is obligated to repay, enter a corresponding liability on the loan application to be included in the debt-to-income ratio</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Joint Accounts</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">For joint accounts, borrowers must sign an Equal Access Letter to provide proof of account access.</p>
+                        <ul class="step-list">
+                            <li><strong>Requirement:</strong> Obtain a signed <strong>Equal Access Letter</strong> from all account holders</li>
+                            <li><strong>Purpose:</strong> Demonstrates that the borrower has full access to the funds in the joint account</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Reference Documents</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>AUS Findings - Verification Messages/Approval Conditions</li>
+                            <li>Fannie Mae Selling Guide - Asset Documentation Requirements</li>
+                            <li>Product Guidelines - Specific investor requirements</li>
+                            <li>Equal Access Letter template</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Asset Statements Quick Reference</h3>
+                <pre>
+ASSET STATEMENT REVIEW CHECKLIST
+================================
+
+BANK STATEMENT REQUIREMENTS
+---------------------------
+[ ] Borrower name and address
+[ ] Bank name
+[ ] Account number (full or last 4 digits)
+[ ] Statement period (two months required)
+[ ] Running balance
+[ ] All pages present (including blank pages)
+
+DOCUMENT TYPE REQUIREMENTS
+--------------------------
+Bank Print Out:     Above + bank teller stamp/signature
+Website Print Out:  Above + URL visible on page
+
+LARGE DEPOSIT THRESHOLDS
+------------------------
+Conventional:  > 50% of total qualifying income
+Government:    > 1% of adjusted value
+
+RETIREMENT ACCOUNT ENTRY
+------------------------
+Balance = 70% of Vested Amount
+Example: Vested $69,321 -> Enter $48,525.00
+
+EARNEST MONEY VERIFICATION
+--------------------------
+If part of minimum contribution:
+[ ] Verify 2-month average balance supports deposit
+[ ] Obtain cancelled check OR written statement
+[ ] If check used, statements must cover clearance date
+
+GIFT FUNDS CHECKLIST
+--------------------
+[ ] Signed gift letter
+[ ] Transfer documentation
+[ ] Eligible source verification
+[ ] Not from interested party
+
+JOINT ACCOUNTS
+--------------
+[ ] Equal Access Letter required
+
+COMMON AUS MSG IDs
+------------------
+0063: Verify liquid assets
+0084: Retirement accounts (20% rule)
+1880: Depository assets (2 months)
+1887: Earnest money verification
+2573: Gift funds requirements
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Asset Statement Review process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">4</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">12 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-depositdetector')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">Large Deposit Detector</div>
+                        <div class="heat-desc">Auto-scan statements for deposits exceeding thresholds</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-docvalidator')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Statement Validator</div>
+                        <div class="heat-desc">Verify all required elements present on statements</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-balancecalc')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">Balance Calculator</div>
+                        <div class="heat-desc">Calculate 70% vested balance for retirement accounts</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-emdverifier')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">EMD Verifier</div>
+                        <div class="heat-desc">Verify earnest money source and average balance</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>2 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Large Deposit Detector Agent -->
+                    <div class="agent-card" id="agent-depositdetector">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Large Deposit Detector</div>
+                                <div class="agent-type">Document Analysis / OCR</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically scans bank statements to identify deposits exceeding threshold amounts based on loan type (50% of income for Conventional, 1% of value for Government). Flags transactions requiring LOE and supporting documentation.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Statement</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Threshold</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Deposits</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Report</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('depositdetector')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statement Validator Agent -->
+                    <div class="agent-card" id="agent-docvalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">V</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Statement Validator</div>
+                                <div class="agent-type">Document Validation / OCR</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates that bank statements contain all required elements: borrower name, address, bank name, account number, statement period, running balance, and all pages present. Identifies missing elements before processor review.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">OCR Document</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Elements</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Verify Pages</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">95%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docvalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Balance Calculator Agent -->
+                    <div class="agent-card" id="agent-balancecalc">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Balance Calculator</div>
+                                <div class="agent-type">Data Processing / Calculation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically extracts vested balance from retirement statements and calculates the 70% value for URLA entry. Pre-populates the Balance field in the Asset entry on the Borrower Info screen.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Extract Balance</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate 70%</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update URLA</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Log Calculation</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('balancecalc')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- EMD Verifier Agent -->
+                    <div class="agent-card" id="agent-emdverifier">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">E</div>
+                            <div class="agent-info">
+                                <div class="agent-name">EMD Verifier</div>
+                                <div class="agent-type">Transaction Analysis</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Analyzes bank statements to verify that the two-month average balance supports the earnest money deposit amount. Identifies the withdrawal transaction and confirms it matches the EMD on the purchase contract.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Calculate Avg Balance</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare to EMD</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Find Withdrawal</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Verify Match</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">2 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('emdverifier')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Asset Statement Workflow Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Reviewing Asset Statements - Byte LOS
+
+## Overview
+Asset statements may be required to verify the source of funds needed for a borrower's down payment, closing costs, and reserves. This job aid outlines the steps for uploading and reviewing asset statements.
+
+## Requesting Asset Statements
+1. Open AUS Findings in Stored Documents
+2. Locate Assets conditions under Verification Messages/Approval Conditions
+3. Contact borrower for required documentation per AUS findings
+
+## Uploading Asset Statements
+1. Open Stored Documents screen
+2. Click Import and Edit New Document(s) from Disk
+3. Select appropriate document Type (Bank Statement, Retirement Account, etc.)
+4. Update Description with bank name and time period
+5. Mark Status as Reviewed
+6. Click Store New Documents
+
+## Bank Statement Review Checklist
+- Borrower name and address
+- Bank name, account number, statement period
+- Running balance
+- All pages present (including blank pages)
+- Bank Print Out: stamp and signature from teller
+- Website Print Out: URL visible
+
+## Large Deposit Thresholds
+- Conventional: > 50% of total qualifying income
+- Government: > 1% of adjusted value
+
+## Retirement Accounts
+- Enter 70% of vested amount as Balance in URLA
+- If using for closing: need withdrawal terms + liquidation proof
+- If reserves only: no withdrawal needed
+
+## Earnest Money Verification
+- Verify 2-month average balance supports deposit
+- Obtain cancelled check or written statement from holder
+- Closely evaluate large or unusual EMD amounts</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            depositdetector: {
+                name: 'Large Deposit Detector',
+                tags: ['Document Analysis', 'OCR', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically scans bank statements to identify deposits exceeding threshold amounts based on loan type. It calculates thresholds dynamically (50% of qualifying income for Conventional, 1% of adjusted value for Government loans) and flags all non-payroll deposits requiring LOE and supporting documentation.`,
+                prompt: `You are building a Document Analysis Agent for CMG Financial's Byte LOS Asset Review process.
+
+AGENT NAME: Large Deposit Detector
+TYPE: Document Analysis / OCR / Transaction Parsing
+
+OBJECTIVE:
+Automatically scan bank statements to identify large deposits that exceed regulatory thresholds and require sourcing documentation.
+
+INPUT DATA:
+- Bank statement PDF(s) from Stored Documents
+- Loan type (Conventional, FHA, VA, USDA)
+- Total qualifying income (from loan file)
+- Adjusted property value (for Government loans)
+
+THRESHOLD CALCULATION:
+{
+  "conventional": {
+    "threshold": "qualifying_income * 0.50",
+    "description": "50% of total qualifying income"
+  },
+  "government": {
+    "threshold": "adjusted_value * 0.01",
+    "description": "1% of adjusted property value"
+  }
+}
+
+OCR EXTRACTION:
+1. Parse bank statement using document AI
+2. Extract all credit transactions (deposits)
+3. Categorize each deposit:
+   - PAYROLL: Regular salary/wage deposits
+   - ACH_TRANSFER: Electronic transfers
+   - CHECK: Check deposits
+   - CASH: Cash deposits
+   - WIRE: Wire transfers
+   - OTHER: Unclassified
+
+FLAGGING LOGIC:
+FOR each deposit in statement:
+  IF deposit.amount > threshold AND deposit.type != PAYROLL:
+    FLAG as "REQUIRES_SOURCING"
+    GENERATE LOE request template
+
+OUTPUT:
+{
+  "statement_period": "01/01/2025 - 01/31/2025",
+  "threshold_amount": 2500.00,
+  "flagged_deposits": [
+    {
+      "date": "01/15/2025",
+      "amount": 5000.00,
+      "description": "Mobile Deposit",
+      "category": "CHECK",
+      "status": "REQUIRES_SOURCING"
+    }
+  ],
+  "total_flagged": 1,
+  "loe_template_generated": true
+}`,
+                integration: `INTEGRATION POINTS:
+1. Stored Documents
+   - Read bank statement PDFs
+   - Attach LOE request to loan file
+   - Update document status
+
+2. Document AI / OCR
+   - Google Document AI or AWS Textract
+   - Table extraction for transactions
+   - Amount and date parsing
+
+3. Byte LOS
+   - Read loan type and income
+   - Create task for processor
+   - Track LOE receipt status
+
+4. Notification
+   - Alert processor of flagged deposits
+   - Generate borrower communication template`
+            },
+            docvalidator: {
+                name: 'Statement Validator',
+                tags: ['Document Validation', 'OCR', 'Low Complexity', 'High Priority'],
+                purpose: `This agent validates that bank statements contain all required elements before processor review. It checks for borrower name, address, bank name, account number, statement period, running balance, and verifies all pages are present including intentionally blank pages.`,
+                prompt: `You are building a Document Validation Agent for CMG Financial's Byte LOS Asset Review process.
+
+AGENT NAME: Statement Validator
+TYPE: Document Validation / Quality Check
+
+OBJECTIVE:
+Validate bank statements contain all required elements and flag missing information before processor review begins.
+
+VALIDATION CHECKLIST:
+{
+  "required_elements": [
+    { "name": "borrower_name", "location": "header", "required": true },
+    { "name": "borrower_address", "location": "header", "required": true },
+    { "name": "bank_name", "location": "header/logo", "required": true },
+    { "name": "account_number", "location": "header", "required": true, "note": "last 4 digits acceptable" },
+    { "name": "statement_period", "location": "header", "required": true },
+    { "name": "running_balance", "location": "transactions", "required": true },
+    { "name": "page_numbers", "location": "footer", "required": true }
+  ],
+  "document_type_checks": {
+    "bank_printout": ["teller_stamp", "teller_signature"],
+    "website_printout": ["url_visible"]
+  }
+}
+
+PAGE VERIFICATION:
+1. Extract page numbers from each page
+2. Verify sequential ordering (1, 2, 3...)
+3. Check for gaps (missing pages)
+4. Verify total page count matches "Page X of Y"
+5. Accept "This page intentionally left blank"
+
+OUTPUT:
+{
+  "validation_status": "PASS | FAIL | INCOMPLETE",
+  "elements_found": {
+    "borrower_name": true,
+    "borrower_address": true,
+    "bank_name": true,
+    "account_number": "last_4_only",
+    "statement_period": "01/01/2025 - 01/31/2025",
+    "running_balance": true
+  },
+  "missing_elements": [],
+  "page_check": {
+    "total_pages": 6,
+    "pages_present": [1, 2, 3, 4, 5, 6],
+    "missing_pages": [],
+    "blank_pages": [6]
+  },
+  "document_type": "website_printout",
+  "type_requirements_met": true
+}`,
+                integration: `INTEGRATION POINTS:
+1. Stored Documents
+   - Read uploaded statement
+   - Update validation status
+   - Flag incomplete documents
+
+2. OCR Service
+   - Text extraction
+   - Layout analysis
+   - Page detection
+
+3. Processor Queue
+   - Route valid documents for review
+   - Return invalid for borrower resubmission
+   - Track validation metrics
+
+4. Borrower Communication
+   - Auto-generate request for missing elements
+   - Template for specific deficiencies`
+            },
+            balancecalc: {
+                name: 'Balance Calculator',
+                tags: ['Data Processing', 'Calculation', 'Low Complexity', 'High Priority'],
+                purpose: `This agent extracts the vested balance from retirement account statements and automatically calculates the 70% value required for URLA entry. It pre-populates the Balance field in the Asset entry on the Borrower Info screen.`,
+                prompt: `You are building a Data Processing Agent for CMG Financial's Byte LOS Asset Review process.
+
+AGENT NAME: Retirement Balance Calculator
+TYPE: Data Processing / Auto-Population
+
+OBJECTIVE:
+Extract vested balance from retirement statements and calculate 70% value for URLA entry.
+
+INPUT DATA:
+- Retirement account statement PDF
+- Account type (401k, IRA, 403b, etc.)
+
+EXTRACTION TARGETS:
+{
+  "vested_balance_labels": [
+    "Vested Balance",
+    "Vested Amount",
+    "Vested Value",
+    "Total Vested",
+    "Your Vested Balance"
+  ],
+  "total_balance_labels": [
+    "Total Balance",
+    "Account Value",
+    "Total Account Value",
+    "Ending Balance"
+  ]
+}
+
+CALCULATION:
+usable_balance = vested_balance * 0.70
+
+EXAMPLE:
+Vested Balance: $69,321.00
+70% Calculation: $69,321.00 * 0.70 = $48,524.70
+URLA Entry: $48,525.00 (rounded)
+
+OUTPUT:
+{
+  "account_type": "401k",
+  "account_holder": "John Smith",
+  "account_number": "****7654",
+  "statement_date": "12/31/2025",
+  "vested_balance": 69321.00,
+  "calculated_70_percent": 48524.70,
+  "urla_entry_value": 48525.00,
+  "auto_populated": true
+}
+
+BYTE FIELD MAPPING:
+- Account Type: response.account_type -> "Retirement Funds"
+- Account No: response.account_number
+- Balance: response.urla_entry_value`,
+                integration: `INTEGRATION POINTS:
+1. Document AI
+   - Extract vested balance
+   - Parse statement structure
+   - Handle various 401k/IRA formats
+
+2. Byte LOS API
+   - Write to URLA Borrower Info
+   - Update Asset entry
+   - Log calculation audit trail
+
+3. Validation
+   - Compare to AUS findings requirements
+   - Flag if balance insufficient for reserves
+   - Alert if liquidation needed for closing
+
+4. Audit Trail
+   - Store original vested amount
+   - Log calculation formula used
+   - Track who approved entry`
+            },
+            emdverifier: {
+                name: 'EMD Verifier',
+                tags: ['Transaction Analysis', 'Calculation', 'Medium Complexity', 'Medium Priority'],
+                purpose: `This agent analyzes bank statements to verify that the two-month average balance supports the earnest money deposit amount. It identifies the withdrawal transaction and confirms it matches the EMD on the purchase contract.`,
+                prompt: `You are building a Transaction Analysis Agent for CMG Financial's Byte LOS Asset Review process.
+
+AGENT NAME: Earnest Money Deposit Verifier
+TYPE: Transaction Analysis / Balance Verification
+
+OBJECTIVE:
+Verify earnest money deposit source by analyzing bank statement balances and matching withdrawal to EMD amount.
+
+INPUT DATA:
+- Bank statements (2 months minimum)
+- EMD amount from purchase contract
+- EMD date from purchase contract
+
+ANALYSIS STEPS:
+
+1. CALCULATE AVERAGE BALANCE:
+   - Extract daily/statement period balances
+   - Calculate 2-month average
+   - Compare to EMD amount
+
+2. LOCATE EMD WITHDRAWAL:
+   - Search for check/withdrawal matching EMD amount
+   - Allow +/- 5% tolerance for fees
+   - Match date to contract date +/- 7 days
+
+3. VERIFY TIMING:
+   - Statement must cover check clearance date
+   - Balance must support withdrawal before EMD
+
+VERIFICATION LOGIC:
+{
+  "average_balance_check": {
+    "pass_if": "average_balance >= emd_amount",
+    "margin": "recommended 10% buffer"
+  },
+  "withdrawal_match": {
+    "amount_tolerance": 0.05,
+    "date_tolerance_days": 7
+  }
+}
+
+OUTPUT:
+{
+  "emd_amount": 10000.00,
+  "emd_date": "01/15/2025",
+  "two_month_average": 15234.56,
+  "balance_supports_emd": true,
+  "withdrawal_found": {
+    "date": "01/14/2025",
+    "amount": 10000.00,
+    "description": "Check #1234",
+    "match_confidence": 0.98
+  },
+  "verification_status": "VERIFIED",
+  "documentation_complete": true
+}`,
+                integration: `INTEGRATION POINTS:
+1. Purchase Contract Parser
+   - Extract EMD amount and date
+   - Identify payee (escrow company)
+
+2. Bank Statement Analysis
+   - Daily balance extraction
+   - Transaction categorization
+   - Check clearance tracking
+
+3. Byte LOS
+   - Update asset verification status
+   - Link to condition satisfaction
+   - Generate compliance report
+
+4. Exception Handling
+   - Flag if balance insufficient
+   - Alert if withdrawal not found
+   - Request cancelled check copy`
+            }
+        };
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>

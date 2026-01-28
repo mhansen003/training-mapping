@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Underwriting Manual - Workflow Guide</title>
+    <style>
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border-color: #1e293b;
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Breadcrumb - Fixed */
+        .breadcrumb {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--accent-blue); }
+        .breadcrumb .separator { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--accent-amber); font-weight: 600; }
+
+        /* Sidebar - Fixed */
+        .sidebar {
+            position: fixed;
+            top: 45px;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 45px);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .sidebar-tab:hover { color: var(--text-secondary); }
+
+        .sidebar-tab.active {
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .sidebar-tab.agent-tab.active {
+            color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+            border-bottom: 2px solid var(--accent-purple);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .nav-number {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-label { flex: 1; }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .doc-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .doc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 75px 40px 40px 40px;
+            min-height: 100vh;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .meta-item {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.05));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .section-title span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        /* Workflow Diagram */
+        .workflow-diagram {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .flow-row:last-child { margin-bottom: 0; }
+
+        .flow-node {
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .flow-node.start { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .flow-node.end { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .flow-node.action { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .flow-node.decision { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 8px; }
+        .flow-node.input { background: var(--bg-secondary); border: 2px solid var(--accent-blue); color: var(--text-primary); }
+        .flow-node.output { background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; }
+        .flow-node.exception { background: linear-gradient(135deg, #f43f5e, #dc2626); color: white; }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .decision-branch {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .branch-label {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Info Boxes */
+        .info-box, .tip-box, .exception-box, .warning-box {
+            padding: 16px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .tip-box {
+            background: rgba(20, 184, 166, 0.1);
+            border-left: 4px solid var(--accent-teal);
+        }
+
+        .exception-box {
+            background: rgba(244, 63, 94, 0.1);
+            border-left: 4px solid #f43f5e;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .info-box h4, .tip-box h4, .exception-box h4, .warning-box h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .info-box p, .tip-box p, .exception-box p, .warning-box p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tables */
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.85rem;
+        }
+
+        .field-table th {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .field-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .field-table tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .required-badge { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
+        .optional-badge { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+        .calculated-badge { background: rgba(20, 184, 166, 0.2); color: #14b8a6; }
+
+        /* Decision Tree */
+        .decision-tree {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .decision-tree h3 {
+            color: var(--accent-blue);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        /* Step List */
+        .step-list { list-style: none; padding: 0; margin: 18px 0; }
+        .step-list li {
+            padding: 14px 18px;
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-secondary);
+        }
+        .step-list li strong { color: var(--text-primary); }
+
+        /* Quick Reference */
+        .quick-ref {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+
+        .quick-ref h3 {
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .quick-ref pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Agent Panel Styles */
+        .agent-header {
+            margin-bottom: 30px;
+        }
+
+        .agent-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .agent-summary-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .agent-summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agent-summary-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        /* Heat Map */
+        .heat-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .heat-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .heat-legend-color {
+            width: 30px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .heat-map-container {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .heat-map-title {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .heat-map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .heat-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .heat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .heat-item.critical { border-left: 4px solid #ef4444; }
+        .heat-item.high { border-left: 4px solid #f97316; }
+        .heat-item.medium { border-left: 4px solid #eab308; }
+        .heat-item.low { border-left: 4px solid #22c55e; }
+
+        .heat-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .heat-item.critical .heat-score { color: #ef4444; }
+        .heat-item.high .heat-score { color: #f97316; }
+        .heat-item.medium .heat-score { color: #eab308; }
+        .heat-item.low .heat-score { color: #22c55e; }
+
+        .heat-name {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .heat-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .heat-metrics {
+            display: flex;
+            gap: 15px;
+        }
+
+        .heat-metric {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .heat-metric span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Agent Cards */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .agent-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .agent-card:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .agent-card.highlight {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .agent-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .agent-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .agent-info { flex: 1; }
+
+        .agent-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .agent-type {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .agent-priority {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .agent-priority.critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .agent-priority.high { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .agent-priority.medium { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+
+        .agent-card-body { padding: 20px; }
+
+        .agent-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .agent-flow {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agent-flow-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .agent-flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .agent-step {
+            background: var(--bg-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .agent-arrow {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .agent-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .agent-stat {
+            text-align: center;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .agent-stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .agent-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .agent-prompt-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .agent-prompt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .modal-actions { display: flex; gap: 10px; }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.copy {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn.close {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(85vh - 80px);
+        }
+
+        .modal-body pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Prompt Modal */
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .prompt-section h4 {
+            color: var(--accent-purple);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .prompt-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 18px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .prompt-tag { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .copy-success {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-teal);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+            z-index: 3000;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
+            .agent-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="../../index.html">Portal Home</a>
+        <span class="separator">></span>
+        <a href="./index.html">Mortgage Fundamentals</a>
+        <span class="separator">></span>
+        <span class="current">Retail Underwriting Manual</span>
+    </nav>
+
+    <!-- Fixed Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Underwriting Manual</h2>
+            <p>CMG Retail Operations Guide</p>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" onclick="switchTab('workflow')">Workflow</button>
+            <button class="sidebar-tab agent-tab" onclick="switchTab('agents')">AI Agents</button>
+        </div>
+
+        <!-- Workflow Navigation -->
+        <nav class="sidebar-nav" id="workflow-nav">
+            <a href="#section-1" class="nav-item active">
+                <span class="nav-number">1</span>
+                <span class="nav-label">Getting Started</span>
+            </a>
+            <a href="#section-2" class="nav-item">
+                <span class="nav-number">2</span>
+                <span class="nav-label">Cover Letter & Submission</span>
+            </a>
+            <a href="#section-3" class="nav-item">
+                <span class="nav-number">3</span>
+                <span class="nav-label">Home Screen & Documents</span>
+            </a>
+            <a href="#section-4" class="nav-item">
+                <span class="nav-number">4</span>
+                <span class="nav-label">URLA Data Entry</span>
+            </a>
+            <a href="#section-5" class="nav-item">
+                <span class="nav-number">5</span>
+                <span class="nav-label">Income Calculation</span>
+            </a>
+            <a href="#section-6" class="nav-item">
+                <span class="nav-number">6</span>
+                <span class="nav-label">Assets & Liabilities</span>
+            </a>
+            <a href="#section-7" class="nav-item">
+                <span class="nav-number">7</span>
+                <span class="nav-label">Running AUS</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Conditions Management</span>
+            </a>
+            <a href="#section-9" class="nav-item">
+                <span class="nav-number">9</span>
+                <span class="nav-label">ULDD & 1008</span>
+            </a>
+            <a href="#section-10" class="nav-item">
+                <span class="nav-number">10</span>
+                <span class="nav-label">Loan Status & Review</span>
+            </a>
+            <a href="#section-11" class="nav-item">
+                <span class="nav-number">11</span>
+                <span class="nav-label">Mortgage Insurance</span>
+            </a>
+            <a href="#section-12" class="nav-item">
+                <span class="nav-number">12</span>
+                <span class="nav-label">Special Procedures</span>
+            </a>
+            <a href="#quick-ref" class="nav-item">
+                <span class="nav-number">*</span>
+                <span class="nav-label">Quick Reference</span>
+            </a>
+        </nav>
+
+        <!-- Agent Navigation -->
+        <nav class="sidebar-nav" id="agents-nav" style="display: none;">
+            <a href="#agent-summary" class="nav-item active">
+                <span class="nav-number">S</span>
+                <span class="nav-label">Summary</span>
+            </a>
+            <a href="#agent-heatmap" class="nav-item">
+                <span class="nav-number">H</span>
+                <span class="nav-label">Heat Map</span>
+            </a>
+            <a href="#agent-details" class="nav-item">
+                <span class="nav-number">A</span>
+                <span class="nav-label">Agent Details</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="doc-btn" onclick="openDocModal()">
+                View Workflow Markdown
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ==================== WORKFLOW TAB ==================== -->
+        <div id="workflow-panel" class="tab-panel active">
+            <!-- Header -->
+            <div class="header">
+                <h1>Retail Underwriting Manual</h1>
+                <p class="subtitle">Comprehensive guide for mortgage underwriting procedures at CMG Financial Services</p>
+                <div class="meta">
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Underwriter</span>
+                    <span class="meta-item">Updated: Oct 2, 2025</span>
+                    <span class="meta-item">Duration: Variable by loan complexity</span>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
+            </div>
+
+            <!-- Section 1: Getting Started -->
+            <section id="section-1" class="section">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <div class="section-title"><h2>Getting Started - New Underwriter Delegation</h2><span>Understanding authority levels and QC responsibilities</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">New Underwriter</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Complete Test Cases</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">QC Review</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Authority Granted</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Corporate Credit Department Authority</h4>
+                        <p>The Corporate Credit Department at CMG is responsible for delegating and managing credit authority. Underwriters are authorized to make credit decisions within specific guidelines for various loan product families including Conventional, FHA, VA, USDA, Jumbo, All In One Loan, Non-Agency (for Retail), Construction Loans, Renovation Loans, and Reverse Mortgages.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Underwriter Type</th>
+                                <th>Test Case Requirements</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>New Hires</strong></td>
+                                <td>Five test cases for each loan product family + No significant QC findings</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Expanding Authority</strong></td>
+                                <td>Five test cases for each additional loan product family + No significant QC findings</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>UW Manager QC Responsibilities</h4>
+                        <p>Responsibilities include random selection of files for review, examining each chosen file, and providing feedback and recommendations for improvement where necessary to maintain integrity and quality of documentation.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Cover Letter & Submission -->
+            <section id="section-2" class="section">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <div class="section-title"><h2>Cover Letter - Submission Notes</h2><span>Review processor notes and conversation log</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Cover Letter Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Processor Notes</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Notes Complete?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node output">Proceed to Review</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">PAPER SUBMISSION</span>
+                                <div class="flow-node action">Review & Mark Inactive</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>What to Review in Cover Letter</h4>
+                        <p>Review notes from the Processor on any challenging income - how it was calculated, work history, assets, and credit items. Ensure all pieces of the submission package are uploaded to Stored Documents and have been marked as Reviewed.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Conversation Log Usage</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Click Conversation Log menu or icon on any screen toolbar</li>
+                            <li><strong>Step 2:</strong> Click New Item icon to add a note</li>
+                            <li><strong>Step 3:</strong> Complete fields in Edit Conversation pop-up</li>
+                            <li><strong>Step 4:</strong> Click Append Notes to add your note</li>
+                            <li><strong>Step 5:</strong> Click OK to save to the Conversation Log</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Home Screen & Documents -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Home Screen & Stored Documents</h2><span>Navigate key loan information and file documents</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Open Loan File</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Home Screen Loads</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review Key Data</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Access Stored Documents</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Home Screen Element</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Qualifying FICO Scores</strong></td><td>Credit scores used for loan qualification</td></tr>
+                            <tr><td><strong>CAIVRs Number</strong></td><td>HUD debarment check number</td></tr>
+                            <tr><td><strong>LDP/GSA Confirmation</strong></td><td>Exclusion list verification</td></tr>
+                            <tr><td><strong>First Time Homebuyer</strong></td><td>FTHB indicator checkbox</td></tr>
+                            <tr><td><strong>Internal Assignments</strong></td><td>Employee assignment information</td></tr>
+                            <tr><td><strong>Property/Loan Program</strong></td><td>Property details and loan type</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Stored Documents Requirements</h4>
+                        <p><strong>Ensure that every document is approved or inactive!</strong> Make sure to add the expiration dates for documents reviewed in Stored Documents. Access via filing cabinet icon or General menu.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: URLA Data Entry -->
+            <section id="section-4" class="section">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <div class="section-title"><h2>URLA Data Entry</h2><span>Complete borrower information and loan application data</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Access URLA Screen</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Application Type?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">ONE APPLICATION</span>
+                                <div class="flow-node action">Primary Borrower + Co-Borrower</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">TWO APPLICATIONS</span>
+                                <div class="flow-node action">Separate URLA for Each</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>New URLA 'Does Not Apply' Feature</h4>
+                        <p>The new URLA interface includes dynamic buttons for sections that do not apply to the selected Borrower. This alerts the Underwriter that the Borrower was asked the information and they stated it "Does Not Apply" to their application. <strong>Note:</strong> These checkboxes cannot be used until after initial disclosures.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Personal Information Section</h3>
+                        <ul class="step-list">
+                            <li><strong>Citizenship Status:</strong> Now in Personal Information section</li>
+                            <li><strong>Type of Credit:</strong> Reflects number of Borrowers applying (not how credit is pulled)</li>
+                            <li><strong>Work Phone:</strong> Borrower's desk number (employer main number entered in Employment section)</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Current Residence Entry</h3>
+                        <ul class="step-list">
+                            <li><strong>Living Status:</strong> Own, Rent, or Living Rent Free</li>
+                            <li><strong>Duration:</strong> Enter years AND months (enter zero if months don't apply)</li>
+                            <li><strong>Unit Number:</strong> Override if Byte incorrectly detects/misses unit number</li>
+                            <li><strong>Country:</strong> Leave blank for US (defaulted)</li>
+                            <li><strong>Former Residences:</strong> Required if less than 2 years at current address</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Rent Entry Warning</h4>
+                        <p>Do NOT enter the full rent on both Borrower and Co-Borrower applications if sharing rent. This causes the rent to be double counted in the present PITI and other calculations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Income Calculation -->
+            <section id="section-5" class="section">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <div class="section-title"><h2>Employment and Income Calculation</h2><span>Calculate and document variable income per guidelines</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Gather Income Docs</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Income Type?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Apply Calculation Method</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Document in Worksheet</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Calculation Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bonuses/Overtime</strong></td>
+                                <td>24-Month Average (or 12-month if consistent); use lower amount if declining</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Commission-Based</strong></td>
+                                <td>24-Month Average required; 12-month if less than 2 years in same role with documentation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Declining Income</strong></td>
+                                <td>Use most recent lower 12-month average or most recent year income</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seasonal/Irregular</strong></td>
+                                <td>12-month average with 2+ years history and employer verification</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Documentation Requirements</h4>
+                        <p>Minimum 2 years of documentation required: Pay stubs with YTD, W-2s/1099s from last 2 years, tax returns with relevant schedules, and employer verification of variable income structure and continuation likelihood.</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Base Pay Entry Warning</h4>
+                        <p>If base pay is entered prior to the Borrower's Employer being entered, the income type defaults to Other Income. Once categorized as Other Income, it <strong>cannot</strong> be changed back to Base income. You must manually enter Base income after Employer is input, then remove the Other income.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Employment Data Entry Fields</h3>
+                        <ul class="step-list">
+                            <li><strong>Employer Phone:</strong> Main number entered in Employer/Monthly Income edit screen</li>
+                            <li><strong>Employed by Family/Party:</strong> If Yes, triggers tax returns in AUS findings</li>
+                            <li><strong>Self-Employed/Business Owner:</strong> Enables ownership percentage indicator</li>
+                            <li><strong>Seasonal/Foreign Income:</strong> Select appropriate indicator</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Assets & Liabilities -->
+            <section id="section-6" class="section">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <div class="section-title"><h2>Assets, Liabilities & Real Estate Owned</h2><span>Document borrower financial position</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Enter Assets</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Import Liabilities</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Document REO</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Verify Totals</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Asset Category</th>
+                                <th>Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bank Accounts/Retirement</strong></td>
+                                <td>Checking, Savings, Money Market, Mutual Funds, CD, Trust, 401k</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Credits</strong></td>
+                                <td>Earnest Money, Relocation Funds, Lot Equity, Rent Credit</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Other Assets</strong></td>
+                                <td>Net proceeds from sale, Secured Borrowed Funds, Cash on hand</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="exception-box">
+                        <h4>Critical: Account Numbers Required</h4>
+                        <p>Include correct account numbers when entering asset data or AUS will not be able to run. Just because the type of asset is listed does not mean it is an acceptable source of funds - review guidelines to confirm.</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Joint Assets Entry</h4>
+                        <p>Assets, liabilities, and REOs owned by Co-Borrower are entered on the primary Borrower's screen (not shown on Co-Borrower screen). If joint, select primary Borrower in 'Borrower' field and select 'Jointly' in 'Held' field.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Real Estate Owned - Key Fields</h3>
+                        <ul class="step-list">
+                            <li><strong>Current Usage:</strong> Primary Residence, Investment, etc.</li>
+                            <li><strong>Intended Usage:</strong> Leave blank if status is Pending Sale or Sold</li>
+                            <li><strong>Mortgages/HELOCs:</strong> Shown in separate grid beneath REO section (not in liabilities)</li>
+                            <li><strong>Net Rental Income:</strong> Entered in REO section, flows to Subject Property Cash Flow</li>
+                        </ul>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Gifts and Grants</h4>
+                        <p>Gifts are no longer entered as assets. If gift has been deposited, 'Deposited Status' should be 'Deposited' and bank account balance should include gift funds. Multiple gifts/grants can be entered with separate gift letters.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Running AUS -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Running AUS (DU/LP)</h2><span>Submit to automated underwriting systems</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select AUS Interface</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">DU or LP?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">FANNIE MAE</span>
+                                <div class="flow-node action">DU XIS Submit</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">FREDDIE MAC</span>
+                                <div class="flow-node action">LP System to System</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>AUS Data Integrity Policy</h4>
+                        <p>All data input to AUS must be valid and supported by documentation. The loan files must contain the documentation/information to support the loan decision. Refer to agency-specific guidelines on SharePoint.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Fannie Mae DU Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Click Fannie Mae on left menu, choose DU XIS</li>
+                            <li><strong>Step 2:</strong> Ensure Credit Ref No. shows (click Fill if not visible)</li>
+                            <li><strong>Step 3:</strong> Choose Submit to score the loan</li>
+                            <li><strong>Step 4:</strong> Results appear and download to Stored Documents</li>
+                            <li><strong>Step 5:</strong> If errors present, choose Review and Fix</li>
+                            <li><strong>Step 6:</strong> Click View Results to see findings</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Freddie Mac LP Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Choose Freddie Mac, select Loan Product Advisor System to System</li>
+                            <li><strong>Step 2:</strong> Complete Freddie Cash Reserves (use Fill button)</li>
+                            <li><strong>Step 3:</strong> Zero out Seller Concession field (or LP subtracts from Sales Price)</li>
+                            <li><strong>Step 4:</strong> Click Validate to check for errors</li>
+                            <li><strong>Step 5:</strong> Use Review and Fix for each validation error</li>
+                            <li><strong>Step 6:</strong> Click Send to LP, then View Feedback for findings</li>
+                        </ul>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Appraisal Value Setting</h4>
+                        <p>The initially submitted appraised value on the Home Screen shows "Estimated." To run your final DU and receive correct findings, the value <strong>must be changed to Actual</strong> on the Appraisal Info screen.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Conditions Management -->
+            <section id="section-8" class="section">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Conditions Management</h2><span>Add, review, and clear underwriting conditions</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Add from Templates</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review/Complete Text</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Set Attributes</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Print Conditions</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Condition Type</th>
+                                <th>Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Template Conditions</strong></td>
+                                <td>Pre-built conditions containing majority of verbiage - saves time</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ad Hoc Conditions</strong></td>
+                                <td>Free form conditions typed by Underwriter</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge" style="background: rgba(244, 63, 94, 0.2); color: #f43f5e;">DO NOT USE</span></td>
+                                <td>Add LP Conditions / Add DU Conditions (too long and cumbersome)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Condition Attributes</h3>
+                        <ul class="step-list">
+                            <li><strong>Class:</strong> Permission field - update only if someone other than UW signs off (e.g., PTF for Funder)</li>
+                            <li><strong>Stage:</strong> When must this be signed off? (PTD, PTF, Suspense, etc.)</li>
+                            <li><strong>Responsibility:</strong> Who reviews and signs off this condition?</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Follow Up Flag Color Codes</h4>
+                        <p><strong>Red:</strong> Unable to clear - UW must remove received date<br>
+                        <strong>Blue:</strong> Processing Manager notes<br>
+                        <strong>Yellow:</strong> UW notes (not for clearing issues)<br>
+                        <strong>Green:</strong> Processor notes for UW<br>
+                        <strong>Orange:</strong> Processor wants to move condition to PTF<br>
+                        <strong>Purple:</strong> UW Manager notes</p>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical: No Leading Symbols</h4>
+                        <p>DO NOT USE ANY SYMBOLS AS A LEADING ITEM in conditions (e.g., **2nd Review Required**). Anything uploaded links to this condition and causes issues. If symbols needed, include later in the condition.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Clearing Conditions</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Click yellow folder next to condition to view attached document</li>
+                            <li><strong>Step 2:</strong> Mark document Approved/Inactive as needed</li>
+                            <li><strong>Step 3:</strong> Click white circle in Cleared column to Mark as Cleared</li>
+                            <li><strong>All PTD conditions must be cleared for CTC</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: ULDD & 1008 -->
+            <section id="section-9" class="section">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <div class="section-title"><h2>ULDD & 1008 Transmittal</h2><span>Complete loan delivery data and transmittal summary</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Select Delivery Destination</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Validate Only</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Review and Fix Errors</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Complete All Tabs</div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>ULDD Purpose</h4>
+                        <p>The ULDD screen replaces the LQA run for Conventional loans. It is the Underwriter's responsibility to complete all possible information to ensure the file can be processed post-closing. Select Delivery Destination based on findings: Fannie for DU, Freddie for LP.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>ULDD Tab</th>
+                                <th>Key Fields</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>General</strong></td><td>GSE Investor, Investor Feature Codes, Total Mortgaged Properties, Community Lending</td></tr>
+                            <tr><td><strong>Property</strong></td><td>Property Details, Flood Information, Project Classification</td></tr>
+                            <tr><td><strong>Borrower</strong></td><td>Per-borrower details from 1003 screens</td></tr>
+                            <tr><td><strong>Loan Info</strong></td><td>Loan Product, details from Home Screen</td></tr>
+                            <tr><td><strong>Loan Details</strong></td><td>Community Lending dropdown, HomeReady questions</td></tr>
+                            <tr><td><strong>MI</strong></td><td>MI Absence Reason if no PMI</td></tr>
+                            <tr><td><strong>Underwriting</strong></td><td>Method and details from Underwriting Screen</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Property Data Offering</h4>
+                        <p>If Freddie PDR or Fannie PDC was ordered, select appropriate GSE Investor and enter Investor Feature Codes (Freddie/LP ACE + PDR: J44, Fannie/DU Value Acceptance + PDR: 774). If property data offering is lost, <strong>remove the property data IFC from ULDD screen</strong>.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>1008 Transmittal Completion</h3>
+                        <ul class="step-list">
+                            <li><strong>Click Fill AUS Info:</strong> Auto-populates DU/LP findings</li>
+                            <li><strong>Representative Credit Score:</strong> Enter manually</li>
+                            <li><strong>Underwriter Comments:</strong> Document calculations and rationale for approval (ATR/QM compliance)</li>
+                            <li><strong>Interested Party Contributions:</strong> Enter manually, verify percentage</li>
+                            <li><strong>Homeownership Education:</strong> Select from dropdown as applicable</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Loan Status & Review -->
+            <section id="section-10" class="section">
+                <div class="section-header">
+                    <div class="section-number">10</div>
+                    <div class="section-title"><h2>Loan Status & Second Level Review</h2><span>Manage loan status changes and escalation review</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Review Complete</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Decision?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">TBD LOAN</span>
+                                <div class="flow-node output">Pre-Approved</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">FULL FILE</span>
+                                <div class="flow-node output">Approved</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">ALL PTD CLEARED</span>
+                                <div class="flow-node output">Clear to Close</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">ISSUES</span>
+                                <div class="flow-node exception">Suspended/Declined</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>Critical: Suspended TBD Files</h4>
+                        <p>Suspended TBD files are <strong>NEVER</strong> to be placed in an Approved status. <strong>ALWAYS</strong> use Pre-Approved. Only move to Approved when property is identified and documents sent to underwriting.</p>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Approval Level</th>
+                                <th>Authority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Level 1</strong></td><td>Underwriter</td></tr>
+                            <tr><td><strong>Level 2</strong></td><td>Underwriting Team Leads, Specially Designated Underwriters</td></tr>
+                            <tr><td><strong>Level 3</strong></td><td>Underwriting Manager</td></tr>
+                            <tr><td><strong>Level 4</strong></td><td>Divisional Underwriting Manager, Specially Designated Managers</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>Second Level Review Requirements</h4>
+                        <p>CMG requires Second Level Review for loans with higher risk criteria. Underwriters must evaluate each loan against policy criteria and document each second signature in the LOS, regardless of outcome.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Clear to Close Checklist</h3>
+                        <ul class="step-list">
+                            <li><strong>All PTD conditions cleared</strong></li>
+                            <li><strong>Review UDM:</strong> Ensure any new debt is added</li>
+                            <li><strong>Address all inquiries</strong></li>
+                            <li><strong>Print all final docs to Stored Documents</strong></li>
+                            <li><strong>Confirm loan is locked and not going to expire prior to close</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 11: Mortgage Insurance -->
+            <section id="section-11" class="section">
+                <div class="section-header">
+                    <div class="section-number">11</div>
+                    <div class="section-title"><h2>Mortgage Insurance</h2><span>Order and document MI for high LTV loans</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node decision">LTV > 80%?</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processor Orders MI</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Submit Required Docs</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">MI Certificate Received</div>
+                        </div>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Required for MI Order</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Final 1003</strong></td><td>Current terms of loan</td></tr>
+                            <tr><td><strong>AUS Findings</strong></td><td>Must match the 1003</td></tr>
+                            <tr><td><strong>Automated UW Cert</strong></td><td>DU or LP at current terms</td></tr>
+                            <tr><td><strong>Credit Report</strong></td><td>Most recent pull</td></tr>
+                            <tr><td><strong>Income Documentation</strong></td><td>All supporting income docs</td></tr>
+                            <tr><td><strong>Asset Documentation</strong></td><td>Bank statements, etc.</td></tr>
+                            <tr><td><strong>Purchase Contract</strong></td><td>If applicable</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h4>MI Certificate Screen</h4>
+                        <p>Displays premium amounts and MI Company that quoted. Access MI company sites directly from Byte: ArchMIConnect, Genworth, MGIC, National MI, Radian, UGC MI Guide.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>LPMI Entry</h4>
+                        <p>For Lender Paid Mortgage Insurance, complete the LPMI MI Certificate Percentage field after the MI Certificate is received by the Underwriter.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 12: Special Procedures -->
+            <section id="section-12" class="section">
+                <div class="section-header">
+                    <div class="section-number">12</div>
+                    <div class="section-title"><h2>Special Procedures</h2><span>FEMA, LoanSafe, Appraisal Review, and more</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="decision-tree">
+                        <h3>FEMA/Disaster Area Process</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> CMG Corporate Credit monitors for disaster area declarations</li>
+                            <li><strong>Step 2:</strong> Automated email sent to Processor with flag notification</li>
+                            <li><strong>Step 3:</strong> Automated condition (609) added to Conditions Screen</li>
+                            <li><strong>Step 4:</strong> Processor refers to CMG Disaster Area Policy for requirements</li>
+                            <li><strong>Step 5:</strong> Processor orders appropriate appraisal and gathers documentation</li>
+                            <li><strong>Step 6:</strong> Underwriter completes Disaster Report/Requirements on Appraisal Info Screen</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>FEMA Hard Stop</h4>
+                        <p>A hard stop at CTC will appear if the Disaster Area/Requirements section on the Appraisal Info screen is blank for properties in declared disaster areas.</p>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>LoanSafe Fraud Detection</h3>
+                        <ul class="step-list">
+                            <li><strong>Access:</strong> Interfaces > Fraud Detection > CoreLogic Fraud > Launch LoanSafe Connect</li>
+                            <li><strong>Low Alerts:</strong> Cleared by Loan Processor</li>
+                            <li><strong>Medium/High Alerts:</strong> Cleared by Underwriter</li>
+                            <li><strong>Clearing:</strong> Select reason (Explained or Data Corrected only) and click Clear</li>
+                        </ul>
+                    </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>LoanSafe Search</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>SSN</strong></td><td>Validation of Borrower's Social Security Number</td></tr>
+                            <tr><td><strong>MERS</strong></td><td>Additional loan activity registered with MERS</td></tr>
+                            <tr><td><strong>NMLS & ASC</strong></td><td>Appraiser and MLO license validation</td></tr>
+                            <tr><td><strong>OFAC</strong></td><td>SDN and Consolidated Sanctions lists</td></tr>
+                            <tr><td><strong>SAM.gov</strong></td><td>GSA Excluded Parties List System</td></tr>
+                            <tr><td><strong>Other Gov't</strong></td><td>HUD LDP and FHFA SCP lists</td></tr>
+                            <tr><td><strong>Freddie Mac</strong></td><td>Exclusionary List (confidential)</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="decision-tree">
+                        <h3>Electronic Signatures</h3>
+                        <ul class="step-list">
+                            <li><strong>Setup:</strong> Sign blank paper, email to ByteSupport@cmgfi.com to add to Byte</li>
+                            <li><strong>Usage:</strong> Choose pen option within document to add signature</li>
+                            <li><strong>Warning:</strong> Once document is saved, signature CANNOT be removed</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>PTF Documents</h4>
+                        <p>For documents requiring signature at closing (LOEs, P&Ls, tax returns), choose "PTF Docs" under Category. This notifies the Closer to look for these documents when gathering for closing.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Reference -->
+            <div id="quick-ref" class="quick-ref">
+                <h3>Underwriting Quick Reference</h3>
+                <pre>
+RETAIL UNDERWRITING MANUAL - QUICK REFERENCE
+=============================================
+
+UNDERWRITER AUTHORITY LEVELS
+----------------------------
+Level 1: Underwriter
+Level 2: UW Team Leads / Specially Designated UWs
+Level 3: Underwriting Manager
+Level 4: Divisional UW Manager / Specially Designated Managers
+
+LOAN STATUS WORKFLOW
+--------------------
+UW Received -> Review File -> Decision:
+  - TBD Loans: Pre-Approved
+  - Full Files: Approved
+  - All PTD Cleared: Clear to Close
+  - Issues: Suspended/Declined
+
+CONDITION FLAG COLORS
+---------------------
+RED    = Unable to clear (UW must remove received date)
+BLUE   = Processing Manager notes
+YELLOW = UW notes (not clearing issues)
+GREEN  = Processor notes for UW
+ORANGE = Processor wants to move to PTF
+PURPLE = UW Manager notes
+
+AUS SUBMISSION CHECKLIST
+------------------------
+[ ] Correct Credit Ref No. showing
+[ ] Appraised Value changed from Estimated to Actual
+[ ] All account numbers entered for assets
+[ ] Seller Concession zeroed (for LP)
+[ ] Freddie Cash Reserves completed (for LP)
+[ ] Validation errors corrected
+
+ULDD CRITICAL FIELDS
+--------------------
+[ ] GSE Investor selected (based on AUS)
+[ ] Investor Feature Codes entered
+[ ] Total Mortgaged Properties filled
+[ ] Community Lending information complete
+[ ] MI Absence Reason (if no PMI)
+[ ] GSE Designation reason checkbox selected
+
+INCOME CALCULATION METHODS
+--------------------------
+Bonuses/Overtime: 24-month average (12-month if consistent)
+Commissions: 24-month average required
+Declining Income: Use lower 12-month average
+Seasonal: 12-month average with 2+ year history
+
+DOCUMENT REQUIREMENTS
+---------------------
+Income: 2 years W-2s/1099s, YTD paystubs, tax returns
+Assets: Bank statements with account numbers
+Credit: Most recent pull, verify expiration
+
+LOANSAFE ALERT CLEARING
+-----------------------
+Low Alerts: Processor clears
+Medium/High Alerts: Underwriter clears
+Reasons: "Explained" or "Data Corrected" only
+
+IMPORTANT REMINDERS
+-------------------
+* NEVER approve a suspended TBD file - use Pre-Approved
+* Do NOT use symbols as leading items in conditions
+* Base pay entered before employer defaults to Other Income
+* Do NOT double-count rent on joint applications
+* Complete File Quality Review screen after initial submission
+* Document ATR/QM rationale in 1008 Underwriter Comments
+                </pre>
+            </div>
+        </div>
+
+        <!-- ==================== AI AGENTS TAB ==================== -->
+        <div id="agents-panel" class="tab-panel">
+            <!-- Agent Header -->
+            <div class="agent-header">
+                <h1>AI Agent Opportunities</h1>
+                <p class="subtitle">Automation opportunities identified for the Retail Underwriting process</p>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="agent-summary" id="agent-summary">
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">6</div>
+                    <div class="agent-summary-label">Agent Opportunities</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">68%</div>
+                    <div class="agent-summary-label">Automation Potential</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">45 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
+                </div>
+                <div class="agent-summary-card">
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Compliance Impact</div>
+                </div>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heat-legend">
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #ef4444, #f97316);"></div>
+                    <span>Critical Priority (9-10)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #f97316, #eab308);"></div>
+                    <span>High Priority (7-8)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #eab308, #22c55e);"></div>
+                    <span>Medium Priority (5-6)</span>
+                </div>
+                <div class="heat-legend-item">
+                    <div class="heat-legend-color" style="background: linear-gradient(90deg, #22c55e, #14b8a6);"></div>
+                    <span>Low Priority (1-4)</span>
+                </div>
+            </div>
+
+            <!-- Heat Map Grid -->
+            <div class="heat-map-container" id="agent-heatmap">
+                <div class="heat-map-title">Priority Heat Map</div>
+                <div class="heat-map-grid">
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-incomevalidator')">
+                        <div class="heat-score">9.5</div>
+                        <div class="heat-name">Income Validator Agent</div>
+                        <div class="heat-desc">Automate income calculation verification against AUS findings</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>15 min</span></div>
+                            <div class="heat-metric">Complexity: <span>High</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-conditionwriter')">
+                        <div class="heat-score">9.2</div>
+                        <div class="heat-name">Condition Writer Agent</div>
+                        <div class="heat-desc">Auto-generate conditions based on AUS findings and guidelines</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>10 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-ausanalyzer')">
+                        <div class="heat-score">8.4</div>
+                        <div class="heat-name">AUS Analyzer Agent</div>
+                        <div class="heat-desc">Parse DU/LP findings and flag discrepancies automatically</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>8 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-ulddvalidator')">
+                        <div class="heat-score">7.8</div>
+                        <div class="heat-name">ULDD Validator Agent</div>
+                        <div class="heat-desc">Validate ULDD fields before submission to investors</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>5 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-loansafe')">
+                        <div class="heat-score">6.5</div>
+                        <div class="heat-name">LoanSafe Monitor Agent</div>
+                        <div class="heat-desc">Auto-clear low alerts and route high alerts for review</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>3 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-docmerge')">
+                        <div class="heat-score">5.8</div>
+                        <div class="heat-name">Document Merge Agent</div>
+                        <div class="heat-desc">Auto-merge supporting documentation packages</div>
+                        <div class="heat-metrics">
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Details -->
+            <div id="agent-details">
+                <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
+                <div class="agent-grid">
+                    <!-- Income Validator Agent -->
+                    <div class="agent-card" id="agent-incomevalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">I</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Income Validator Agent</div>
+                                <div class="agent-type">Data Validation / Calculation</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically validates income calculations by comparing manual entries against AUS findings, W-2s, and paystubs. Flags discrepancies for underwriter review and suggests corrections based on investor guidelines.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse Income Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Calculate Income</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare to AUS</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Flag Discrepancies</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">15 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">High</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('incomevalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Condition Writer Agent -->
+                    <div class="agent-card" id="agent-conditionwriter">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">C</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Condition Writer Agent</div>
+                                <div class="agent-type">Document Generation / AI</div>
+                            </div>
+                            <span class="agent-priority critical">Critical</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Generates underwriting conditions automatically based on AUS findings, loan characteristics, and investor guidelines. Uses approved condition templates and ensures proper formatting without prohibited symbols.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Analyze AUS</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Match Templates</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Generate Conditions</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Format</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">10 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">94%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('conditionwriter')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AUS Analyzer Agent -->
+                    <div class="agent-card" id="agent-ausanalyzer">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">A</div>
+                            <div class="agent-info">
+                                <div class="agent-name">AUS Analyzer Agent</div>
+                                <div class="agent-type">Data Analysis / Comparison</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Parses DU and LP findings automatically, compares results between systems, identifies data entry errors that may affect pricing or approval, and recommends which AUS to use for optimal results.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Parse DU/LP</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Compare Findings</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Identify Errors</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Recommend Action</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">96%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('ausanalyzer')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ULDD Validator Agent -->
+                    <div class="agent-card" id="agent-ulddvalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">U</div>
+                            <div class="agent-info">
+                                <div class="agent-name">ULDD Validator Agent</div>
+                                <div class="agent-type">Data Validation / Compliance</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates all ULDD fields before investor submission, ensuring GSE investor selection matches AUS, feature codes are correct, and all required fields are populated. Prevents rejection at delivery.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Read ULDD</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Fields</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check GSE Match</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Issues</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">5 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('ulddvalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LoanSafe Monitor Agent -->
+                    <div class="agent-card" id="agent-loansafe">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">L</div>
+                            <div class="agent-info">
+                                <div class="agent-name">LoanSafe Monitor Agent</div>
+                                <div class="agent-type">Fraud Detection / Automation</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Monitors LoanSafe fraud detection alerts, automatically clears low-level alerts with proper documentation, and escalates medium/high alerts to underwriters with supporting context and recommended actions.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Monitor Alerts</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Classify Level</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Clear/Escalate</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Document Action</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">92%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('loansafe')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Document Merge Agent -->
+                    <div class="agent-card" id="agent-docmerge">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">D</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Document Merge Agent</div>
+                                <div class="agent-type">Document Processing / PDF</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Automatically identifies related documents in Stored Docs and merges them into compliant packages. Ensures proper document ordering, removes duplicates, and sets appropriate document types and statuses.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Identify Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Match Categories</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Merge PDF</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Update Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">98%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docmerge')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Documentation Modal -->
+    <div class="modal-overlay" id="docModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Retail Underwriting Manual Documentation</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
+                    <button class="modal-btn close" onclick="closeDocModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <pre id="docContent"># Retail Underwriting Manual - Byte LOS
+
+## Overview
+This manual covers the complete retail underwriting workflow in Byte LOS, from initial file review through final approval. All underwriters must follow these procedures to ensure compliance and consistency.
+
+## Key Workflow Steps
+
+### 1. Initial File Review
+- Check Conversation Log for processor notes
+- Review Cover Letter and Submission Notes
+- Verify all required documents in Stored Docs
+- Confirm AUS has been run with current data
+
+### 2. Income Analysis
+- Calculate income per investor guidelines
+- Use 24-month averaging for variable income
+- Verify employment via VVOE
+- Document all calculations in Byte
+
+### 3. Asset Verification
+- Verify sufficient funds for closing
+- Check source of large deposits
+- Confirm gift documentation if applicable
+- Document reserves per loan program
+
+### 4. Credit Analysis
+- Review credit report for accuracy
+- Address disputed accounts
+- Calculate DTI ratios
+- Document compensating factors
+
+### 5. AUS Submission
+- Ensure all data matches documentation
+- Run both DU and LP when required
+- Review findings and messages
+- Address any data discrepancies
+
+### 6. Condition Management
+- Write clear, specific conditions
+- Use approved condition templates
+- Do NOT use symbols as leading items
+- Set appropriate due dates
+
+### 7. ULDD Completion
+- Select correct GSE investor
+- Enter all required feature codes
+- Complete community lending info
+- Set MI absence reason if no PMI
+
+### 8. Final Approval
+- Complete 1008 transmittal
+- Document ATR/QM rationale
+- Obtain MI certificate if required
+- Send for Second Level Review if delegated
+
+## Important Reminders
+- NEVER approve a suspended TBD file
+- Use Pre-Approved status for TBD loans
+- Document everything in Conversation Log
+- Follow investor-specific guidelines</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Prompt Modal -->
+    <div class="modal-overlay prompt-modal" id="promptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="promptModalTitle">AI Agent Build Prompt</h3>
+                <div class="modal-actions">
+                    <button class="modal-btn copy" onclick="copyPromptToClipboard()">Copy Prompt</button>
+                    <button class="modal-btn close" onclick="closePromptModal()">Close</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="prompt-tags" id="promptTags"></div>
+                <div class="prompt-section">
+                    <h4>Agent Purpose</h4>
+                    <div class="prompt-box" id="promptPurpose"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Full Build Prompt</h4>
+                    <div class="prompt-box" id="promptContent"></div>
+                </div>
+                <div class="prompt-section">
+                    <h4>Integration Points</h4>
+                    <div class="prompt-box" id="promptIntegration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
+
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            if (tab === 'workflow') {
+                document.querySelector('.sidebar-tab:not(.agent-tab)').classList.add('active');
+                document.getElementById('workflow-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'block';
+                document.getElementById('agents-nav').style.display = 'none';
+            } else {
+                document.querySelector('.sidebar-tab.agent-tab').classList.add('active');
+                document.getElementById('agents-panel').classList.add('active');
+                document.getElementById('workflow-nav').style.display = 'none';
+                document.getElementById('agents-nav').style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Scroll spy with isScrolling flag and 1000ms timeout
+        const sections = document.querySelectorAll('.section, .quick-ref');
+        const navItems = document.querySelectorAll('#workflow-nav .nav-item');
+        let isScrolling = false;
+        let scrollTimeout;
+
+        function updateActiveNav() {
+            if (isScrolling) return;
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) item.classList.add('active');
+            });
+        }
+
+        // Handle nav click to temporarily disable scroll spy
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+
+                // Remove active from all, add to clicked
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Re-enable scroll spy after 1000ms
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        window.addEventListener('scroll', updateActiveNav);
+
+        // Modal
+        function openDocModal() {
+            document.getElementById('docModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDocModal() {
+            document.getElementById('docModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(document.getElementById('docContent').textContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) { alert('Failed to copy.'); }
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDocModal(); closePromptModal(); } });
+        document.getElementById('docModal').addEventListener('click', (e) => { if (e.target.id === 'docModal') closeDocModal(); });
+
+        document.addEventListener('DOMContentLoaded', () => { updateActiveNav(); });
+
+        // Scroll to agent card and highlight
+        function scrollToAgent(agentId) {
+            const agentCard = document.getElementById(agentId);
+            if (agentCard) {
+                document.querySelectorAll('.agent-card.highlight').forEach(card => {
+                    card.classList.remove('highlight');
+                });
+
+                agentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    agentCard.classList.add('highlight');
+                }, 300);
+
+                setTimeout(() => {
+                    agentCard.classList.remove('highlight');
+                }, 2500);
+            }
+        }
+
+        // Agent Prompt System
+        const agentPrompts = {
+            incomevalidator: {
+                name: 'Income Validator Agent',
+                tags: ['Data Validation', 'Calculation', 'High Complexity', 'Critical Priority'],
+                purpose: `This agent automatically validates income calculations by comparing manual entries against AUS findings, W-2s, paystubs, and tax returns. It applies investor-specific calculation rules, flags discrepancies for underwriter review, and suggests corrections based on the appropriate guidelines.`,
+                prompt: `You are building a Data Validation Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: Income Validator Agent
+TYPE: Data Validation / Calculation Engine
+
+OBJECTIVE:
+Automatically validate income calculations by cross-referencing data sources and applying investor-specific calculation rules.
+
+INPUT DATA:
+- W-2s (2 years)
+- Paystubs (YTD)
+- Tax returns (if self-employed)
+- AUS income findings (DU/LP)
+- Byte employment screen data
+- Investor guidelines (Fannie/Freddie/FHA/VA)
+
+CALCULATION RULES:
+1. Base Salary: Monthly = Annual / 12
+2. Overtime/Bonus: 24-month average (12-month if stable/increasing)
+3. Commission: 24-month average required
+4. Declining Income: Use lower 12-month average
+5. Seasonal: 12-month average with 2+ year history
+
+VALIDATION CHECKS:
+{
+  "ytd_vs_base": "Compare YTD earnings to stated base",
+  "w2_consistency": "Compare W-2 year-over-year",
+  "aus_match": "Compare calculated to AUS",
+  "gap_analysis": "Check for employment gaps",
+  "declining_trend": "Flag if income declining >10%"
+}
+
+OUTPUT:
+{
+  "status": "VALID" | "DISCREPANCY" | "REVIEW_REQUIRED",
+  "calculated_income": 8500.00,
+  "aus_income": 8750.00,
+  "variance": -250.00,
+  "variance_pct": -2.86,
+  "discrepancies": [
+    { "field": "Overtime", "expected": 500, "actual": 750, "recommendation": "Use 24-month average" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Data
+   - Employment screen fields
+   - Income breakdown sections
+   - AUS findings parser
+
+2. Document OCR
+   - W-2 extraction
+   - Paystub parsing
+   - Tax return analysis
+
+3. Investor Guidelines
+   - Fannie Mae Selling Guide
+   - Freddie Mac requirements
+   - FHA/VA handbook rules
+
+4. Underwriter Dashboard
+   - Variance alerts
+   - One-click corrections
+   - Audit trail logging`
+            },
+            conditionwriter: {
+                name: 'Condition Writer Agent',
+                tags: ['Document Generation', 'AI', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent generates underwriting conditions automatically based on AUS findings, loan characteristics, and investor guidelines. It uses approved condition templates, ensures proper formatting without prohibited symbols, and maintains consistency across underwriters.`,
+                prompt: `You are building a Document Generation Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: Condition Writer Agent
+TYPE: Document Generation / AI Text
+
+OBJECTIVE:
+Generate clear, compliant underwriting conditions based on AUS findings and loan characteristics.
+
+INPUT DATA:
+- AUS findings (DU/LP messages)
+- Loan program type
+- Property type
+- Borrower characteristics
+- Missing documentation list
+
+CONDITION TEMPLATES:
+{
+  "income_verification": "Provide [DOC_TYPE] covering [DATE_RANGE] to verify [INCOME_TYPE] income of $[AMOUNT]",
+  "asset_verification": "Provide [STATEMENT_TYPE] showing [ACCOUNT_TYPE] with minimum balance of $[AMOUNT]",
+  "title_condition": "Provide clear title insurance commitment with no outstanding liens or judgments",
+  "appraisal_condition": "Appraisal must reflect [REQUIREMENT] per [INVESTOR] guidelines"
+}
+
+FORMATTING RULES:
+1. NO symbols as leading items (no *, -, o, etc.)
+2. Use numbered lists when multiple items
+3. Clear, specific language
+4. Include due dates when applicable
+5. Reference investor guidelines by name
+
+AUS MESSAGE MAPPING:
+{
+  "Assets - Large Deposit": "Provide LOE for deposits >$[THRESHOLD]",
+  "Income - Verification Required": "Provide VVOE dated within 10 days of closing",
+  "Credit - Disputed Account": "Provide letter of dispute resolution or remove from DTI"
+}
+
+OUTPUT:
+{
+  "conditions": [
+    {
+      "category": "Prior To Docs",
+      "text": "Provide bank statements for [Account] covering the most recent 2 months",
+      "due_date": "2026-02-15",
+      "source": "AUS Message - Assets"
+    }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Conditions Screen
+   - Auto-populate condition text
+   - Set category (PTD/PTC/PTF)
+   - Assign due dates
+
+2. AUS Parser
+   - Extract all messages
+   - Categorize by type
+   - Map to condition templates
+
+3. Template Library
+   - CMG approved conditions
+   - Investor-specific language
+   - Version control
+
+4. Audit Trail
+   - Log condition generation
+   - Track modifications
+   - Compliance reporting`
+            },
+            ausanalyzer: {
+                name: 'AUS Analyzer Agent',
+                tags: ['Data Analysis', 'Comparison', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent parses DU and LP findings automatically, compares results between systems, identifies data entry errors that may affect pricing or approval, and recommends which AUS to use for optimal loan pricing and approval.`,
+                prompt: `You are building a Data Analysis Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: AUS Analyzer Agent
+TYPE: Data Analysis / Comparison Engine
+
+OBJECTIVE:
+Parse and analyze DU/LP findings to identify discrepancies and recommend optimal AUS selection.
+
+INPUT DATA:
+- DU findings (XML/PDF)
+- LP findings (XML/PDF)
+- Byte loan data
+- Credit report
+
+ANALYSIS CATEGORIES:
+1. Risk Assessment
+   - DU: Approve/Eligible, Refer
+   - LP: Accept, Caution, Ineligible
+
+2. Representation & Warranty Relief
+   - DU: Day 1 Certainty
+   - LP: Loan Product Advisor
+
+3. Income/Asset Validation
+   - What's waived
+   - What's required
+
+COMPARISON LOGIC:
+{
+  "dti_variance": "Compare DTI between DU and LP",
+  "ltv_variance": "Check LTV consistency",
+  "reserves_variance": "Compare reserve requirements",
+  "income_validation": "Check what income docs are waived"
+}
+
+OUTPUT:
+{
+  "recommended_aus": "DU",
+  "reason": "Better pricing with Day 1 Certainty",
+  "du_result": {
+    "decision": "Approve/Eligible",
+    "risk_class": "Limited Review",
+    "dti": 43.2,
+    "waivers": ["Income", "Assets"]
+  },
+  "lp_result": {
+    "decision": "Accept",
+    "risk_class": "Standard Documentation",
+    "dti": 43.5,
+    "waivers": ["Assets"]
+  },
+  "discrepancies": [
+    { "field": "DTI", "du": 43.2, "lp": 43.5, "impact": "Minimal" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. AUS Response Parser
+   - XML parsing for structured data
+   - PDF OCR for manual runs
+   - Store parsed results
+
+2. Byte Data Comparison
+   - Cross-reference with loan file
+   - Identify data entry errors
+   - Flag for correction
+
+3. Pricing Engine
+   - Calculate price difference
+   - Factor in rep/warranty value
+   - Net benefit analysis
+
+4. Recommendation Engine
+   - Rule-based selection
+   - ML-enhanced predictions
+   - Historical success rates`
+            },
+            ulddvalidator: {
+                name: 'ULDD Validator Agent',
+                tags: ['Data Validation', 'Compliance', 'Low Complexity', 'High Priority'],
+                purpose: `This agent validates all ULDD (Uniform Loan Delivery Dataset) fields before investor submission, ensuring GSE investor selection matches the AUS used, feature codes are correct, and all required fields are populated to prevent rejection at delivery.`,
+                prompt: `You are building a Data Validation Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: ULDD Validator Agent
+TYPE: Data Validation / Compliance Check
+
+OBJECTIVE:
+Validate ULDD fields for completeness and accuracy before investor submission.
+
+CRITICAL FIELDS:
+1. GSE Investor Selection
+   - Must match AUS used (DU=Fannie, LP=Freddie)
+   - Cannot be blank
+
+2. Investor Feature Codes
+   - Based on loan characteristics
+   - Property type codes
+   - Special program codes
+
+3. Required Fields:
+   - Total Mortgaged Properties
+   - Community Lending info
+   - MI Absence Reason (if no PMI)
+   - GSE Designation reason
+
+VALIDATION RULES:
+{
+  "gse_aus_match": {
+    "if_du": "GSE must be Fannie Mae",
+    "if_lp": "GSE must be Freddie Mac"
+  },
+  "mi_required": {
+    "if_ltv_gt_80": "MI or MI Absence required",
+    "mi_certificate": "Must be in file"
+  },
+  "feature_codes": {
+    "condo": "Requires project ID",
+    "investment": "Requires rental income docs"
+  }
+}
+
+OUTPUT:
+{
+  "status": "VALID" | "ERRORS_FOUND" | "WARNINGS",
+  "errors": [
+    { "field": "GSE Investor", "issue": "Set to Freddie but DU was used", "fix": "Change to Fannie Mae" }
+  ],
+  "warnings": [
+    { "field": "Feature Code", "issue": "ARMs usually require code 305" }
+  ],
+  "completeness": 94
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte ULDD Screen
+   - Read all field values
+   - Cross-reference with loan data
+   - Update fields as needed
+
+2. AUS Results
+   - Determine which GSE to use
+   - Check for special findings
+   - Map to feature codes
+
+3. Investor Guidelines
+   - Fannie Mae ULDD specs
+   - Freddie Mac requirements
+   - Error code references
+
+4. Delivery Preparation
+   - Pre-submission validation
+   - Error correction workflow
+   - Audit logging`
+            },
+            loansafe: {
+                name: 'LoanSafe Monitor Agent',
+                tags: ['Fraud Detection', 'Automation', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent monitors LoanSafe fraud detection alerts, automatically clears low-level alerts with proper documentation, and escalates medium/high alerts to underwriters with supporting context and recommended actions based on CMG policies.`,
+                prompt: `You are building a Fraud Detection Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: LoanSafe Monitor Agent
+TYPE: Fraud Detection / Alert Automation
+
+OBJECTIVE:
+Monitor and process LoanSafe fraud alerts according to CMG clearing policies.
+
+ALERT LEVELS:
+1. Low Alerts
+   - Processor can clear
+   - Reason: "Explained" or "Data Corrected"
+   - Auto-clear when documentation exists
+
+2. Medium Alerts
+   - Underwriter review required
+   - Escalate with context
+   - Suggest clearing reason
+
+3. High Alerts
+   - Underwriter + Manager review
+   - Full investigation required
+   - Document all findings
+
+CLEARING RULES:
+{
+  "identity_mismatch": {
+    "if_ssn_match": "Clear with 'Verified in credit report'",
+    "if_name_variation": "Clear with 'Married name/legal name change'"
+  },
+  "address_discrepancy": {
+    "if_recent_move": "Clear with 'Recent relocation documented'",
+    "if_mail_forwarding": "Clear with 'Temporary address explained'"
+  },
+  "income_alert": {
+    "if_verified": "Clear with 'Income verified via VVOE'",
+    "if_discrepancy": "Escalate to underwriter"
+  }
+}
+
+OUTPUT:
+{
+  "alerts_processed": 5,
+  "auto_cleared": 3,
+  "escalated": 2,
+  "actions": [
+    { "alert": "SSN Variation", "action": "Cleared", "reason": "Verified in credit report" },
+    { "alert": "Employment History Gap", "action": "Escalated", "priority": "Medium" }
+  ]
+}`,
+                integration: `INTEGRATION POINTS:
+1. LoanSafe API
+   - Retrieve alerts
+   - Post clearing reasons
+   - Update alert status
+
+2. Byte Loan Data
+   - Cross-reference borrower info
+   - Check for supporting docs
+   - Verify explanations
+
+3. Notification System
+   - Email escalations
+   - Dashboard alerts
+   - Manager notifications
+
+4. Audit Trail
+   - Log all actions
+   - Track clearing patterns
+   - Compliance reporting`
+            },
+            docmerge: {
+                name: 'Document Merge Agent',
+                tags: ['Document Processing', 'PDF Manipulation', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent automatically identifies related documents in Stored Docs and merges them into compliant packages. It ensures proper document ordering, removes duplicates, sets appropriate document types and statuses, and maintains clear audit trails.`,
+                prompt: `You are building a Document Processing Agent for CMG Financial's Byte LOS Underwriting process.
+
+AGENT NAME: Document Merge Agent
+TYPE: Document Processing / PDF Manipulation
+
+OBJECTIVE:
+Identify and merge related documents into compliant packages for underwriting and investor delivery.
+
+DOCUMENT CATEGORIES:
+1. Income Package
+   - W-2s (2 years)
+   - Paystubs (30 days)
+   - Tax returns (if applicable)
+   - VVOE
+
+2. Asset Package
+   - Bank statements
+   - Investment statements
+   - Gift letters and documentation
+
+3. Credit Package
+   - Credit report
+   - Explanation letters
+   - Dispute resolutions
+
+4. Title Package
+   - Title commitment
+   - Legal descriptions
+   - Survey (if required)
+
+MERGE RULES:
+{
+  "order": "Newest documents first within category",
+  "duplicates": "Remove exact duplicates, flag near-duplicates",
+  "naming": "[LoanNumber]-[Category]-[Date].pdf",
+  "bookmarks": "Add bookmark for each source document"
+}
+
+OPERATIONS:
+1. Query Stored Docs by loan and type
+2. Identify related documents
+3. Sort by category and date
+4. Merge with PyPDF2/pdf-lib
+5. Add page numbers and bookmarks
+6. Update Stored Docs entry
+7. Archive source documents
+
+OUTPUT:
+{
+  "merged_packages": [
+    { "category": "Income", "pages": 12, "sources": 4 },
+    { "category": "Assets", "pages": 8, "sources": 2 }
+  ],
+  "duplicates_removed": 2,
+  "total_pages": 20
+}`,
+                integration: `INTEGRATION POINTS:
+1. Byte Stored Documents
+   - Query document list
+   - Download source files
+   - Upload merged packages
+   - Archive originals
+
+2. PDF Processing
+   - PyPDF2 for Python
+   - pdf-lib for Node.js
+   - Cloud Functions
+
+3. Document Classification
+   - Read document types
+   - Pattern matching
+   - ML classification
+
+4. Audit Trail
+   - Log merge operations
+   - Track source documents
+   - Enable un-merge option`
+            }
+        };
+
+        // Show agent prompt modal
+        let currentPromptContent = '';
+
+        function showAgentPrompt(agentKey) {
+            const agent = agentPrompts[agentKey];
+            if (!agent) return;
+
+            document.getElementById('promptModalTitle').textContent = agent.name + ' - Build Prompt';
+
+            const tagsHtml = agent.tags.map(tag => '<span class="prompt-tag">' + tag + '</span>').join('');
+            document.getElementById('promptTags').innerHTML = tagsHtml;
+
+            document.getElementById('promptPurpose').textContent = agent.purpose;
+            document.getElementById('promptContent').textContent = agent.prompt;
+            document.getElementById('promptIntegration').textContent = agent.integration;
+
+            currentPromptContent = '# ' + agent.name + '\n\n## Purpose\n' + agent.purpose + '\n\n## Build Prompt\n' + agent.prompt + '\n\n## Integration Points\n' + agent.integration;
+
+            document.getElementById('promptModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePromptModal() {
+            document.getElementById('promptModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function copyPromptToClipboard() {
+            try {
+                await navigator.clipboard.writeText(currentPromptContent);
+                const success = document.getElementById('copySuccess');
+                success.style.display = 'block';
+                setTimeout(() => { success.style.display = 'none'; }, 2000);
+            } catch (e) {
+                alert('Failed to copy prompt.');
+            }
+        }
+
+        document.getElementById('promptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'promptModal') closePromptModal();
+        });
+    </script>
+</body>
+</html>
