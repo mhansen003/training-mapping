@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>First-Time Homebuyer Do's & Don'ts - Process Workflow</title>
+    <title>TBD Checklist - Process Workflow</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -347,7 +347,6 @@
         .badge.required-badge { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
         .badge.optional-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
         .badge.calculated-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
-        .badge.warning-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
 
         /* Info Boxes */
         .exception-box, .tip-box, .info-box {
@@ -369,56 +368,6 @@
         .info-box { background: rgba(59, 130, 246, 0.08); border-color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.2); border-left: 4px solid var(--accent-blue); }
         .info-box h4 { color: var(--accent-blue); margin-bottom: 10px; font-size: 1rem; }
         .info-box p, .info-box li { color: var(--text-secondary); }
-
-        /* Do/Don't Cards */
-        .do-dont-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin: 22px 0; }
-
-        .do-card, .dont-card {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .do-card .card-header {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .dont-card .card-header {
-            background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .do-card .card-body, .dont-card .card-body { padding: 20px; }
-
-        .do-card ul, .dont-card ul { list-style: none; padding: 0; margin: 0; }
-
-        .do-card li, .dont-card li {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .do-card li:last-child, .dont-card li:last-child { border-bottom: none; }
-
-        .check-icon { color: var(--accent-green); font-weight: bold; font-size: 1.1rem; flex-shrink: 0; }
-        .x-icon { color: var(--accent-rose); font-weight: bold; font-size: 1.1rem; flex-shrink: 0; }
 
         /* Decision Tree */
         .decision-tree {
@@ -464,6 +413,28 @@
             color: var(--text-secondary);
         }
         .step-list li strong { color: var(--text-primary); }
+
+        /* Checklist */
+        .checklist { list-style: none; padding: 0; margin: 18px 0; }
+        .checklist li {
+            padding: 12px 18px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 8px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .checklist li::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--accent-blue);
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
 
         /* Quick Reference */
         .quick-ref {
@@ -881,18 +852,18 @@
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
         <a href="../../index.html" class="breadcrumb-logo-link"><img src="../../images/clear-ai-logo.png" alt="Clear AI" class="breadcrumb-logo"></a>
-        <a href="../../index.html">Portal Home</a>
+        <a href="../../index.html">Home</a>
         <span class="separator">></span>
         <a href="./index.html">Mortgage Fundamentals</a>
         <span class="separator">></span>
-        <span class="current">First-Time Homebuyer Do's & Don'ts</span>
+        <span class="current">TBD Checklist</span>
     </nav>
 
     <!-- Fixed Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <h2>FTHB Do's & Don'ts</h2>
-            <p>Interactive Workflow Guide</p>
+            <h2>TBD Checklist</h2>
+            <p>Credit Only Approval Process</p>
         </div>
 
         <!-- Tab Switcher -->
@@ -909,27 +880,31 @@
             </a>
             <a href="#section-2" class="nav-item">
                 <span class="nav-number">2</span>
-                <span class="nav-label">Do's When Planning</span>
+                <span class="nav-label">Borrower Qualifications</span>
             </a>
             <a href="#section-3" class="nav-item">
                 <span class="nav-number">3</span>
-                <span class="nav-label">Don'ts After Applying</span>
+                <span class="nav-label">Credit Report</span>
             </a>
             <a href="#section-4" class="nav-item">
                 <span class="nav-number">4</span>
-                <span class="nav-label">Documentation Requirements</span>
+                <span class="nav-label">Income Documentation</span>
             </a>
             <a href="#section-5" class="nav-item">
                 <span class="nav-number">5</span>
-                <span class="nav-label">Credit Management</span>
+                <span class="nav-label">Assets</span>
             </a>
             <a href="#section-6" class="nav-item">
                 <span class="nav-number">6</span>
-                <span class="nav-label">Communication Best Practices</span>
+                <span class="nav-label">Miscellaneous</span>
             </a>
             <a href="#section-7" class="nav-item">
                 <span class="nav-number">7</span>
-                <span class="nav-label">PMI Information</span>
+                <span class="nav-label">Submission to Operations</span>
+            </a>
+            <a href="#section-8" class="nav-item">
+                <span class="nav-number">8</span>
+                <span class="nav-label">Accepted Offer Process</span>
             </a>
             <a href="#quick-ref" class="nav-item">
                 <span class="nav-number">*</span>
@@ -967,588 +942,569 @@
         <div id="workflow-panel" class="tab-panel active">
             <!-- Header -->
             <div class="header">
-                <h1>First-Time Homebuyer Do's & Don'ts</h1>
-                <p class="subtitle">Essential guidance for borrowers navigating the mortgage application process - what to do and what to avoid</p>
+                <h1>TBD Checklist</h1>
+                <p class="subtitle">Credit Only approval process for borrowers without a subject property address</p>
                 <div class="meta">
-                    <span class="meta-item">Source: Enact MI</span>
-                    <span class="meta-item">Audience: Borrowers / LOs</span>
-                    <span class="meta-item">Doc ID: 01754.CB.0323</span>
-                    <span class="meta-item">Category: FTHB Education</span>
+                    <span class="meta-item">System: Byte LOS</span>
+                    <span class="meta-item">Role: Loan Officer / Sales</span>
+                    <span class="meta-item">Updated: Jan 16, 2026</span>
+                    <span class="meta-item">Type: Pre-Approval</span>
                 </div>
             </div>
 
             <!-- Legend -->
             <div class="legend">
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Recommended Action (DO)</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Avoid Action (DON'T)</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Information</span></div>
-                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Warning/Caution</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #22c55e, #16a34a);"></div><span>Start/End</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div><span>Action Step</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div><span>Decision Point</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #111827; border: 2px solid #3b82f6;"></div><span>User Input</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #f43f5e, #dc2626);"></div><span>Exception</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #14b8a6, #0d9488);"></div><span>Output</span></div>
             </div>
 
             <!-- Section 1: Overview -->
             <section id="section-1" class="section">
                 <div class="section-header">
                     <div class="section-number">1</div>
-                    <div class="section-title"><h2>Overview</h2><span>Understanding the mortgage application journey</span></div>
+                    <div class="section-title"><h2>TBD Process Overview</h2><span>Understanding the Credit Only approval workflow</span></div>
                 </div>
                 <div class="section-content">
                     <div class="workflow-diagram">
                         <div class="flow-row">
-                            <div class="flow-node start">Planning Phase</div>
+                            <div class="flow-node start">Borrower Qualifies</div>
                             <span class="flow-arrow">-></span>
-                            <div class="flow-node action">Application</div>
+                            <div class="flow-node action">Submit TBD Loan</div>
                             <span class="flow-arrow">-></span>
-                            <div class="flow-node action">Processing</div>
+                            <div class="flow-node action">Credit Only Review</div>
                             <span class="flow-arrow">-></span>
-                            <div class="flow-node action">Underwriting</div>
-                            <span class="flow-arrow">-></span>
-                            <div class="flow-node output">Closing</div>
+                            <div class="flow-node output">Conditional Approval</div>
                         </div>
                     </div>
-
                     <div class="info-box">
-                        <h4>Key Principle</h4>
-                        <p>Your mortgage loan application process can be easier with a little bit of advance planning. Your post-application process can also be smoother when you keep in mind what activities can slow down your closing.</p>
+                        <h4>What is TBD?</h4>
+                        <p>The TBD (To Be Determined) process empowers Sales to submit a loan with Borrower qualifying fields and documentation to obtain a <strong>Credit Only approval</strong>. The loan is submitted <strong>without a subject property address</strong>.</p>
                     </div>
-
-                    <div class="summary-grid">
-                        <div class="summary-card">
-                            <h4>Do's Count</h4>
-                            <div class="value">6</div>
-                            <div class="label">Pre-Application Best Practices</div>
-                        </div>
-                        <div class="summary-card">
-                            <h4>Don'ts Count</h4>
-                            <div class="value">6</div>
-                            <div class="label">Post-Application Pitfalls</div>
-                        </div>
-                        <div class="summary-card">
-                            <h4>Focus Areas</h4>
-                            <div class="value">4</div>
-                            <div class="label">Documentation, Employment, Credit, Communication</div>
-                        </div>
+                    <div class="tip-box">
+                        <h4>Key Benefits</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Borrowers with credit and qualifying risk can obtain a Conditional loan decision from underwriting</li>
+                            <li>Well-qualified Borrowers can credit qualify before finding a property</li>
+                            <li>Expedites loan closing when Borrower goes to contract on a Purchase transaction</li>
+                            <li>Provides confidence to buyers and sellers with a Conditional Commitment letter</li>
+                        </ul>
+                    </div>
+                    <div class="exception-box">
+                        <h4>Important Requirements</h4>
+                        <p>Loan Officers must ensure that all items are documented in the loan fields for Credit Only review. All applicable documentation listed must be in Clear Docs. <strong>Always confirm the product guidelines allow TBD submissions.</strong></p>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 2: Do's When Planning -->
+            <!-- Section 2: Borrower Qualifications -->
             <section id="section-2" class="section">
                 <div class="section-header">
                     <div class="section-number">2</div>
-                    <div class="section-title"><h2>Do's When You Plan to Apply</h2><span>Essential actions before and during the mortgage application</span></div>
+                    <div class="section-title"><h2>Borrower Qualifications</h2><span>Required field entry and documentation for borrower information</span></div>
                 </div>
                 <div class="section-content">
-                    <div class="do-card" style="margin-bottom: 25px;">
-                        <div class="card-header">
-                            <span style="font-size: 1.3rem;">&#10003;</span> Recommended Actions
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Enter Residency History</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Verify Citizenship</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Complete Declarations</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">HMDA Information</div>
                         </div>
-                        <div class="card-body">
-                            <ul>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Keep an ongoing paper trail</strong><br>
-                                        Maintain ongoing documentation related to income, employment verification and current debts/obligations -- keeping your W2s, tax return documents, pay stubs and bank statements handy.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Provide money deposit receipts</strong><br>
-                                        This includes an earnest money deposit from your personal bank account or gift funds. Gift funds are acceptable only if certain criteria are met -- reach out to your loan originator for clarification.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Maintain employment and income</strong><br>
-                                        Show stability through the mortgage application period. This process goes much smoother if you keep your income steady and avoid major changes. Pay raises/promotions are exceptions to this expectation.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Create a savings plan</strong><br>
-                                        Buying a house is exciting, but focusing on saving during this period is key. You'll need funds for an earnest money deposit, down payment and/or closing costs, and major purchases could impact your credit. Pay your bills on time and be mindful of spending habits.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Understand credit pulls</strong><br>
-                                        Your lender may pull a new credit report just prior to closing to check for new debt. If your recent credit activity raises a concern, you may be asked to explain.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="check-icon">&#10003;</span>
-                                    <div>
-                                        <strong>Ask questions and communicate</strong><br>
-                                        At any point in the process, your team is there to help you and answer any question that might come up. Trust their expertise, communicate effectively and often, and learn what you can about the loan process to set yourself up for success.
-                                    </div>
-                                </li>
-                            </ul>
+                    </div>
+                    <ul class="checklist">
+                        <li>Two-year residency history documented</li>
+                        <li>Acceptable Citizenship and/or any other Borrower-related qualifications verified</li>
+                        <li>Complete Declaration information entered</li>
+                        <li>HMDA information fully documented</li>
+                    </ul>
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Requirement</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Residency History</strong></td>
+                                <td>Full 2-year address history</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Citizenship Status</strong></td>
+                                <td>US Citizen, Permanent Resident, or eligible non-citizen</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Declarations</strong></td>
+                                <td>All 1003 declaration questions answered</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>HMDA Data</strong></td>
+                                <td>Ethnicity, race, sex, and other demographic info</td>
+                                <td><span class="badge required-badge">Required</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 3: Credit Report -->
+            <section id="section-3" class="section">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <div class="section-title"><h2>Credit Report</h2><span>SoftCheck or Full-Trimerge as required per guidelines</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Pull Credit Report</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Scores Acceptable?</div>
                         </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">Review Credit History</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">NO</span>
+                                <div class="flow-node exception">Address Credit Issues</div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="checklist">
+                        <li>SoftCheck or Full-Trimerge pulled as required per guidelines</li>
+                        <li>Acceptable Credit Scores verified</li>
+                        <li>Credit History reviewed for derogatory items</li>
+                    </ul>
+
+                    <div class="decision-tree">
+                        <h3>Key Documentation as Applicable</h3>
+                        <ul class="step-list">
+                            <li><strong>Credit Inquiries:</strong> Explanation letter for recent inquiries</li>
+                            <li><strong>Omitted Liabilities:</strong> Explanation for debts not shown on credit report</li>
+                            <li><strong>Bankruptcy Documents:</strong> Discharge papers, schedules, and court documents</li>
+                            <li><strong>Student Loans:</strong> Payment documentation and accurate agency calculation added if deferred</li>
+                        </ul>
                     </div>
 
                     <table class="field-table">
                         <thead>
                             <tr>
                                 <th>Document Type</th>
-                                <th>Purpose</th>
+                                <th>When Required</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>W2s</strong></td>
-                                <td>Verify annual income and employment</td>
-                                <td><span class="badge required-badge">Required</span></td>
+                                <td><strong>Credit Inquiry Letter</strong></td>
+                                <td>Recent credit inquiries within 120 days</td>
+                                <td><span class="badge optional-badge">If Applicable</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Tax Returns</strong></td>
-                                <td>Verify income history and consistency</td>
-                                <td><span class="badge required-badge">Required</span></td>
+                                <td><strong>Omitted Liabilities LOX</strong></td>
+                                <td>Debts not appearing on credit report</td>
+                                <td><span class="badge optional-badge">If Applicable</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Pay Stubs</strong></td>
-                                <td>Verify current income</td>
-                                <td><span class="badge required-badge">Required</span></td>
+                                <td><strong>BK Discharge/Schedules</strong></td>
+                                <td>Prior bankruptcy on record</td>
+                                <td><span class="badge optional-badge">If Applicable</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Bank Statements</strong></td>
-                                <td>Verify assets and deposit sources</td>
-                                <td><span class="badge required-badge">Required</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Gift Letter</strong></td>
-                                <td>Document gift funds source and terms</td>
+                                <td><strong>Student Loan Docs</strong></td>
+                                <td>Deferred student loans</td>
                                 <td><span class="badge optional-badge">If Applicable</span></td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="tip-box">
-                        <h4>Pro Tip: Paper Trail Organization</h4>
-                        <p>Create a dedicated folder (physical or digital) for all mortgage-related documents. Organize by category: Income, Assets, Identity, and Property. This makes it easy to respond quickly to document requests.</p>
-                    </div>
                 </div>
             </section>
 
-            <!-- Section 3: Don'ts After Applying -->
-            <section id="section-3" class="section">
-                <div class="section-header">
-                    <div class="section-number">3</div>
-                    <div class="section-title"><h2>Don'ts After You Apply</h2><span>Critical actions to avoid during the loan process</span></div>
-                </div>
-                <div class="section-content">
-                    <div class="dont-card" style="margin-bottom: 25px;">
-                        <div class="card-header">
-                            <span style="font-size: 1.3rem;">&#10007;</span> Actions to Avoid
-                        </div>
-                        <div class="card-body">
-                            <ul>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Close or open bank accounts</strong><br>
-                                        Before you open, close, or transfer money across accounts, check with your Loan Officer on how this may affect your qualification or documentation. Changes could result in a delay for the loan origination.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Make large bank deposits</strong><br>
-                                        If you deposit any money outside of your automated payroll deposits, especially cash, check with your Loan Officer on the documentation you will need to provide to verify their sources.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Change jobs, employer or employment</strong><br>
-                                        You can change jobs, as well as amend any tax returns, but you'll need to make your Loan Officer aware because it may impact your qualification and documentation. If shifts do occur, you may need a new loan approval.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Make major purchases</strong><br>
-                                        This involves large spending prior to or during the contract period. It's tempting to get new furniture, a car or house appliances, but these purchases will hurt your savings, debt-to-income ratio and credit utilization.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Open a new line of credit</strong><br>
-                                        This also includes closing credit lines, co-signing on loans, or making major purchases on credit cards.
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="x-icon">&#10007;</span>
-                                    <div>
-                                        <strong>Panic, stress or isolate</strong><br>
-                                        Your team wants you to be successful, knowledgeable and confident during this process. Whatever your finances, be sure to include all debts and liabilities on your mortgage application. Keep the lines of communication open and trust they want you to get across the finish line.
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="exception-box">
-                        <h4>Critical Warning: Credit Re-Pull</h4>
-                        <p>Your lender may pull a new credit report just prior to closing. Any new debt, credit inquiries, or changes to your credit profile could trigger additional underwriting review or even loan denial. When in doubt, always consult your Loan Officer BEFORE making any financial changes.</p>
-                    </div>
-
-                    <div class="workflow-diagram">
-                        <div class="flow-row">
-                            <div class="flow-node decision">Financial Change?</div>
-                        </div>
-                        <div class="decision-branch">
-                            <div class="branch">
-                                <span class="branch-label">Major Change</span>
-                                <div class="flow-node exception">Contact LO Immediately</div>
-                            </div>
-                            <div class="branch">
-                                <span class="branch-label">Minor Change</span>
-                                <div class="flow-node action">Document Everything</div>
-                            </div>
-                            <div class="branch">
-                                <span class="branch-label">No Change</span>
-                                <div class="flow-node output">Continue Process</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 4: Documentation Requirements -->
+            <!-- Section 4: Income Documentation -->
             <section id="section-4" class="section">
                 <div class="section-header">
                     <div class="section-number">4</div>
-                    <div class="section-title"><h2>Documentation Requirements</h2><span>Understanding what documents you'll need and when</span></div>
+                    <div class="section-title"><h2>Income Documentation</h2><span>Two-year sufficient employment and income history</span></div>
                 </div>
                 <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Document Employment</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">Self-Employed?</div>
+                        </div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">NO (W-2)</span>
+                                <div class="flow-node action">TRUV / Borrower Docs</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">YES</span>
+                                <div class="flow-node action">LoanBeam / Tax Returns</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="decision-tree">
-                        <h3>Documentation Categories</h3>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Income Verification</span>
-                            <div class="tree-node">W2s (2 years), Pay Stubs (30 days), Tax Returns (2 years if self-employed)</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Employment Verification</span>
-                            <div class="tree-node">Current employer name, address, phone number, dates of employment</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Asset Documentation</span>
-                            <div class="tree-node">Bank statements (2-3 months), Investment accounts, Retirement accounts</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Debt/Obligation Records</span>
-                            <div class="tree-node">Current credit card statements, Loan statements, Alimony/Child support documents</div>
-                        </div>
+                        <h3>W-2 / Salaried Income (TRUV or Borrower Provided)</h3>
+                        <ul class="step-list">
+                            <li><strong>Paystub:</strong> Most recent paystub with 30 days of earnings</li>
+                            <li><strong>W2s:</strong> Most recent 2 years of W-2 forms</li>
+                            <li><strong>Tax Returns:</strong> If needed for income type verification</li>
+                            <li><strong>WVOE:</strong> Written Verification of Employment for variable income</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>Self-Employed Income</h3>
+                        <ul class="step-list">
+                            <li><strong>LoanBeam Findings:</strong> Automated income analysis results</li>
+                            <li><strong>Tax Returns:</strong> Complete personal and business returns (2 years)</li>
+                            <li><strong>Current P&L:</strong> Profit and Loss statement for current year</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Resource Folders</h4>
+                        <p>Reference the following resource folders for detailed guidance:</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>TRUV Resources</strong> - Electronic verification setup and troubleshooting</li>
+                            <li><strong>LoanBeam Resources</strong> - Self-employed income calculation guidance</li>
+                        </ul>
                     </div>
 
                     <table class="field-table">
                         <thead>
                             <tr>
-                                <th>Deposit Type</th>
-                                <th>Documentation Needed</th>
-                                <th>Alert Level</th>
+                                <th>Income Type</th>
+                                <th>Required Documents</th>
+                                <th>Source</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Payroll Direct Deposit</strong></td>
-                                <td>Pay stub showing matching amount</td>
-                                <td><span class="badge optional-badge">Standard</span></td>
+                                <td><strong>W-2 Salaried</strong></td>
+                                <td>Paystub (30 days), W-2s (2 years)</td>
+                                <td>TRUV / Borrower</td>
                             </tr>
                             <tr>
-                                <td><strong>Gift Funds</strong></td>
-                                <td>Gift letter, donor bank statements, transfer proof</td>
-                                <td><span class="badge warning-badge">Requires Verification</span></td>
+                                <td><strong>Variable Income</strong></td>
+                                <td>Paystub, W-2s, WVOE</td>
+                                <td>TRUV / Borrower</td>
                             </tr>
                             <tr>
-                                <td><strong>Cash Deposit</strong></td>
-                                <td>Source documentation, letter of explanation</td>
-                                <td><span class="badge required-badge">High Scrutiny</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Transfer from Another Account</strong></td>
-                                <td>Statements from both accounts showing transfer</td>
-                                <td><span class="badge warning-badge">Paper Trail Required</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Earnest Money</strong></td>
-                                <td>Copy of check, receipt, bank statement</td>
-                                <td><span class="badge required-badge">Required</span></td>
+                                <td><strong>Self-Employed</strong></td>
+                                <td>Tax Returns (2 years), P&L, LoanBeam</td>
+                                <td>LoanBeam / Borrower</td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="info-box">
-                        <h4>Gift Funds Criteria</h4>
-                        <p>Gift funds are acceptable only if certain criteria are met. Common requirements include:</p>
-                        <ul style="margin-top: 10px; margin-left: 20px;">
-                            <li>Gift must be from an acceptable donor (typically family member)</li>
-                            <li>Signed gift letter stating the gift requires no repayment</li>
-                            <li>Paper trail showing funds transfer from donor to borrower</li>
-                            <li>Donor bank statements may be required</li>
-                        </ul>
-                        <p style="margin-top: 10px;"><strong>Always reach out to your loan originator for clarification on gift fund requirements.</strong></p>
-                    </div>
                 </div>
             </section>
 
-            <!-- Section 5: Credit Management -->
+            <!-- Section 5: Assets -->
             <section id="section-5" class="section">
                 <div class="section-header">
                     <div class="section-number">5</div>
-                    <div class="section-title"><h2>Credit Management</h2><span>Protecting your credit profile during the loan process</span></div>
+                    <div class="section-title"><h2>Assets</h2><span>Sufficient and documented assets to anticipate cash to close</span></div>
                 </div>
                 <div class="section-content">
                     <div class="workflow-diagram">
                         <div class="flow-row">
-                            <div class="flow-node action">Initial Credit Pull</div>
+                            <div class="flow-node action">AccountChek / Statements</div>
                             <span class="flow-arrow">-></span>
-                            <div class="flow-node input">Maintain Status Quo</div>
+                            <div class="flow-node decision">Large Deposits?</div>
                             <span class="flow-arrow">-></span>
-                            <div class="flow-node decision">Pre-Closing Credit Check</div>
-                        </div>
-                        <div class="decision-branch">
-                            <div class="branch">
-                                <span class="branch-label">No Changes</span>
-                                <div class="flow-node output">Proceed to Closing</div>
-                            </div>
-                            <div class="branch">
-                                <span class="branch-label">New Activity</span>
-                                <div class="flow-node exception">Explain & Possible Re-Qualification</div>
-                            </div>
+                            <div class="flow-node action">Document & Explain</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Assets Verified</div>
                         </div>
                     </div>
 
-                    <div class="do-dont-grid">
-                        <div class="do-card">
-                            <div class="card-header">
-                                <span style="font-size: 1.3rem;">&#10003;</span> Credit DO's
-                            </div>
-                            <div class="card-body">
-                                <ul>
-                                    <li><span class="check-icon">&#10003;</span><div>Pay all bills on time</div></li>
-                                    <li><span class="check-icon">&#10003;</span><div>Keep credit card balances low</div></li>
-                                    <li><span class="check-icon">&#10003;</span><div>Continue using existing credit responsibly</div></li>
-                                    <li><span class="check-icon">&#10003;</span><div>Monitor your credit report</div></li>
-                                    <li><span class="check-icon">&#10003;</span><div>Notify LO of any credit alerts</div></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="dont-card">
-                            <div class="card-header">
-                                <span style="font-size: 1.3rem;">&#10007;</span> Credit DON'Ts
-                            </div>
-                            <div class="card-body">
-                                <ul>
-                                    <li><span class="x-icon">&#10007;</span><div>Open new credit cards or loans</div></li>
-                                    <li><span class="x-icon">&#10007;</span><div>Close existing credit accounts</div></li>
-                                    <li><span class="x-icon">&#10007;</span><div>Co-sign for anyone</div></li>
-                                    <li><span class="x-icon">&#10007;</span><div>Max out credit cards</div></li>
-                                    <li><span class="x-icon">&#10007;</span><div>Apply for store financing</div></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <ul class="checklist">
+                        <li>AccountChek or Borrower provided most recent 60-day asset statements</li>
+                        <li>Statements for any other income types (retirement, rental, etc.)</li>
+                        <li>Large deposits, transfers, or concerns addressed with documentation</li>
+                    </ul>
 
                     <div class="exception-box">
-                        <h4>Impact on Debt-to-Income Ratio</h4>
-                        <p>Major purchases and new credit lines directly impact your debt-to-income (DTI) ratio. Even if you have excellent credit, new debt can push your DTI beyond acceptable limits, potentially disqualifying you for the loan or requiring a smaller loan amount.</p>
+                        <h4>Special Requirements for AIO and Jumbo Loans</h4>
+                        <p>AIO and Jumbo loans require <strong>3 months' asset statements</strong> for self-employed Borrower(s). Ensure you have the appropriate timeframe based on loan type.</p>
                     </div>
 
-                    <div class="tip-box">
-                        <h4>Credit Utilization Best Practice</h4>
-                        <p>Keep credit card utilization below 30% of your available credit. For example, if you have a $10,000 credit limit, try to keep your balance below $3,000. Lower utilization demonstrates responsible credit management.</p>
+                    <div class="info-box">
+                        <h4>AccountChek Resources</h4>
+                        <p>Reference the AccountChek resources folder for setup instructions, borrower enrollment, and troubleshooting common issues.</p>
                     </div>
+
+                    <table class="field-table">
+                        <thead>
+                            <tr>
+                                <th>Asset Requirement</th>
+                                <th>Standard Loans</th>
+                                <th>AIO/Jumbo (Self-Emp)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Statement Period</strong></td>
+                                <td>60 days (2 statements)</td>
+                                <td>90 days (3 statements)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Verification Method</strong></td>
+                                <td>AccountChek or Paper</td>
+                                <td>AccountChek or Paper</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Large Deposit Threshold</strong></td>
+                                <td>Per agency guidelines</td>
+                                <td>Per agency guidelines</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
-            <!-- Section 6: Communication Best Practices -->
+            <!-- Section 6: Miscellaneous -->
             <section id="section-6" class="section">
                 <div class="section-header">
                     <div class="section-number">6</div>
-                    <div class="section-title"><h2>Communication Best Practices</h2><span>Staying connected with your loan team throughout the process</span></div>
+                    <div class="section-title"><h2>Miscellaneous Entry and Documentation</h2><span>Additional documentation when applicable</span></div>
                 </div>
                 <div class="section-content">
-                    <div class="info-box">
-                        <h4>Your Team is Here to Help</h4>
-                        <p>At any point in the process, your team is there to help you and answer any question that might come up. Trust their expertise, communicate effectively and often, and learn what you can about the loan process to set yourself up for success.</p>
-                    </div>
-
-                    <ul class="step-list">
-                        <li><strong>Step 1:</strong> Establish primary contact method with your Loan Officer (email, phone, text)</li>
-                        <li><strong>Step 2:</strong> Respond promptly to document requests - delays can extend your closing timeline</li>
-                        <li><strong>Step 3:</strong> Proactively inform your LO of ANY financial changes (job, income, expenses, accounts)</li>
-                        <li><strong>Step 4:</strong> Ask questions when you don't understand something - no question is too basic</li>
-                        <li><strong>Step 5:</strong> Keep all communication documented for your records</li>
-                        <li><strong>Step 6:</strong> Don't panic, stress, or isolate - your team wants you to succeed</li>
+                    <ul class="checklist">
+                        <li>Divorce Decree to document Alimony or Child Support</li>
+                        <li>Entry of and documentation for all real estate owned (including details of PITIA or rental income)</li>
+                        <li>Sales Contract for current residence with tentative Net Proceeds from Sale, or Rental agreement, whenever applicable</li>
                     </ul>
 
                     <table class="field-table">
                         <thead>
                             <tr>
-                                <th>When to Contact Your LO</th>
-                                <th>Urgency</th>
-                                <th>Method</th>
+                                <th>Document</th>
+                                <th>When Required</th>
+                                <th>Details to Capture</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Job change or loss</strong></td>
-                                <td><span class="badge required-badge">Immediate</span></td>
-                                <td>Phone call</td>
+                                <td><strong>Divorce Decree</strong></td>
+                                <td>Alimony/Child Support paid or received</td>
+                                <td>Payment amount, duration, recipient</td>
                             </tr>
                             <tr>
-                                <td><strong>Large deposit or withdrawal</strong></td>
-                                <td><span class="badge required-badge">Same Day</span></td>
-                                <td>Phone or email</td>
+                                <td><strong>REO Documentation</strong></td>
+                                <td>Borrower owns other properties</td>
+                                <td>PITIA, rental income, mortgage info</td>
                             </tr>
                             <tr>
-                                <td><strong>Credit inquiry or new account</strong></td>
-                                <td><span class="badge required-badge">Same Day</span></td>
-                                <td>Phone or email</td>
+                                <td><strong>Sales Contract</strong></td>
+                                <td>Selling current residence</td>
+                                <td>Net proceeds estimate, closing date</td>
                             </tr>
                             <tr>
-                                <td><strong>Address change</strong></td>
-                                <td><span class="badge warning-badge">Within 24 Hours</span></td>
-                                <td>Email</td>
-                            </tr>
-                            <tr>
-                                <td><strong>General questions</strong></td>
-                                <td><span class="badge optional-badge">Standard</span></td>
-                                <td>Email or portal</td>
+                                <td><strong>Rental Agreement</strong></td>
+                                <td>Converting current residence to rental</td>
+                                <td>Lease terms, rental amount</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
 
-                    <div class="tip-box">
-                        <h4>Full Disclosure is Essential</h4>
-                        <p>Whatever your finances, be sure to include <strong>all debts and liabilities</strong> on your mortgage application. Undisclosed debts discovered later can cause significant delays or even loan denial. Honesty upfront leads to smoother closings.</p>
+            <!-- Section 7: Submission to Operations -->
+            <section id="section-7" class="section">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <div class="section-title"><h2>Submission to Operations</h2><span>Proper workflow for TBD loan submission</span></div>
+                </div>
+                <div class="section-content">
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node action">Complete Documentation</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Email Processor</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">Processing Review</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node output">Submit to UW</div>
+                        </div>
+                    </div>
+
+                    <div class="exception-box">
+                        <h4>CRITICAL: Do NOT Use Standard Submission</h4>
+                        <p>Sales should <strong>NOT</strong> complete Request LE or Send to Processing status in the LOS. Sales should email the assigned Processor or Processing Manager to notify them that the loan needs a TBD submission.</p>
+                    </div>
+
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Complete all required documentation in Clear Docs</li>
+                        <li><strong>Step 2:</strong> Email assigned Processor or Processing Manager</li>
+                        <li><strong>Step 3:</strong> Loan remains in <strong>Prospect</strong> status (TBD Loans are not disclosed as TBD)</li>
+                        <li><strong>Step 4:</strong> Processing reviews all information</li>
+                        <li><strong>Step 5:</strong> Processing submits to Underwriting for Credit Approval</li>
+                    </ul>
+
+                    <div class="decision-tree">
+                        <h3>If Changes Needed to TBD Loan Terms</h3>
+                        <ul class="step-list">
+                            <li><strong>Action:</strong> Loan is put into <strong>Restructured Status</strong></li>
+                            <li><strong>Next Step:</strong> Processor resubmits the Restructured loan to Underwriting for confirmation of Credit Only Approval</li>
+                            <li><strong>Reference:</strong> See the Byte - Loan Restructure - Job Aid for complete instructions</li>
+                        </ul>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 7: PMI Information -->
-            <section id="section-7" class="section">
+            <!-- Section 8: Accepted Offer Process -->
+            <section id="section-8" class="section">
                 <div class="section-header">
-                    <div class="section-number">7</div>
-                    <div class="section-title"><h2>Private Mortgage Insurance (PMI)</h2><span>Understanding how PMI can help you achieve homeownership faster</span></div>
+                    <div class="section-number">8</div>
+                    <div class="section-title"><h2>Accepted Offer Process</h2><span>Workflow when borrower finds a property</span></div>
                 </div>
                 <div class="section-content">
-                    <div class="info-box">
-                        <h4>Homeownership Doesn't Have to Be a Dream</h4>
-                        <p>Private mortgage insurance can get you into a house faster with less than a 20% down payment. Talk to your loan officer to learn more about the value of mortgage insurance from Enact.</p>
+                    <div class="tip-box">
+                        <h4>Key Benefit</h4>
+                        <p>Once PreApproved, Sales can issue a <strong>Conditional Commitment letter</strong> to the Borrower, which gives Borrowers confidence to shop and gives potential sellers confidence.</p>
                     </div>
 
-                    <div class="summary-grid">
-                        <div class="summary-card">
-                            <h4>Traditional Down Payment</h4>
-                            <div class="value">20%</div>
-                            <div class="label">Required to avoid PMI</div>
+                    <div class="workflow-diagram">
+                        <div class="flow-row">
+                            <div class="flow-node start">Credit Only Status</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node action">UW Review</div>
+                            <span class="flow-arrow">-></span>
+                            <div class="flow-node decision">UW Decision</div>
                         </div>
-                        <div class="summary-card">
-                            <h4>With PMI</h4>
-                            <div class="value">3-5%</div>
-                            <div class="label">Minimum down payment possible</div>
-                        </div>
-                        <div class="summary-card">
-                            <h4>PMI Removal</h4>
-                            <div class="value">78%</div>
-                            <div class="label">LTV when PMI auto-terminates</div>
+                        <div class="decision-branch">
+                            <div class="branch">
+                                <span class="branch-label">APPROVED</span>
+                                <div class="flow-node output">PreApproved Status</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">SUSPENDED</span>
+                                <div class="flow-node action">Submit Conditions</div>
+                            </div>
+                            <div class="branch">
+                                <span class="branch-label">DECLINED</span>
+                                <div class="flow-node exception">Adverse Action</div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="decision-tree">
-                        <h3>Benefits of PMI</h3>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Lower Barrier to Entry</span>
-                            <div class="tree-node">Buy a home sooner with a smaller down payment</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Build Equity Faster</span>
-                            <div class="tree-node">Start building equity instead of paying rent</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Not Permanent</span>
-                            <div class="tree-node">PMI can be removed once you reach 20% equity</div>
-                        </div>
-                        <div class="tree-node level-1">
-                            <span class="tree-label">Tax Considerations</span>
-                            <div class="tree-node">PMI may be tax-deductible (consult tax advisor)</div>
-                        </div>
+                        <h3>TBD Status Flow</h3>
+                        <ul class="step-list">
+                            <li><strong>Credit Only:</strong> Processor moves loan to this status in Byte after review, which sends the TBD file to Underwriting without an address</li>
+                            <li><strong>PreApproved:</strong> Indicates Credit Only approval by underwriting. If there are any conditions, the Processor can submit</li>
+                            <li><strong>Waiting Period:</strong> File stays in PreApproved Status until Borrower has an accepted offer OR until the credit-only preapproval expires</li>
+                        </ul>
                     </div>
 
-                    <div class="tip-box">
-                        <h4>Talk to Your Loan Officer</h4>
-                        <p>Your loan officer can explain the specific PMI options available for your situation, including different payment structures (monthly, single premium, lender-paid) and help you calculate the true cost versus waiting to save a larger down payment.</p>
+                    <div class="info-box">
+                        <h4>Status Outcomes</h4>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>If Suspended:</strong> Processor will submit the suspense conditions to Underwriting to attempt to achieve Credit Only Approval</li>
+                            <li><strong>If Declined:</strong> The loan will be adverse actioned by Operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="decision-tree">
+                        <h3>When Borrower Obtains a Subject Property Contract</h3>
+                        <ul class="step-list">
+                            <li><strong>Step 1:</strong> Loan Officer is informed that the property is under contract</li>
+                            <li><strong>Step 2:</strong> Loan Officer guides Operations to put the loan in <strong>Loan Restructure Status</strong></li>
+                            <li><strong>Step 3:</strong> Loan Officer updates all terms, fields, and needed/updated documents added to Clear Docs for full processing and underwriting reconsideration</li>
+                            <li><strong>Step 4:</strong> Loan Officer requests disclosure, and the loan is initially disclosed</li>
+                            <li><strong>Step 5:</strong> Loan Officer submits the file to Processing for full-file processing</li>
+                            <li><strong>Step 6:</strong> Processor submits as UW Received for full underwriting decision</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Reference Document</h4>
+                        <p>See the <strong>Byte - Loan Restructure - Job Aid</strong> for complete instructions on the restructure process.</p>
                     </div>
                 </div>
             </section>
 
             <!-- Quick Reference -->
             <div id="quick-ref" class="quick-ref">
-                <h3>First-Time Homebuyer Quick Reference</h3>
+                <h3>TBD Checklist Quick Reference</h3>
                 <pre>
-FIRST-TIME HOMEBUYER DO'S & DON'TS SUMMARY
-==========================================
+TBD CHECKLIST SUMMARY
+=====================
 
-DO'S WHEN PLANNING TO APPLY
-===========================
-[x] Keep an ongoing paper trail (W2s, tax returns, pay stubs, bank statements)
-[x] Provide money deposit receipts (earnest money, gift funds with documentation)
-[x] Maintain employment and income stability (raises/promotions OK)
-[x] Create a savings plan (earnest money, down payment, closing costs)
-[x] Understand credit pulls (pre-closing credit check is standard)
-[x] Ask questions and communicate (your team is here to help)
+BORROWER QUALIFICATIONS
+[ ] Two-year residency history
+[ ] Citizenship/eligibility verified
+[ ] Declarations complete
+[ ] HMDA information documented
 
-DON'TS AFTER YOU APPLY
-======================
-[ ] Close or open bank accounts without LO approval
-[ ] Make large bank deposits (especially cash) without documentation
-[ ] Change jobs, employer or employment without notifying LO
-[ ] Make major purchases (furniture, car, appliances)
-[ ] Open new lines of credit or co-sign loans
-[ ] Panic, stress or isolate (communicate with your team!)
+CREDIT REPORT
+[ ] SoftCheck or Full-Trimerge pulled
+[ ] Credit scores acceptable
+[ ] Credit inquiry explanations (if applicable)
+[ ] Omitted liabilities explanations (if applicable)
+[ ] Bankruptcy documents (if applicable)
+[ ] Student loan documentation (if deferred)
 
-DOCUMENTATION CHECKLIST
-=======================
-[ ] W2s - Last 2 years
-[ ] Tax Returns - Last 2 years (especially if self-employed)
-[ ] Pay Stubs - Most recent 30 days
-[ ] Bank Statements - Last 2-3 months
-[ ] Gift Letter & Documentation (if applicable)
-[ ] Earnest Money Receipt
+INCOME - W-2/SALARIED (TRUV or Borrower)
+[ ] Most recent paystub (30 days earnings)
+[ ] W-2s (2 years)
+[ ] Tax Returns (if needed)
+[ ] WVOE (for variable income)
 
-WHEN TO CONTACT YOUR LOAN OFFICER
-=================================
-- Job change or loss           -> IMMEDIATELY
-- Large deposit/withdrawal     -> Same Day
-- Credit inquiry/new account   -> Same Day
-- Address change               -> Within 24 Hours
-- General questions            -> As Needed
+INCOME - SELF-EMPLOYED
+[ ] LoanBeam findings
+[ ] Tax Returns (2 years)
+[ ] Current P&L
 
-CREDIT MANAGEMENT TIPS
-======================
-- Pay all bills on time
-- Keep credit utilization under 30%
-- Don't open new accounts
-- Don't close existing accounts
-- Don't co-sign for anyone
-- Avoid store financing
+ASSETS
+[ ] AccountChek or 60-day statements
+  - NOTE: AIO/Jumbo require 3 months for self-employed
+[ ] Large deposit documentation
+[ ] Other income source statements
 
-PMI QUICK FACTS
-===============
-- Allows down payment as low as 3-5%
-- Auto-terminates at 78% LTV
-- Can be removed at 80% LTV (request required)
-- May be tax-deductible
+MISCELLANEOUS (When Applicable)
+[ ] Divorce Decree (alimony/child support)
+[ ] REO documentation (PITIA, rental income)
+[ ] Sales Contract (net proceeds)
+[ ] Rental Agreement (converting residence)
 
-Source: Enact Mortgage Insurance (01754.CB.0323)
+SUBMISSION PROCESS
+==================
+1. Complete all docs in Clear Docs
+2. EMAIL Processor/Manager (DO NOT use Request LE)
+3. Loan stays in PROSPECT status
+4. Processing reviews and submits to UW
+
+STATUS FLOW
+===========
+Prospect -> Credit Only -> PreApproved
+                        -> Suspended (submit conditions)
+                        -> Declined (adverse action)
+
+WHEN PROPERTY FOUND
+===================
+1. LO informed of contract
+2. Move to Loan Restructure Status
+3. Update terms/docs in Clear Docs
+4. Request disclosure (initial)
+5. Submit to Processing
+6. Processor submits as UW Received
                 </pre>
             </div>
         </div>
@@ -1558,7 +1514,7 @@ Source: Enact Mortgage Insurance (01754.CB.0323)
             <!-- Agent Header -->
             <div class="agent-header">
                 <h1>AI Agent Opportunities</h1>
-                <p class="subtitle">Automation opportunities identified for borrower education and application monitoring</p>
+                <p class="subtitle">Automation opportunities identified for the TBD Checklist process</p>
             </div>
 
             <!-- Summary Stats -->
@@ -1568,16 +1524,16 @@ Source: Enact Mortgage Insurance (01754.CB.0323)
                     <div class="agent-summary-label">Agent Opportunities</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">65%</div>
+                    <div class="agent-summary-value">68%</div>
                     <div class="agent-summary-label">Automation Potential</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">High</div>
-                    <div class="agent-summary-label">Borrower Experience Impact</div>
+                    <div class="agent-summary-value">15 min</div>
+                    <div class="agent-summary-label">Est. Time Saved</div>
                 </div>
                 <div class="agent-summary-card">
-                    <div class="agent-summary-value">Low</div>
-                    <div class="agent-summary-label">Fallout Risk Reduction</div>
+                    <div class="agent-summary-value">High</div>
+                    <div class="agent-summary-label">Quality Impact</div>
                 </div>
             </div>
 
@@ -1605,40 +1561,40 @@ Source: Enact Mortgage Insurance (01754.CB.0323)
             <div class="heat-map-container" id="agent-heatmap">
                 <div class="heat-map-title">Priority Heat Map</div>
                 <div class="heat-map-grid">
-                    <div class="heat-item critical" onclick="scrollToAgent('agent-creditmonitor')">
-                        <div class="heat-score">9.1</div>
-                        <div class="heat-name">Credit Monitor Agent</div>
-                        <div class="heat-desc">Real-time credit activity alerts during loan process</div>
+                    <div class="heat-item critical" onclick="scrollToAgent('agent-doccheck')">
+                        <div class="heat-score">9.4</div>
+                        <div class="heat-name">TBD Doc Checker</div>
+                        <div class="heat-desc">Validate all required documents before submission</div>
                         <div class="heat-metrics">
-                            <div class="heat-metric">Impact: <span>High</span></div>
+                            <div class="heat-metric">Time: <span>8 min</span></div>
                             <div class="heat-metric">Complexity: <span>Medium</span></div>
                         </div>
                     </div>
-                    <div class="heat-item high" onclick="scrollToAgent('agent-docreminder')">
-                        <div class="heat-score">8.3</div>
-                        <div class="heat-name">Document Reminder Agent</div>
-                        <div class="heat-desc">Proactive document collection and reminders</div>
+                    <div class="heat-item high" onclick="scrollToAgent('agent-creditanalyzer')">
+                        <div class="heat-score">8.2</div>
+                        <div class="heat-name">Credit Analyzer</div>
+                        <div class="heat-desc">Auto-identify credit issues requiring documentation</div>
                         <div class="heat-metrics">
-                            <div class="heat-metric">Impact: <span>High</span></div>
-                            <div class="heat-metric">Complexity: <span>Low</span></div>
+                            <div class="heat-metric">Time: <span>4 min</span></div>
+                            <div class="heat-metric">Complexity: <span>Medium</span></div>
                         </div>
                     </div>
-                    <div class="heat-item high" onclick="scrollToAgent('agent-education')">
+                    <div class="heat-item high" onclick="scrollToAgent('agent-incomevalidator')">
                         <div class="heat-score">7.8</div>
-                        <div class="heat-name">Borrower Education Agent</div>
-                        <div class="heat-desc">Automated FTHB guidance and tips</div>
+                        <div class="heat-name">Income Validator</div>
+                        <div class="heat-desc">Verify income documentation completeness</div>
                         <div class="heat-metrics">
-                            <div class="heat-metric">Impact: <span>Medium</span></div>
+                            <div class="heat-metric">Time: <span>3 min</span></div>
                             <div class="heat-metric">Complexity: <span>Low</span></div>
                         </div>
                     </div>
-                    <div class="heat-item medium" onclick="scrollToAgent('agent-deposit')">
+                    <div class="heat-item medium" onclick="scrollToAgent('agent-statustracker')">
                         <div class="heat-score">6.5</div>
-                        <div class="heat-name">Deposit Tracker Agent</div>
-                        <div class="heat-desc">Flag unusual deposits requiring documentation</div>
+                        <div class="heat-name">Status Tracker</div>
+                        <div class="heat-desc">Monitor TBD loans and alert on expiration</div>
                         <div class="heat-metrics">
-                            <div class="heat-metric">Impact: <span>Medium</span></div>
-                            <div class="heat-metric">Complexity: <span>Medium</span></div>
+                            <div class="heat-metric">Time: <span>N/A</span></div>
+                            <div class="heat-metric">Complexity: <span>Low</span></div>
                         </div>
                     </div>
                 </div>
@@ -1648,177 +1604,177 @@ Source: Enact Mortgage Insurance (01754.CB.0323)
             <div id="agent-details">
                 <h2 style="color: var(--text-primary); margin-bottom: 25px; font-size: 1.5rem;">Agent Details</h2>
                 <div class="agent-grid">
-                    <!-- Credit Monitor Agent -->
-                    <div class="agent-card" id="agent-creditmonitor">
+                    <!-- TBD Doc Checker Agent -->
+                    <div class="agent-card" id="agent-doccheck">
                         <div class="agent-card-header">
-                            <div class="agent-icon">C</div>
+                            <div class="agent-icon">D</div>
                             <div class="agent-info">
-                                <div class="agent-name">Credit Monitor Agent</div>
-                                <div class="agent-type">Monitoring / Alerts</div>
+                                <div class="agent-name">TBD Doc Checker</div>
+                                <div class="agent-type">Document Validation</div>
                             </div>
                             <span class="agent-priority critical">Critical</span>
                         </div>
                         <div class="agent-card-body">
-                            <p class="agent-description">Continuously monitors borrower credit activity during the loan process and immediately alerts LO/Processor of any new inquiries, accounts, or significant balance changes that could impact qualification.</p>
+                            <p class="agent-description">Automatically validates that all required TBD checklist documents are present in Clear Docs before submission. Checks for borrower qualifications, credit docs, income, and assets based on loan scenario.</p>
                             <div class="agent-flow">
                                 <div class="agent-flow-title">Agent Flow</div>
                                 <div class="agent-flow-diagram">
-                                    <span class="agent-step">Monitor Credit</span>
+                                    <span class="agent-step">Scan Clear Docs</span>
                                     <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Detect Change</span>
+                                    <span class="agent-step">Match Checklist</span>
                                     <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Assess Impact</span>
+                                    <span class="agent-step">Flag Missing</span>
                                     <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Alert Team</span>
+                                    <span class="agent-step">Generate Report</span>
                                 </div>
                             </div>
                             <div class="agent-stats">
                                 <div class="agent-stat">
-                                    <div class="agent-stat-value">15%</div>
-                                    <div class="agent-stat-label">Fallout Reduction</div>
+                                    <div class="agent-stat-value">8 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
                                 </div>
                                 <div class="agent-stat">
-                                    <div class="agent-stat-value">Real</div>
-                                    <div class="agent-stat-label">Time Alerts</div>
+                                    <div class="agent-stat-value">97%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
                                 </div>
                                 <div class="agent-stat">
                                     <div class="agent-stat-value">Med</div>
                                     <div class="agent-stat-label">Complexity</div>
                                 </div>
                             </div>
-                            <button class="agent-prompt-btn" onclick="showAgentPrompt('creditmonitor')">
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('doccheck')">
                                 View Build Prompt
                             </button>
                         </div>
                     </div>
 
-                    <!-- Document Reminder Agent -->
-                    <div class="agent-card" id="agent-docreminder">
+                    <!-- Credit Analyzer Agent -->
+                    <div class="agent-card" id="agent-creditanalyzer">
                         <div class="agent-card-header">
-                            <div class="agent-icon">D</div>
+                            <div class="agent-icon">C</div>
                             <div class="agent-info">
-                                <div class="agent-name">Document Reminder Agent</div>
-                                <div class="agent-type">Communication / Automation</div>
+                                <div class="agent-name">Credit Analyzer</div>
+                                <div class="agent-type">Credit Analysis / AI</div>
                             </div>
                             <span class="agent-priority high">High</span>
                         </div>
                         <div class="agent-card-body">
-                            <p class="agent-description">Sends personalized reminders to borrowers about outstanding document needs, with clear instructions on what to provide and why. Reduces time-to-close by ensuring faster document collection.</p>
+                            <p class="agent-description">Analyzes credit report data to automatically identify items requiring documentation such as credit inquiries, omitted liabilities, bankruptcy history, and deferred student loans. Generates a documentation requirements list.</p>
                             <div class="agent-flow">
                                 <div class="agent-flow-title">Agent Flow</div>
                                 <div class="agent-flow-diagram">
-                                    <span class="agent-step">Check Conditions</span>
+                                    <span class="agent-step">Parse Credit</span>
                                     <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Identify Missing</span>
+                                    <span class="agent-step">Identify Issues</span>
                                     <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Send Reminder</span>
+                                    <span class="agent-step">Map Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Create List</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">4 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">94%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('creditanalyzer')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Income Validator Agent -->
+                    <div class="agent-card" id="agent-incomevalidator">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">I</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Income Validator</div>
+                                <div class="agent-type">Document Validation</div>
+                            </div>
+                            <span class="agent-priority high">High</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Validates income documentation completeness based on employment type (W-2 vs self-employed). Checks for paystub currency, W-2 coverage, tax return completeness, and LoanBeam findings for self-employed borrowers.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Detect Income Type</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Docs</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Validate Dates</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Report Status</span>
+                                </div>
+                            </div>
+                            <div class="agent-stats">
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">3 min</div>
+                                    <div class="agent-stat-label">Time Saved</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">96%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
+                                    <div class="agent-stat-label">Complexity</div>
+                                </div>
+                            </div>
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('incomevalidator')">
+                                View Build Prompt
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Tracker Agent -->
+                    <div class="agent-card" id="agent-statustracker">
+                        <div class="agent-card-header">
+                            <div class="agent-icon">S</div>
+                            <div class="agent-info">
+                                <div class="agent-name">Status Tracker</div>
+                                <div class="agent-type">Monitoring / Alerts</div>
+                            </div>
+                            <span class="agent-priority medium">Medium</span>
+                        </div>
+                        <div class="agent-card-body">
+                            <p class="agent-description">Monitors all TBD loans in PreApproved status and sends proactive alerts when credit-only approvals are approaching expiration. Notifies LO and processor to re-engage borrower or refresh documentation.</p>
+                            <div class="agent-flow">
+                                <div class="agent-flow-title">Agent Flow</div>
+                                <div class="agent-flow-diagram">
+                                    <span class="agent-step">Scan TBD Loans</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Check Dates</span>
+                                    <span class="agent-arrow">-></span>
+                                    <span class="agent-step">Send Alerts</span>
                                     <span class="agent-arrow">-></span>
                                     <span class="agent-step">Track Response</span>
                                 </div>
                             </div>
                             <div class="agent-stats">
                                 <div class="agent-stat">
-                                    <div class="agent-stat-value">3 days</div>
-                                    <div class="agent-stat-label">Faster Collection</div>
-                                </div>
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">85%</div>
-                                    <div class="agent-stat-label">Response Rate</div>
-                                </div>
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">Low</div>
-                                    <div class="agent-stat-label">Complexity</div>
-                                </div>
-                            </div>
-                            <button class="agent-prompt-btn" onclick="showAgentPrompt('docreminder')">
-                                View Build Prompt
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Borrower Education Agent -->
-                    <div class="agent-card" id="agent-education">
-                        <div class="agent-card-header">
-                            <div class="agent-icon">E</div>
-                            <div class="agent-info">
-                                <div class="agent-name">Borrower Education Agent</div>
-                                <div class="agent-type">Communication / Content</div>
-                            </div>
-                            <span class="agent-priority high">High</span>
-                        </div>
-                        <div class="agent-card-body">
-                            <p class="agent-description">Delivers timely educational content to first-time homebuyers at key milestones, including Do's and Don'ts tips, process explanations, and milestone celebrations to keep borrowers engaged and informed.</p>
-                            <div class="agent-flow">
-                                <div class="agent-flow-title">Agent Flow</div>
-                                <div class="agent-flow-diagram">
-                                    <span class="agent-step">Detect Milestone</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Select Content</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Personalize</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Deliver</span>
-                                </div>
-                            </div>
-                            <div class="agent-stats">
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">92%</div>
-                                    <div class="agent-stat-label">Satisfaction</div>
-                                </div>
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">20%</div>
-                                    <div class="agent-stat-label">Less Support Calls</div>
-                                </div>
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">Low</div>
-                                    <div class="agent-stat-label">Complexity</div>
-                                </div>
-                            </div>
-                            <button class="agent-prompt-btn" onclick="showAgentPrompt('education')">
-                                View Build Prompt
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Deposit Tracker Agent -->
-                    <div class="agent-card" id="agent-deposit">
-                        <div class="agent-card-header">
-                            <div class="agent-icon">$</div>
-                            <div class="agent-info">
-                                <div class="agent-name">Deposit Tracker Agent</div>
-                                <div class="agent-type">Data Analysis / Compliance</div>
-                            </div>
-                            <span class="agent-priority medium">Medium</span>
-                        </div>
-                        <div class="agent-card-body">
-                            <p class="agent-description">Analyzes bank statements to identify non-payroll deposits that require source documentation, automatically notifying processors and borrowers of documentation requirements before underwriting.</p>
-                            <div class="agent-flow">
-                                <div class="agent-flow-title">Agent Flow</div>
-                                <div class="agent-flow-diagram">
-                                    <span class="agent-step">Parse Statements</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Flag Deposits</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Request Docs</span>
-                                    <span class="agent-arrow">-></span>
-                                    <span class="agent-step">Track Status</span>
-                                </div>
-                            </div>
-                            <div class="agent-stats">
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">95%</div>
-                                    <div class="agent-stat-label">Detection Rate</div>
-                                </div>
-                                <div class="agent-stat">
-                                    <div class="agent-stat-value">2 hrs</div>
+                                    <div class="agent-stat-value">N/A</div>
                                     <div class="agent-stat-label">Time Saved</div>
                                 </div>
                                 <div class="agent-stat">
-                                    <div class="agent-stat-value">Med</div>
+                                    <div class="agent-stat-value">99%</div>
+                                    <div class="agent-stat-label">Accuracy</div>
+                                </div>
+                                <div class="agent-stat">
+                                    <div class="agent-stat-value">Low</div>
                                     <div class="agent-stat-label">Complexity</div>
                                 </div>
                             </div>
-                            <button class="agent-prompt-btn" onclick="showAgentPrompt('deposit')">
+                            <button class="agent-prompt-btn" onclick="showAgentPrompt('statustracker')">
                                 View Build Prompt
                             </button>
                         </div>
@@ -1832,78 +1788,71 @@ Source: Enact Mortgage Insurance (01754.CB.0323)
     <div class="modal-overlay" id="docModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>FTHB Do's & Don'ts Documentation</h3>
+                <h3>TBD Checklist Workflow Documentation</h3>
                 <div class="modal-actions">
                     <button class="modal-btn copy" onclick="copyToClipboard()">Copy</button>
                     <button class="modal-btn close" onclick="closeDocModal()">Close</button>
                 </div>
             </div>
             <div class="modal-body">
-                <pre id="docContent"># First-Time Homebuyer Do's & Don'ts
+                <pre id="docContent"># TBD Checklist - Credit Only Approval Process
 
 ## Overview
-Your mortgage loan application process can be easier with advance planning.
-Your post-application process can also be smoother when you keep in mind what
-activities can slow down your closing.
+The TBD process empowers Sales to submit a loan with Borrower qualifying fields and documentation to obtain a Credit Only approval. The loan is submitted without a subject property address.
 
-## DO's When You Plan to Apply
+## Benefits
+- Borrowers can obtain Conditional loan decision before finding a property
+- Expedites closing when borrower goes to contract
+- Provides confidence to buyers and sellers
 
-### Keep an ongoing paper trail
-- W2s, tax returns, pay stubs, bank statements
-- Documentation for income, employment, and debts
+## Required Documentation
 
-### Provide money deposit receipts
-- Earnest money from personal account
-- Gift funds (with proper documentation)
+### Borrower Qualifications
+- Two-year residency history
+- Citizenship verification
+- Complete Declarations and HMDA
 
-### Maintain employment and income
-- Show stability through application period
-- Pay raises/promotions are acceptable
+### Credit Report
+- SoftCheck or Full-Trimerge per guidelines
+- Acceptable scores and history
+- Credit inquiry explanations (if applicable)
+- Bankruptcy documents (if applicable)
+- Student loan documentation (if deferred)
 
-### Create a savings plan
-- Earnest money deposit
-- Down payment and closing costs
-- Avoid major purchases
+### Income (W-2/Salaried)
+- Most recent paystub (30 days)
+- W-2s (2 years)
+- Tax Returns (if needed)
+- WVOE for variable income
 
-### Understand credit pulls
-- Lender may pull new report before closing
-- Be prepared to explain new activity
+### Income (Self-Employed)
+- LoanBeam findings
+- Tax Returns (2 years)
+- Current P&L
 
-### Ask questions and communicate
-- Trust your team's expertise
-- Stay engaged and informed
+### Assets
+- AccountChek or 60-day statements
+- AIO/Jumbo: 3 months for self-employed
+- Large deposit documentation
 
-## DON'Ts After You Apply
+## Submission Process
+1. DO NOT use Request LE or Send to Processing
+2. Email Processor/Processing Manager
+3. Loan stays in Prospect status
+4. Processing submits to UW for Credit Approval
 
-### Don't close or open bank accounts
-- Could delay loan origination
-- Check with LO before any changes
+## Status Flow
+- Credit Only -> PreApproved (approved)
+- Credit Only -> Suspended (conditions needed)
+- Credit Only -> Declined (adverse action)
 
-### Don't make large bank deposits
-- Especially cash deposits
-- Need documentation for sources
-
-### Don't change jobs or employment
-- Notify LO of any changes
-- May require new loan approval
-
-### Don't make major purchases
-- Affects DTI ratio and credit utilization
-- Wait until after closing
-
-### Don't open new lines of credit
-- No new cards, loans, or co-signing
-- Avoid store financing
-
-### Don't panic, stress or isolate
-- Your team wants you to succeed
-- Disclose all debts and liabilities
-
-## PMI Information
-Private mortgage insurance allows homeownership with less than 20% down.
-Talk to your loan officer about PMI options from Enact.
-
-Source: Enact Mortgage Insurance (01754.CB.0323)</pre>
+## When Property Found
+1. LO notified of contract
+2. Move to Loan Restructure Status
+3. Update terms and docs
+4. Request disclosure
+5. Submit to Processing
+6. UW Received for full decision</pre>
             </div>
         </div>
     </div>
@@ -2045,297 +1994,344 @@ Source: Enact Mortgage Insurance (01754.CB.0323)</pre>
 
         // Agent Prompt System
         const agentPrompts = {
-            creditmonitor: {
-                name: 'Credit Monitor Agent',
-                tags: ['Monitoring', 'Alerts', 'Medium Complexity', 'Critical Priority'],
-                purpose: `This agent continuously monitors borrower credit activity during the loan process and immediately alerts the LO/Processor of any new inquiries, accounts opened, or significant balance changes that could impact loan qualification or require re-underwriting.`,
-                prompt: `You are building a Credit Monitoring Agent for CMG Financial's loan process.
+            doccheck: {
+                name: 'TBD Doc Checker',
+                tags: ['Document Validation', 'Quality Control', 'Medium Complexity', 'Critical Priority'],
+                purpose: `This agent automatically validates that all required TBD checklist documents are present in Clear Docs before submission to Operations. It checks for borrower qualifications, credit documentation, income documents, and assets based on the specific loan scenario and borrower characteristics.`,
+                prompt: `You are building a Document Validation Agent for CMG Financial's TBD Checklist process.
 
-AGENT NAME: Credit Monitor Agent
-TYPE: Real-time Monitoring / Push Alerts
-
-OBJECTIVE:
-Monitor borrower credit profiles from application through closing and alert the loan team immediately when credit activity is detected that could impact qualification.
-
-MONITORING TRIGGERS:
-1. New credit inquiries (hard pulls)
-2. New accounts opened (credit cards, loans, lines of credit)
-3. Balance increases > $500 on existing accounts
-4. Late payments reported
-5. Collections or derogatory marks
-6. Account closures
-
-ALERT THRESHOLDS:
-- New Inquiry: INFO alert to LO
-- New Account: WARNING alert to LO + Processor
-- Balance Increase > $2,000: WARNING alert
-- Late Payment: CRITICAL alert to LO + Processor + Manager
-- New Collection: CRITICAL alert with loan hold
-
-DATA SOURCES:
-- Soft credit monitoring services (Credit Karma API, Experian Connect)
-- Pre-closing credit refresh triggers
-- Borrower-authorized credit monitoring
-
-ALERT MESSAGE FORMAT:
-{
-  "loan_number": "2026-001234",
-  "borrower_name": "John Smith",
-  "alert_type": "NEW_ACCOUNT",
-  "severity": "WARNING",
-  "details": "New credit card opened: Chase Freedom, $5,000 limit",
-  "dti_impact": "+2.3%",
-  "action_required": "Request explanation letter, recalculate DTI"
-}`,
-                integration: `INTEGRATION POINTS:
-1. Credit Bureau APIs
-   - Soft pull monitoring services
-   - Pre-closing refresh integration
-   - Alert webhook endpoints
-
-2. LOS Integration
-   - Update loan notes with alerts
-   - Trigger condition creation
-   - DTI recalculation
-
-3. Notification System
-   - Email to loan team
-   - SMS for critical alerts
-   - Dashboard notifications
-
-4. Compliance Logging
-   - All alerts logged for audit
-   - Borrower communication tracking
-   - Resolution documentation`
-            },
-            docreminder: {
-                name: 'Document Reminder Agent',
-                tags: ['Communication', 'Automation', 'Low Complexity', 'High Priority'],
-                purpose: `This agent sends personalized, timely reminders to borrowers about outstanding document needs. It explains what documents are needed, why they're needed, and how to submit them, reducing processor follow-up time and accelerating document collection.`,
-                prompt: `You are building a Document Reminder Agent for CMG Financial's loan process.
-
-AGENT NAME: Document Reminder Agent
-TYPE: Automated Communication / Follow-up
+AGENT NAME: TBD Doc Checker
+TYPE: Document Validation / Quality Control
 
 OBJECTIVE:
-Proactively remind borrowers of outstanding document needs with clear, helpful instructions to accelerate document collection and reduce processor workload.
+Automatically validate that all required TBD checklist documents are present in Clear Docs before the Loan Officer emails the Processor for submission.
 
-REMINDER SCHEDULE:
-- Day 0: Initial request with full instructions
-- Day 2: Friendly reminder (if not received)
-- Day 5: Urgent reminder with escalation warning
-- Day 7: Final notice + LO notified
+INPUT DATA:
+- Loan Number
+- Borrower employment type (W-2/Self-Employed)
+- Loan type (Conventional/FHA/VA/Jumbo/AIO)
+- Credit report data (for identifying required docs)
 
-MESSAGE PERSONALIZATION:
-- Borrower first name
-- Specific document name
-- Why it's needed (plain language)
-- How to submit (upload link, email, fax)
-- Who to contact with questions
+CHECKLIST VALIDATION RULES:
 
-DOCUMENT-SPECIFIC INSTRUCTIONS:
-{
-  "pay_stubs": {
-    "what": "Most recent 30 days of pay stubs",
-    "why": "Verify your current income and employment",
-    "tips": "Include all pages, ensure employer name visible"
-  },
-  "bank_statements": {
-    "what": "Last 2 months of bank statements (all pages)",
-    "why": "Verify funds for down payment and closing costs",
-    "tips": "Include all pages even if blank, all accounts used for funds"
-  },
-  "gift_letter": {
-    "what": "Signed gift letter from donor",
-    "why": "Document that funds are a gift with no repayment",
-    "tips": "Use provided template, donor signature required"
-  }
-}
+1. BORROWER QUALIFICATIONS:
+   [ ] 2-year residency history in URLA
+   [ ] Citizenship status documented
+   [ ] Declarations complete (all questions answered)
+   [ ] HMDA data populated
 
-TRACKING:
-- Log all reminders sent
-- Track borrower opens/clicks
-- Flag non-responsive borrowers
-- Escalate to LO after Day 7`,
-                integration: `INTEGRATION POINTS:
-1. LOS Condition System
-   - Query outstanding conditions
-   - Filter by document type
-   - Update when received
+2. CREDIT DOCUMENTS (Conditional):
+   [ ] Credit inquiry LOX (if inquiries within 120 days)
+   [ ] Omitted liabilities LOX (if debts identified)
+   [ ] BK discharge/schedules (if bankruptcy on record)
+   [ ] Student loan docs (if deferred loans present)
 
-2. Email/SMS Platform
-   - SendGrid for email
-   - Twilio for SMS
-   - Template management
+3. INCOME - W-2/SALARIED:
+   [ ] Paystub dated within 30 days
+   [ ] W-2s for 2 years
+   [ ] Tax returns (if variable income)
+   [ ] WVOE (if variable income)
 
-3. Document Portal
-   - Direct upload links
-   - Status tracking
-   - Receipt confirmation
+4. INCOME - SELF-EMPLOYED:
+   [ ] LoanBeam findings report
+   [ ] 2 years tax returns (personal + business)
+   [ ] YTD Profit & Loss statement
 
-4. Reporting
-   - Collection time metrics
-   - Response rates by document type
-   - Processor time saved`
-            },
-            education: {
-                name: 'Borrower Education Agent',
-                tags: ['Communication', 'Content', 'Low Complexity', 'High Priority'],
-                purpose: `This agent delivers timely, relevant educational content to first-time homebuyers at key milestones in their loan journey. It includes Do's and Don'ts tips, process explanations, and milestone celebrations to keep borrowers informed and engaged.`,
-                prompt: `You are building a Borrower Education Agent for CMG Financial.
-
-AGENT NAME: Borrower Education Agent
-TYPE: Automated Content Delivery / Engagement
-
-OBJECTIVE:
-Keep first-time homebuyers informed and engaged throughout the loan process by delivering relevant educational content at key milestones.
-
-MILESTONE TRIGGERS:
-1. Application Submitted: Welcome + What to Expect
-2. Processing Started: Do's and Don'ts Reminder
-3. Submitted to UW: What Underwriting Means
-4. Conditionally Approved: Celebration + Final Steps
-5. Clear to Close: Closing Day Preparation
-6. Funded: Congratulations + Homeowner Tips
-
-CONTENT LIBRARY:
-{
-  "dos_donts": {
-    "trigger": "processing_started",
-    "subject": "Important Tips While Your Loan is Processing",
-    "content": [
-      "DO: Keep paying bills on time",
-      "DO: Maintain current employment",
-      "DO: Keep documents organized",
-      "DON'T: Open new credit accounts",
-      "DON'T: Make large purchases",
-      "DON'T: Change jobs without telling us"
-    ]
-  },
-  "closing_prep": {
-    "trigger": "clear_to_close",
-    "subject": "You're Almost There! Closing Day Checklist",
-    "content": [
-      "What to bring to closing",
-      "Wire fraud warning",
-      "Final walk-through tips",
-      "What happens at the closing table"
-    ]
-  }
-}
-
-PERSONALIZATION:
-- Borrower name
-- LO name and contact
-- Loan milestone dates
-- Property address (when available)`,
-                integration: `INTEGRATION POINTS:
-1. LOS Milestone Events
-   - Subscribe to status changes
-   - Trigger content delivery
-   - Track delivery status
-
-2. Content Management
-   - Template library
-   - Version control
-   - A/B testing capability
-
-3. Delivery Channels
-   - Email (primary)
-   - SMS (opt-in)
-   - Borrower portal
-
-4. Analytics
-   - Open rates
-   - Click-through rates
-   - Satisfaction surveys
-   - Support call reduction metrics`
-            },
-            deposit: {
-                name: 'Deposit Tracker Agent',
-                tags: ['Data Analysis', 'Compliance', 'Medium Complexity', 'Medium Priority'],
-                purpose: `This agent analyzes bank statements to identify non-payroll deposits that require source documentation for compliance. It automatically flags unusual deposits, categorizes them, and initiates documentation requests before underwriting review.`,
-                prompt: `You are building a Deposit Tracker Agent for CMG Financial.
-
-AGENT NAME: Deposit Tracker Agent
-TYPE: Document Analysis / Compliance Automation
-
-OBJECTIVE:
-Automatically analyze bank statements to identify deposits requiring source documentation, flag them for review, and initiate documentation requests before underwriting.
-
-DEPOSIT CLASSIFICATION:
-{
-  "payroll": {
-    "pattern": "Direct deposit, recurring, matches pay stub amount",
-    "documentation": "None (covered by pay stubs)",
-    "flag": false
-  },
-  "transfer": {
-    "pattern": "Transfer from another account",
-    "documentation": "Statement from source account",
-    "flag": true
-  },
-  "cash": {
-    "pattern": "Cash deposit, ATM cash, branch deposit",
-    "documentation": "LOE, source documentation",
-    "flag": true,
-    "alert_level": "HIGH"
-  },
-  "gift": {
-    "pattern": "Large non-recurring deposit, check from individual",
-    "documentation": "Gift letter, donor bank statement",
-    "flag": true
-  },
-  "unknown": {
-    "pattern": "Cannot categorize automatically",
-    "documentation": "LOE required",
-    "flag": true
-  }
-}
-
-ANALYSIS RULES:
-1. Parse all deposits > $500 in 2-month statement period
-2. Match recurring deposits to pay stub amounts
-3. Flag all non-payroll deposits
-4. Calculate total flagged amount vs. assets needed
-5. Generate documentation request list
+5. ASSETS:
+   [ ] 60-day bank statements OR AccountChek
+   [ ] 90-day statements (if AIO/Jumbo + self-employed)
+   [ ] Large deposit documentation (if applicable)
 
 OUTPUT:
 {
   "loan_number": "2026-001234",
-  "total_deposits": "$15,750",
-  "payroll_deposits": "$12,000",
-  "flagged_deposits": [
-    {
-      "date": "01/15/2026",
-      "amount": "$2,500",
-      "description": "Mobile Deposit Check",
-      "classification": "gift_or_unknown",
-      "documentation_needed": "LOE, check copy, source documentation"
-    }
+  "validation_status": "INCOMPLETE",
+  "missing_documents": [
+    {"category": "Income", "document": "W-2 (2024)", "required": true},
+    {"category": "Credit", "document": "Credit Inquiry LOX", "required": true}
   ],
-  "action_items": ["Request LOE for $2,500 deposit", "Request gift letter if applicable"]
+  "warnings": [
+    "Paystub is 28 days old - refresh soon"
+  ],
+  "ready_for_submission": false
 }`,
                 integration: `INTEGRATION POINTS:
-1. Document OCR/Parsing
-   - Bank statement OCR
-   - Transaction extraction
-   - Pattern matching
+1. Byte Clear Docs API
+   - Query document inventory
+   - Check document types and dates
+   - Validate document categorization
 
-2. LOS Integration
-   - Create conditions automatically
-   - Link to asset documentation
-   - Update loan notes
+2. Credit Report Data
+   - Parse for inquiries, derogatory items
+   - Identify student loans, bankruptcy
+   - Flag items requiring documentation
 
-3. Borrower Communication
-   - Automated documentation requests
-   - Clear explanation of requirements
-   - Upload link generation
+3. URLA/1003 Data
+   - Employment type detection
+   - Residency history validation
+   - Declaration completion check
 
-4. Compliance Reporting
-   - Audit trail of all flagged deposits
-   - Documentation tracking
-   - Underwriter pre-check`
+4. Notification System
+   - Email missing doc list to LO
+   - Dashboard indicator for status
+   - Checklist PDF generation`
+            },
+            creditanalyzer: {
+                name: 'Credit Analyzer',
+                tags: ['Credit Analysis', 'AI/ML', 'Medium Complexity', 'High Priority'],
+                purpose: `This agent analyzes credit report data to automatically identify items that require supporting documentation for the TBD submission. It detects credit inquiries, omitted liabilities, bankruptcy history, and deferred student loans, then generates a prioritized documentation requirements list.`,
+                prompt: `You are building a Credit Analysis Agent for CMG Financial's TBD Checklist process.
+
+AGENT NAME: Credit Analyzer
+TYPE: Credit Analysis / Document Mapping
+
+OBJECTIVE:
+Analyze credit report data to identify items requiring documentation and generate a prioritized list of required documents for TBD submission.
+
+INPUT DATA:
+- Credit report XML/JSON from bureau
+- Borrower SSN (for matching)
+- Loan type (for guideline-specific rules)
+
+ANALYSIS RULES:
+
+1. CREDIT INQUIRIES:
+   - Identify inquiries within 120 days
+   - Flag mortgage inquiries (may indicate other applications)
+   - Flag auto/credit card inquiries (potential new debt)
+   - OUTPUT: Require Credit Inquiry LOX
+
+2. OMITTED LIABILITIES:
+   - Cross-reference declared debts vs credit report
+   - Identify accounts not in URLA
+   - Flag joint accounts where borrower is authorized user
+   - OUTPUT: Require Omitted Liabilities LOX
+
+3. BANKRUPTCY:
+   - Detect BK public record
+   - Identify BK type (7, 11, 13)
+   - Calculate seasoning from discharge date
+   - OUTPUT: Require BK Discharge + Schedules
+
+4. STUDENT LOANS:
+   - Identify student loan tradelines
+   - Check payment status (current, deferred, IBR)
+   - Flag deferred loans (special calculation needed)
+   - OUTPUT: Require student loan documentation
+
+5. DEROGATORY CREDIT:
+   - Collections, charge-offs, judgments
+   - Late payment history
+   - Foreclosure/short sale history
+   - OUTPUT: May require LOX or payoff documentation
+
+OUTPUT FORMAT:
+{
+  "credit_score": 720,
+  "analysis_date": "2026-01-27",
+  "findings": [
+    {
+      "type": "INQUIRY",
+      "description": "3 mortgage inquiries in last 90 days",
+      "required_doc": "Credit Inquiry Letter of Explanation",
+      "priority": "HIGH"
+    },
+    {
+      "type": "STUDENT_LOAN",
+      "description": "2 deferred student loans totaling $45,000",
+      "required_doc": "Student loan statements showing payment/deferment status",
+      "priority": "HIGH",
+      "calculation_note": "Use 0.5% of balance for agency calculation if no payment documented"
+    }
+  ],
+  "total_issues": 2,
+  "docs_required": 2
+}`,
+                integration: `INTEGRATION POINTS:
+1. Credit Bureau Integration
+   - Parse Equifax/Experian/TransUnion XML
+   - Extract tradelines, public records, inquiries
+   - Handle soft-pull vs hard-pull data
+
+2. Byte LOS Integration
+   - Compare credit data to URLA liabilities
+   - Flag discrepancies automatically
+   - Update condition tracking
+
+3. Document Generation
+   - Auto-generate LOX templates
+   - Pre-fill known information
+   - Route to borrower via secure portal
+
+4. Compliance Engine
+   - Apply agency-specific rules
+   - Calculate student loan payments per guidelines
+   - Flag items requiring UW review`
+            },
+            incomevalidator: {
+                name: 'Income Validator',
+                tags: ['Document Validation', 'Income Analysis', 'Low Complexity', 'High Priority'],
+                purpose: `This agent validates income documentation completeness based on employment type. It verifies paystub currency, W-2 coverage periods, tax return completeness, and LoanBeam findings for self-employed borrowers. Ensures all required income docs are present before TBD submission.`,
+                prompt: `You are building an Income Validation Agent for CMG Financial's TBD Checklist process.
+
+AGENT NAME: Income Validator
+TYPE: Document Validation / Income Analysis
+
+OBJECTIVE:
+Validate that income documentation is complete and current based on borrower employment type before TBD submission.
+
+INPUT DATA:
+- Employment type (W-2, Self-Employed, Both)
+- Income type (Salary, Hourly, Variable, Commission, Bonus)
+- Documents in Clear Docs with dates
+
+VALIDATION RULES:
+
+W-2/SALARIED INCOME:
+1. Paystub Validation:
+   - Must be dated within 30 days of submission
+   - Must show 30 days of YTD earnings
+   - Must match employer in URLA
+
+2. W-2 Validation:
+   - Must have 2 most recent tax years
+   - Employer name must match paystub
+   - Income amounts should be consistent (+/- 20%)
+
+3. Variable Income (Bonus/Commission/OT):
+   - Requires WVOE in addition to above
+   - May require tax returns for 2-year history
+
+SELF-EMPLOYED INCOME:
+1. LoanBeam Findings:
+   - Must be present and current
+   - Income calculation must be documented
+
+2. Tax Returns:
+   - Personal returns (2 years)
+   - Business returns if applicable (2 years)
+   - All schedules included (Schedule C, K-1, etc.)
+
+3. Profit & Loss Statement:
+   - YTD P&L required
+   - Must be prepared by CPA or signed by borrower
+
+DATE VALIDATION:
+- Paystub: Within 30 days
+- W-2s: Most recent 2 tax years
+- Tax Returns: Most recent 2 tax years
+- P&L: Current year, within 60 days
+
+OUTPUT:
+{
+  "borrower": "John Smith",
+  "employment_type": "Self-Employed",
+  "validation_status": "INCOMPLETE",
+  "income_docs": [
+    {"doc": "2024 Tax Return", "status": "PRESENT", "valid": true},
+    {"doc": "2023 Tax Return", "status": "PRESENT", "valid": true},
+    {"doc": "LoanBeam Findings", "status": "MISSING", "valid": false},
+    {"doc": "YTD P&L", "status": "PRESENT", "valid": true, "warning": "Dated 45 days ago"}
+  ],
+  "ready": false,
+  "missing": ["LoanBeam Findings"]
+}`,
+                integration: `INTEGRATION POINTS:
+1. Clear Docs Integration
+   - Query income document inventory
+   - Extract document dates and types
+   - Validate document metadata
+
+2. TRUV/LoanBeam Integration
+   - Check for electronic verification status
+   - Retrieve findings reports
+   - Validate data currency
+
+3. URLA Employment Data
+   - Match employer names
+   - Verify employment dates
+   - Cross-reference income amounts
+
+4. Alert System
+   - Notify LO of missing docs
+   - Warn of expiring documents
+   - Track document refresh needs`
+            },
+            statustracker: {
+                name: 'Status Tracker',
+                tags: ['Monitoring', 'Alerts', 'Low Complexity', 'Medium Priority'],
+                purpose: `This agent monitors all TBD loans in PreApproved status and sends proactive alerts when credit-only approvals are approaching expiration. It notifies Loan Officers and Processors to re-engage borrowers or refresh documentation before the approval expires.`,
+                prompt: `You are building a Status Tracking Agent for CMG Financial's TBD Checklist process.
+
+AGENT NAME: TBD Status Tracker
+TYPE: Monitoring / Push Notifications
+
+OBJECTIVE:
+Monitor all TBD loans in PreApproved status and alert relevant parties when credit-only approvals are approaching expiration.
+
+MONITORING SCOPE:
+- All loans in "PreApproved" status
+- Loans with "Credit Only" approval type
+- Filter by branch/LO for targeted alerts
+
+EXPIRATION RULES:
+- Credit-only approvals typically valid 90-120 days
+- Refresh required before expiration
+- Some documentation may expire earlier (credit report, income docs)
+
+ALERT THRESHOLDS:
+- 30 days: INFO - "Approval expires in 30 days"
+- 14 days: WARNING - "Approval expires soon - contact borrower"
+- 7 days: URGENT - "Immediate action required"
+- 0 days: CRITICAL - "Approval EXPIRED - loan no longer preapproved"
+
+DOCUMENT EXPIRATION TRACKING:
+- Credit Report: Per investor guidelines
+- Paystubs: 30 days from date
+- Bank Statements: 60 days from statement date
+- VVOE: Per investor guidelines
+
+ALERT CONTENT:
+{
+  "loan_number": "2026-001234",
+  "borrower_name": "John Smith",
+  "preapproval_date": "2026-01-15",
+  "expiration_date": "2026-04-15",
+  "days_remaining": 14,
+  "alert_level": "WARNING",
+  "loan_officer": "Jane Doe",
+  "processor": "Bob Johnson",
+  "expiring_docs": [
+    {"doc": "Paystub", "expires": "2026-01-30"},
+    {"doc": "Credit Report", "expires": "2026-04-15"}
+  ],
+  "recommended_action": "Contact borrower to check property search status. Refresh paystub if extending approval."
+}
+
+BATCH PROCESSING:
+- Run daily at 7:00 AM
+- Group alerts by LO for digest email
+- Escalate unacknowledged warnings`,
+                integration: `INTEGRATION POINTS:
+1. Byte LOS Database
+   - Query loans by status
+   - Track approval dates
+   - Monitor document expiration
+
+2. Notification Services
+   - Email alerts to LO/Processor
+   - Dashboard notifications
+   - Weekly digest reports
+
+3. CRM Integration
+   - Trigger borrower follow-up tasks
+   - Log contact attempts
+   - Track borrower engagement
+
+4. Reporting
+   - TBD pipeline aging report
+   - Expiration risk dashboard
+   - Conversion rate tracking (TBD to funded)`
             }
         };
 

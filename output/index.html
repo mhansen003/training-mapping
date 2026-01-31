@@ -66,14 +66,20 @@
             margin: 0 auto;
         }
 
+        .logo-image {
+            display: block;
+            max-width: 400px;
+            height: auto;
+            margin: 0 auto 24px auto;
+            filter: drop-shadow(0 4px 24px rgba(59, 130, 246, 0.3));
+        }
+
         .logo {
-            font-size: 3.5rem;
-            font-weight: 800;
+            font-size: 2.2rem;
+            font-weight: 700;
             margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 50%, var(--accent-teal) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
         }
 
         .logo span {
@@ -409,7 +415,8 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .logo { font-size: 2.5rem; }
+            .logo-image { max-width: 280px; }
+            .logo { font-size: 1.6rem; }
             .stats-bar { gap: 25px; }
             .stat-value { font-size: 2.2rem; }
             .systems-grid { grid-template-columns: 1fr; }
@@ -422,6 +429,7 @@
     <!-- Header -->
     <header class="main-header">
         <div class="header-content">
+            <img src="./images/clear-ai-logo.png" alt="Clear AI" class="logo-image">
             <h1 class="logo">CMG <span>Training</span> Portal</h1>
             <p class="tagline">Comprehensive Documentation for All Systems & Processes</p>
 
@@ -1008,7 +1016,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>CMG Training Documentation Portal — Built with ❤️ by CMG Technology Team — Last Updated: January 2026</p>
+        <p>CMG Training Documentation Portal — Powered by Clear AI — Built with ❤️ by CMG Technology Team — Last Updated: January 2026</p>
     </footer>
 
     <script>

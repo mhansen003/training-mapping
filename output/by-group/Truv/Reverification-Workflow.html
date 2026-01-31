@@ -104,10 +104,14 @@
         .prompt-section:last-child { margin-bottom: 0; }
         .prompt-section h4 { font-size: 0.9rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 12px; }
         .prompt-content { background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.7; color: var(--text-secondary); white-space: pre-wrap; }
+            .breadcrumb-logo-link { display: flex; align-items: center; padding: 4px 8px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); transition: all 0.2s; }
+        .breadcrumb-logo-link:hover { background: rgba(255,255,255,0.15); }
+        .breadcrumb-logo { height: 28px; width: auto; }
     </style>
 </head>
 <body>
     <nav class="breadcrumb">
+        <a href="../../index.html" class="breadcrumb-logo-link"><img src="../../images/clear-ai-logo.png" alt="Clear AI" class="breadcrumb-logo"></a>
         <a href="../../index.html">🏠 Portal</a>
         <span class="separator">›</span>
         <a href="./index.html">✅ Truv</a>

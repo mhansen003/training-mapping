@@ -844,11 +844,15 @@
             .main-content { margin-left: 0; padding: 75px 20px 30px 20px; }
             .agent-grid { grid-template-columns: 1fr; }
         }
+            .breadcrumb-logo-link { display: flex; align-items: center; padding: 4px 8px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); transition: all 0.2s; }
+        .breadcrumb-logo-link:hover { background: rgba(255,255,255,0.15); }
+        .breadcrumb-logo { height: 28px; width: auto; }
     </style>
 </head>
 <body>
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
+        <a href="../../index.html" class="breadcrumb-logo-link"><img src="../../images/clear-ai-logo.png" alt="Clear AI" class="breadcrumb-logo"></a>
         <a href="../../index.html">Portal Home</a>
         <span class="separator">></span>
         <a href="./index.html">Mortgage Fundamentals</a>
