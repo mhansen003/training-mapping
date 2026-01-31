@@ -238,14 +238,14 @@
             .header-stat { padding: 12px 18px; }
             .module-grid { grid-template-columns: 1fr; }
         }
-            .breadcrumb-logo-link { display: flex; align-items: center; padding: 4px 8px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); transition: all 0.2s; }
+        .breadcrumb-logo-link { display: inline-flex; align-items: center; padding: 4px 8px; background: rgba(255,255,255,0.08); border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); transition: all 0.2s; flex-shrink: 0; margin-right: 4px; }
         .breadcrumb-logo-link:hover { background: rgba(255,255,255,0.15); }
-        .breadcrumb-logo { height: 28px; width: auto; }
+        .breadcrumb-logo { height: 24px; width: auto; display: block; }
     </style>
 </head>
 <body>
     <nav class="breadcrumb">
-        <a href="../../index.html" class="breadcrumb-logo-link"><img src="../../images/clear-ai-logo.png" alt="Clear AI" class="breadcrumb-logo"></a>
+<a href="../../index.html" class="breadcrumb-logo-link"><img src="../../images/clear-ai-logo.png" alt="Clear AI" class="breadcrumb-logo"></a>
         <a href="../../index.html">🏠 Portal Home</a>
         <span class="separator">›</span>
         <span class="current">📚 Mortgage Fundamentals</span>
